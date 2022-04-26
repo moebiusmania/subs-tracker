@@ -8,6 +8,7 @@ export type Subscription = {
 };
 
 export type AppState = {
+  locale: string;
   theme: "dark" | "light";
   currency: string;
   data: Subscription[];

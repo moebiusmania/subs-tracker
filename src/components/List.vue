@@ -12,9 +12,9 @@ defineProps<{
   <Container>
     <header class="md:flex md:gap-7 md:justify-between mb-4">
       <h2 class="font-sans text-2xl font-bold">Your subscriptions:</h2>
-      <button class="btn btn-accent w-full md:w-max">
+      <router-link to="/add" class="btn btn-accent w-full md:w-max">
         Add a new subscription
-      </button>
+      </router-link>
     </header>
     <section
       class="md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-7"

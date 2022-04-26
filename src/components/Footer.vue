@@ -4,7 +4,7 @@ const year: number = new Date().getFullYear();
 
 <template>
   <footer
-    class="footer footer-center p-10 bg-base-100 text-base-content rounded absolute bottom-0"
+    class="footer footer-center p-10 bg-base-100 text-base-content rounded fixed bottom-0 border-t-2 border-base-200"
   >
     <div>
       <p>
