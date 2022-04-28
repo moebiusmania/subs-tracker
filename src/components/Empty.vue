@@ -12,8 +12,10 @@ import Container from "./Container.vue";
     </p>
     <div class="mt-10 md:flex md:justify-center">
       <router-link to="/add" class="btn btn-accent w-full md:w-1/2 lg:w-1/3">
-        Add some data!
+        Start tracking some subscriptions!
       </router-link>
+      <div class="divider">OR</div>
+      <button class="btn w-full md:w-1/2 lg:w-1/3">Use the example data</button>
     </div>
   </Container>
 </template>
