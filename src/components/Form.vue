@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { ref, Ref } from "vue";
-import { format } from "date-fns";
+// import { format } from "date-fns";
 
+import { formatDate } from "../libs";
 import { Subscription } from "../libs/types";
+
+const emit = defineEmits<{
+  (e: "add-item", item: Subscription): void;
+}>();
 
 const data: Ref<Subscription> = ref({
   name: "",
@@ -12,8 +17,6 @@ const data: Ref<Subscription> = ref({
   expiration: new Date(),
   recurrence: "monthly",
 } as Subscription);
-
-const formatDate = (value: Date): string => format(value, "yyyy-MM-dd");
 
 const updatePrice = (event: Event): void => {
   const value: string = (event.target as HTMLInputElement).value;
@@ -26,10 +29,15 @@ const updateExpiration = (event: Event): void => {
   const update: Subscription = { ...data.value, expiration: new Date(value) };
   data.value = update;
 };
+
+const onSubmit = (event: Event): void => {
+  event.preventDefault();
+  emit("add-item", data.value);
+};
 </script>
 
 <template>
-  <form>
+  <form @submit="onSubmit">
     <label for="name" class="label">Service name:</label>
     <input
       type="text"
@@ -59,6 +67,7 @@ const updateExpiration = (event: Event): void => {
       required
       name="currency"
       v-model="data.currency"
+      disabled
     >
       <option value="€">€ Euro</option>
       <option value="$">$ Dollar</option>
@@ -96,7 +105,7 @@ const updateExpiration = (event: Event): void => {
       <option value="yearly">Yearly</option>
     </select>
 
-    <div class="mt-7">
+    <div class="mt-7 flex flex-col gap-5 md:flex-row md: justify-between">
       <button class="btn btn-accent w-full md:w-1/2 lg:w-1/3">
         Add this subscription
       </button>
