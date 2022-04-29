@@ -1,10 +1,16 @@
 # 💰 Subscriptions Tracker ⚠️
 
-> Webapp to keep track on subscriptions fees and has some math done for you.
+Webapp to keep track on subscriptions fees and has some math done for you.
 
 ### Motivation
 
-TBD
+> "...but exactly how much I'm spending right now with all the subscriptions services that I'm using right now?"
+
+I guess that **everyone** of us has asked him/herself this question at least once in the last few years.
+
+We use subscription services for every kind of needs nowadays, and most of them are more than legitimate to ask the money they are charging, but for us it's easy to lost track of the overall expenses with these solutions.
+
+So that's what this app is doing: just insert the data of the subscriptions that you are using and it will do some easy math to tell you how much you are spending on a yearly and monthly basis.
 
 ### How it stores the data?
 
@@ -16,6 +22,9 @@ This **may** change in the future if I will consider the idea of adding a backen
 
 - Edit & delete entries
 - Manage currencies (_both per-entry and globally_)
+- Highlight/prioritize items that are close to expire (_within 30 days from the given expiration date_)
+- Push Notifications?
+- "Help/How it works" screen
 - Localization, maybe...
 - PWA (_install in your homescreen and works offline_)
 - (_still undecided_) Signup/signin + Backend to sync data on multiple devices. As I said above if this will happen it will not be mandatory.
@@ -63,12 +72,13 @@ open a browser at `http://localhost:3000` and you will see the application.
 - [Typescript](https://www.typescriptlang.org/) - static typed Javascript
 - [Pinia](https://pinia.vuejs.org/) - state management
 - [Vite.js](https://vitejs.dev/) - project bootstrap and tooling
+- [Vitest](https://vitest.dev/) - unit testing
 - [TailwindCSS](https://tailwindcss.com/) - CSS as utilility classes
 - [DaisyUI](https://daisyui.com/) - UI components built on top of TailwindCSS
 
 ### Support
 
-If you like this project and do you want to support me a little bit [you could buy me a coffee ☕](https://www.buymeacoffee.com/moebiusmania), and you would make me very happy (_coffee is life essence for a developer!_) 🥳.
+This is an "hobby project" so if you like it and do you want to support me a little bit [you could buy me a coffee ☕](https://www.buymeacoffee.com/moebiusmania), and you would make me very happy (_coffee is life essence for a developer!_) 🥳.
 
 ### License
 
