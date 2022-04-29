@@ -1,1 +1,0 @@
-import{p as o,o as n,c as r,q as t}from"./index.d14bd24c.js";const a={},s={class:"md:container md:mx-auto py-3 px-5"};function c(e,_){return n(),r("main",s,[t(e.$slots,"default")])}var d=o(a,[["render",c]]);export{d as C};

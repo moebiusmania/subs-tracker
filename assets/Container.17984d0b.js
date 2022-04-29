@@ -1,0 +1,1 @@
+import{o as a,c,p as s}from"./index.290752a8.js";var _=(e,t)=>{const o=e.__vccOpts||e;for(const[r,n]of t)o[r]=n;return o};const l={},m={class:"md:container md:mx-auto py-3 px-5"};function p(e,t){return a(),c("main",m,[s(e.$slots,"default")])}var f=_(l,[["render",p]]);export{f as C};
