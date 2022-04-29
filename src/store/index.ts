@@ -25,6 +25,12 @@ export const useMainStore = defineStore("app", {
       items[index].isActive = actives > 1 ? !items[index].isActive : true;
       this.data = items;
     },
+    setTheme(value: "light" | "dark"): void {
+      this.theme = value;
+    },
+    deleteSubs(): void {
+      this.data = [];
+    },
   },
 });
 

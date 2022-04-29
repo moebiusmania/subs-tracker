@@ -27,6 +27,7 @@ defineProps<{
       <article
         v-for="(item, index) in data"
         class="card rounded-none bg-base-100 shadow-xl my-7 md:my-0"
+        :key="index"
       >
         <div class="card-body">
           <h2 class="card-title">
@@ -45,5 +46,11 @@ defineProps<{
         </div>
       </article>
     </section>
+    <button
+      class="btn w-full mt-7 btn-error modal-button"
+      @click="app.deleteSubs()"
+    >
+      Delete all
+    </button>
   </Container>
 </template>
