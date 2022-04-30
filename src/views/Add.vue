@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useRouter, Router } from "vue-router";
 
-import { useMainStore } from "./../store";
 import { Subscription } from "../libs/types";
+import { useMainStore } from "./../store";
+import { save } from "./../libs/storage";
 import Container from "./../components/Container.vue";
 import Form from "./../components/Form.vue";
 
@@ -11,6 +12,7 @@ const router: Router = useRouter();
 
 const creationComplete = (data: Subscription): void => {
   app.addSubscription(data);
+  save(app.getState);
   router.push("/");
 };
 </script>

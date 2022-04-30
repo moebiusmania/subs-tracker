@@ -10,6 +10,16 @@ export const useMainStore = defineStore("app", {
     currency: "€",
     data: [],
   }),
+  getters: {
+    getState(): AppState {
+      return {
+        locale: this.locale,
+        theme: this.theme,
+        currency: this.currency,
+        data: this.data,
+      };
+    },
+  },
   actions: {
     loadMock(): void {
       this.data = mock;
@@ -30,6 +40,13 @@ export const useMainStore = defineStore("app", {
     },
     deleteSubs(): void {
       this.data = [];
+    },
+    setState({ locale, theme, currency, data }: AppState): void {
+      console.log(theme);
+      this.locale = locale;
+      this.currency = currency;
+      this.theme = theme;
+      this.data = data;
     },
   },
 });

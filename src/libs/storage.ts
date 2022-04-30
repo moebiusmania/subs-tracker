@@ -1,4 +1,4 @@
-import { Subscription } from "./types";
+import { AppState } from "./types";
 
 const KEY: string = "subs-tracker";
 
@@ -7,12 +7,12 @@ const hasData = (): boolean => {
   return typeof check === "string" && check?.length > 0;
 };
 
-const load = (): Subscription[] => {
+const load = (): AppState => {
   const str: string = localStorage.getItem(KEY) as string;
-  return JSON.parse(str) as Subscription[];
+  return JSON.parse(str) as AppState;
 };
 
-const save = (data: Subscription[]): void => {
+const save = (data: AppState): void => {
   const str: string = JSON.stringify(data);
   localStorage.setItem(KEY, str);
 };

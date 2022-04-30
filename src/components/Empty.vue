@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import Container from "./Container.vue";
 import { useMainStore } from "./../store";
+import { save } from "./../libs/storage";
 
 const app = useMainStore();
 
-const useMock = (): void => app.loadMock();
+const useMock = (): void => {
+  app.loadMock();
+  save(app.getState);
+};
 </script>
 
 <template>

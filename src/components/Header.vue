@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useMainStore } from "./../store";
+import { save } from "./../libs/storage";
 
 const app = useMainStore();
 
@@ -7,6 +8,7 @@ const handleTheme = (): void => {
   const update: "dark" | "light" = app.theme === "light" ? "dark" : "light";
   app.setTheme(update);
   document.querySelector("html")?.setAttribute("data-theme", update);
+  save(app.getState);
 };
 </script>
 

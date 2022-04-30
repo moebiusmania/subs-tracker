@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Subscription } from "../libs/types";
 import { useMainStore } from "./../store";
+import { save } from "./../libs/storage";
 
 import Container from "./Container.vue";
 
@@ -9,6 +10,16 @@ const app = useMainStore();
 defineProps<{
   data: Subscription[];
 }>();
+
+const deleteAll = (): void => {
+  app.deleteSubs();
+  save(app.getState);
+};
+
+const toggleActive = (index: number): void => {
+  app.toggleActive(index);
+  save(app.getState);
+};
 </script>
 
 <template>
@@ -32,7 +43,7 @@ defineProps<{
         <div class="card-body">
           <h2 class="card-title">
             <span
-              @click="app.toggleActive(index)"
+              @click="toggleActive(index)"
               :class="`badge cursor-pointer ${
                 item.isActive ? 'badge-success' : 'badge-error'
               }`"
@@ -41,15 +52,12 @@ defineProps<{
           </h2>
           <p>
             {{ item.price + item.currency }}, {{ item.recurrence }} - Expires on
-            {{ item.expiration.toLocaleDateString() }}
+            {{ new Date(item.expiration).toLocaleDateString() }}
           </p>
         </div>
       </article>
     </section>
-    <button
-      class="btn w-full mt-7 btn-error modal-button"
-      @click="app.deleteSubs()"
-    >
+    <button class="btn w-full mt-7 btn-error modal-button" @click="deleteAll">
       Delete all
     </button>
   </Container>
