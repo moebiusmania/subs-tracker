@@ -10,7 +10,7 @@ const year: number = new Date().getFullYear();
       <p>
         MIT license {{ year }} -
         <a
-          href=""
+          href="https://github.com/moebiusmania/subs-tracker"
           target="_blank"
           rel="noopener noreferrer"
           class="link link-accent font-semibold"

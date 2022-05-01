@@ -48,9 +48,13 @@ const handleTheme = (): void => {
       </router-link>
     </div>
     <div class="navbar-end">
-      <button class="btn btn-ghost btn-circle w-8 h-8" @click="handleTheme">
+      <button
+        class="btn btn-ghost btn-circle w-8 h-8"
+        aria-label="Theme switcher"
+        @click="handleTheme"
+      >
         <svg
-          v-if="app.theme === 'light'"
+          v-if="app.theme === 'dark'"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
           fill="currentColor"
@@ -63,7 +67,7 @@ const handleTheme = (): void => {
           ></path>
         </svg>
         <svg
-          v-if="app.theme === 'dark'"
+          v-if="app.theme === 'light'"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
           fill="currentColor"
