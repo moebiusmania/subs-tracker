@@ -2,15 +2,19 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { VitePWA } from "vite-plugin-pwa";
 
+const id: string = "/subs-tracker/";
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/subs-tracker/",
+  base: id,
   plugins: [
     vue(),
     VitePWA({
+      strategies: "injectManifest",
       includeAssets: ["favicon.svg"],
       manifest: {
-        start_url: "https://moebiusmania.github.io/subs-tracker/",
+        id,
+        start_url: `https://moebiusmania.github.io${id}`,
         name: "Subscriptions Tracker",
         short_name: "Subscriptions Tracker",
         description:
