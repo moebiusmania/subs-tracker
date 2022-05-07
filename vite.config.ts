@@ -10,6 +10,7 @@ export default defineConfig({
     VitePWA({
       includeAssets: ["favicon.svg"],
       manifest: {
+        start_url: "https://moebiusmania.github.io/subs-tracker/",
         name: "Subscriptions Tracker",
         short_name: "Subscriptions Tracker",
         description:
@@ -30,7 +31,7 @@ export default defineConfig({
             src: "/subs-tracker/favicon.svg",
             sizes: "512x512",
             type: "image/svg+xml",
-            purpose: "any maskable",
+            // purpose: "any maskable",
           },
         ],
       },
