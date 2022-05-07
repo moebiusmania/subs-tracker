@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [
     vue(),
     VitePWA({
+      includeAssets: ["favicon.svg"],
       manifest: {
         name: "Subscriptions Tracker",
         short_name: "Subscriptions Tracker",
@@ -16,17 +17,17 @@ export default defineConfig({
         theme_color: "#ffffff",
         icons: [
           {
-            src: "/favicon.svg",
+            src: "/subs-tracker/favicon.svg",
             sizes: "192x192",
             type: "image/svg+xml",
           },
           {
-            src: "/favicon.svg",
+            src: "/subs-tracker/favicon.svg",
             sizes: "512x512",
             type: "image/svg+xml",
           },
           {
-            src: "/favicon.svg",
+            src: "/subs-tracker/favicon.svg",
             sizes: "512x512",
             type: "image/svg+xml",
             purpose: "any maskable",
