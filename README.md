@@ -26,7 +26,7 @@ This **may** change in the future if I will consider the idea of adding a backen
 - Push Notifications?
 - "Help/How it works" screen
 - Localization, maybe...
-- ~~PWA (_install in your homescreen and works offline_)~~ ✅
+- PWA (_install in your homescreen and works offline_)
 - (_still undecided_) Signup/signin + Backend to sync data on multiple devices. As I said above if this will happen it will not be mandatory.
 
 ### Thoughts on the backend
