@@ -6,6 +6,7 @@ import { save } from "./../libs/storage";
 import Container from "./Container.vue";
 
 const app = useMainStore();
+const i18n = app.i18n.main;
 
 defineProps<{
   data: Subscription[];
@@ -27,9 +28,9 @@ const toggleActive = (index: number): void => {
     <header
       class="flex flex-col gap-3 md:flex-row md:gap-7 md:justify-between mb-4"
     >
-      <h2 class="font-sans text-2xl font-bold">Your subscriptions:</h2>
+      <h2 class="font-sans text-2xl font-bold">{{ i18n.list }}</h2>
       <router-link to="/add" class="btn btn-accent w-full md:w-max">
-        Add a new subscription
+        {{ i18n.cta }}
       </router-link>
     </header>
     <section
@@ -51,14 +52,14 @@ const toggleActive = (index: number): void => {
             {{ item.name }}
           </h2>
           <p>
-            {{ item.price + item.currency }}, {{ item.recurrence }} - Expires on
+            {{ item.price + item.currency }}, {{ item.recurrence }} - {{ i18n.expires }}
             {{ new Date(item.expiration).toLocaleDateString() }}
           </p>
         </div>
       </article>
     </section>
     <button class="btn w-full mt-7 btn-error modal-button" @click="deleteAll">
-      Delete all
+      {{ i18n.delete }}
     </button>
   </Container>
 </template>

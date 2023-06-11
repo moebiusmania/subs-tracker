@@ -3,9 +3,12 @@ import { defineStore, acceptHMRUpdate } from "pinia";
 import { AppState, Subscription } from "./../libs/types";
 import { subs as mock } from "./../libs/mocks";
 
+import en from "./../i18n/en.json";
+
 export const useMainStore = defineStore("app", {
   state: (): AppState => ({
-    locale: "en-EN",
+    locale: "en",
+    i18n: en,
     theme: "light",
     currency: "€",
     data: [],
@@ -14,6 +17,7 @@ export const useMainStore = defineStore("app", {
     getState(): AppState {
       return {
         locale: this.locale,
+        i18n: this.i18n,
         theme: this.theme,
         currency: this.currency,
         data: this.data,

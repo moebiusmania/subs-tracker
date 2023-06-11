@@ -29,4 +29,6 @@ const getYearlyCost = (data: Subscription[]): number => {
   return parseFloat(value);
 };
 
-export { getInactives, getMonthlyCost, getYearlyCost, formatDate };
+const getTranslation = (key: string, value: any): string => key.replace("{{value}}", value);
+
+export { getInactives, getMonthlyCost, getYearlyCost, formatDate, getTranslation };
