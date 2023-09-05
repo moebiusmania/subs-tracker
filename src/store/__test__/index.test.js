@@ -24,10 +24,31 @@ describe("Application Store", () => {
     test("getState", () => {
       const app = useMainStore();
       expect(app.getState).toEqual({
-        locale: "en-EN",
+        locale: "en",
         theme: "light",
         currency: "€",
         data: [],
+        i18n: {
+          main: {
+            title: "Your stats",
+            total: "Total subscriptions:",
+            inactives: "with {{value}} inactive subscriptions",
+            monthly: "Total monthly cost:",
+            yearly: "Total yearly cost:",
+            detail: "(only active subscriptions)",
+            list: "Your subscriptions",
+            cta: "Add a new subscription",
+            expires: "Expires on",
+            delete: "Delete all",
+          },
+          empty: {
+            title: "There is nothing here!",
+            message: "Let's start by adding your subscriptions data.",
+            cta: "Let's track some subscriptions!",
+            or: "or",
+            default: "Use the example data",
+          },
+        },
       });
     });
   });
