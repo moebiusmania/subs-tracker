@@ -1,1 +1,0 @@
-import{c as r,x as s,o as a}from"./index-ChE0ZsZf.js";const _=(t,o)=>{const e=t.__vccOpts||t;for(const[n,c]of o)e[n]=c;return e},m={},l={class:"md:container md:mx-auto py-3 px-5 mb-auto"};function d(t,o){return a(),r("main",l,[s(t.$slots,"default")])}const i=_(m,[["render",d]]);export{i as C};
