@@ -48,6 +48,10 @@ describe("Application Store", () => {
             or: "or",
             default: "Use the example data",
           },
+          backup: {
+            export: "Export the data",
+            import: "Import data",
+          },
         },
       });
     });
