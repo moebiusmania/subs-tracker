@@ -45,6 +45,9 @@ export const useMainStore = defineStore("app", {
     deleteSubs(): void {
       this.data = [];
     },
+    importSubs(data: Subscription[]): void {
+      this.data = data;
+    },
     setState({ locale, theme, currency, data }: AppState): void {
       console.log(theme);
       this.locale = locale;

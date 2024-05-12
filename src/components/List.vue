@@ -4,17 +4,25 @@ import { useMainStore } from "./../store";
 import { save } from "./../libs/storage";
 
 import Container from "./Container.vue";
+import Backup from "./Backup.vue";
 
 const app = useMainStore();
 const i18n = app.i18n.main;
+const fbText = "Sure you want to delete all subscriptions data?";
 
 defineProps<{
   data: Subscription[];
 }>();
 
+const ask = (message: string): boolean => {
+  return confirm(message);
+};
+
 const deleteAll = (): void => {
-  app.deleteSubs();
-  save(app.getState);
+  if (ask(fbText)) {
+    app.deleteSubs();
+    save(app.getState);
+  }
 };
 
 const toggleActive = (index: number): void => {
@@ -30,7 +38,7 @@ const toggleActive = (index: number): void => {
     >
       <h2 class="font-sans text-2xl font-bold">{{ i18n.list }}</h2>
       <router-link to="/add" class="btn btn-accent w-full md:w-max">
-        {{ i18n.cta }}
+        ⊕ {{ i18n.cta }}
       </router-link>
     </header>
     <section
@@ -52,14 +60,16 @@ const toggleActive = (index: number): void => {
             {{ item.name }}
           </h2>
           <p>
-            {{ item.price + item.currency }}, {{ item.recurrence }} - {{ i18n.expires }}
+            {{ item.price + item.currency }}, {{ item.recurrence }} -
+            {{ i18n.expires }}
             {{ new Date(item.expiration).toLocaleDateString() }}
           </p>
         </div>
       </article>
     </section>
+    <Backup />
     <button class="btn w-full mt-7 btn-error modal-button" @click="deleteAll">
-      {{ i18n.delete }}
+      ⊗ {{ i18n.delete }}
     </button>
   </Container>
 </template>

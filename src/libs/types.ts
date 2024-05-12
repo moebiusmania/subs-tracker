@@ -8,7 +8,7 @@ export type Subscription = {
 };
 
 export type I18n = {
-  main : {
+  main: {
     title: string;
     total: string;
     inactives: string;
@@ -19,15 +19,19 @@ export type I18n = {
     cta: string;
     expires: string;
     delete: string;
-  },
+  };
   empty: {
     title: string;
     message: string;
     cta: string;
     or: string;
     default: string;
-  }
-}
+  };
+  backup: {
+    export: string;
+    import: string;
+  };
+};
 
 export type AppState = {
   locale: string;

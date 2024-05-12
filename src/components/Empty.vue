@@ -21,11 +21,11 @@ const useMock = (): void => {
     </p>
     <div class="mt-10 md:flex md:justify-center">
       <router-link to="/add" class="btn btn-accent w-full md:w-1/2 lg:w-1/3">
-        Let's track some subscriptions!
+        ⊕ Let's track some subscriptions!
       </router-link>
       <div class="divider">OR</div>
-      <button class="btn w-full md:w-1/2 lg:w-1/3" @click="useMock">
-        Use the example data
+      <button class="btn btn-neutral w-full md:w-1/2 lg:w-1/3" @click="useMock">
+        ✏️ Use the example data
       </button>
     </div>
   </Container>
