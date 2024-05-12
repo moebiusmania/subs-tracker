@@ -18,6 +18,8 @@ Everything you type and "save" in the application **is stored locally on your de
 
 This **may** change in the future if I will consider the idea of adding a backend to make the app work across multiple device, but eventually this will be an opt-in feature with the local device data being always the default method.
 
+At the moment there is an _import/export_ functionality available in the app that will create a `.json` file with your subscriptions data that you can use to eventually move the data on another instance of the app (_on another device_). It isn't the most convenient way to _"sync"_ the data, but it easy to implement and keeps the complete ownership of personal data to the users.
+
 ### Roadmap
 
 - Edit & delete entries
