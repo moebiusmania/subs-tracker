@@ -12,10 +12,10 @@
     "https-preview": "preview dist"
   },
   "dependencies": {
-    "daisyui": "^4.10.2",
+    "daisyui": "^4.11.1",
     "date-fns": "^3.6.0",
     "pinia": "^2.1.7",
-    "vue": "^3.4.25",
+    "vue": "^3.4.27",
     "vue-router": "^4.3.2"
   },
   "devDependencies": {
@@ -25,8 +25,8 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.4.5",
-    "vite": "^5.2.10",
-    "vitest": "^1.5.2",
-    "vue-tsc": "^2.0.14"
+    "vite": "^5.2.11",
+    "vitest": "^1.6.0",
+    "vue-tsc": "^2.0.17"
   }
 }
