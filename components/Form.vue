@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, Ref } from "vue";
+import { ref, type Ref } from "vue";
 // import { format } from "date-fns";
-
 import { formatDate } from "../libs";
-import { Subscription } from "../libs/types";
+import type { Subscription } from "../libs/types";
 
 const emit = defineEmits<{
   (e: "add-item", item: Subscription): void;

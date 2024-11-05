@@ -1,6 +1,5 @@
-import { defineStore, acceptHMRUpdate } from "pinia";
 
-import { AppState, Subscription } from "./../libs/types";
+import type { AppState, Subscription } from "./../libs/types";
 import { subs as mock } from "./../libs/mocks";
 
 import en from "./../i18n/en.json";

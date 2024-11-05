@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useMainStore } from "./../store";
 import { save } from "./../libs/storage";
 
 const app = useMainStore();

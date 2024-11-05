@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import Container from "./Container.vue";
-import Stat from "./Stat.vue";
-
-import { Subscription } from "../libs/types";
+import type { Subscription } from "../libs/types";
 import { getInactives, getMonthlyCost, getYearlyCost, getTranslation } from "./../libs";
-import { useMainStore } from "../store";
 
 defineProps<{
   data: Subscription[];

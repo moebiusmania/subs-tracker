@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { Subscription } from "../libs/types";
-import { useMainStore } from "./../store";
+import type { Subscription } from "../libs/types";
 import { save } from "./../libs/storage";
-
-import Container from "./Container.vue";
-import Backup from "./Backup.vue";
 
 const app = useMainStore();
 const i18n = app.i18n.main;

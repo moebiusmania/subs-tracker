@@ -70,11 +70,9 @@ open a browser at `http://localhost:3000` and you will see the application.
 
 ### What has been used
 
-- [Vue 3](https://vuejs.org/) - component framework
-- [Typescript](https://www.typescriptlang.org/) - static typed Javascript
+- [Nuxt 3](https://nuxt.com/) - main application framework based on [Vue 3](https://vuejs.org/)
 - [Pinia](https://pinia.vuejs.org/) - state management
-- [Vite.js](https://vitejs.dev/) - project bootstrap and tooling
-- [Vitest](https://vitest.dev/) - unit testing
+<!-- - [Vitest](https://vitest.dev/) - unit testing -->
 - [TailwindCSS](https://tailwindcss.com/) - CSS as utilility classes
 - [DaisyUI](https://daisyui.com/) - UI components built on top of TailwindCSS
 

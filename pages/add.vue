@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { useRouter, Router } from "vue-router";
+import { useRouter, type Router } from "vue-router";
 
-import { Subscription } from "../libs/types";
-import { useMainStore } from "./../store";
+import type { Subscription } from "../libs/types";
 import { save } from "./../libs/storage";
-import Container from "./../components/Container.vue";
-import Form from "./../components/Form.vue";
 
 const app = useMainStore();
 const router: Router = useRouter();

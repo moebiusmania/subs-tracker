@@ -1,8 +1,13 @@
-name: Deploy React App to GH pages
+name: Build & deploy
 
 on:
   push:
     branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build:
@@ -10,20 +15,26 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.12]
+        node-version: [22.10]
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - name: 💻 Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build static website
+        run: npm run build:gh
+
+      - name: 🚀 Upload artifact 
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          path: .output/public
+
+      - name: 🏁 Deploy to GitHub Pages
+        id: gh-pages
+        uses: actions/deploy-pages@v4
