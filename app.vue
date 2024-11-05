@@ -24,16 +24,11 @@ useHead({
       type: "image/svg+xml",
       href: "/favicon.svg",
     },
-    {
-      rel: "icon",
-      type: "image/png",
-      sizes: "32x32",
-      href: "/static/favicons/favicon-32x32.png",
-    },
   ],
   htmlAttrs: {
     lang: "it-IT",
     "data-theme": "light",
+    "class": "bg-base-200"
     // class: document && document.documentElement.classList.contains("dark") ? "dark" : "light",
   }
 })
