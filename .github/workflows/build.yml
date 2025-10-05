@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.10]
+        node-version: [24.4]
 
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
       - name: 🏗️ Build static website
         run: npm run build:gh
 
-      - name: 🚀 Upload artifact 
+      - name: 🚀 Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: .output/public
