@@ -8,7 +8,7 @@ defineProps<{
 
 <template>
   <div class="stats shadow w-full">
-    <div class="stat">
+    <div class="stat bg-base-100">
       <div class="stat-title">{{ title }}</div>
       <div class="stat-value">{{ value }}</div>
       <div class="stat-desc">{{ description }}</div>

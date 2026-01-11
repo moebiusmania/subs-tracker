@@ -1,4 +1,3 @@
-
 import type { AppState, Subscription } from "./../libs/types";
 import { subs as mock } from "./../libs/mocks";
 
@@ -35,7 +34,7 @@ export const useMainStore = defineStore("app", {
       const actives: number = items.filter(
         (e: Subscription) => e.isActive
       ).length;
-      items[index].isActive = actives > 1 ? !items[index].isActive : true;
+      items[index]!.isActive = actives > 1 ? !items[index]!.isActive : true;
       this.data = items;
     },
     setTheme(value: "light" | "dark"): void {

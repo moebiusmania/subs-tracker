@@ -11,11 +11,12 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxtjs/tailwindcss": "^6.14.0",
-    "@pinia/nuxt": "^0.11.2",
-    "daisyui": "^5.1.27",
+    "@pinia/nuxt": "^0.11.3",
+    "@tailwindcss/vite": "^4.1.18",
+    "daisyui": "^5.5.14",
     "date-fns": "^4.1.0",
-    "nuxt": "^4.1.2",
+    "nuxt": "^4.2.2",
+    "tailwindcss": "^4.1.18",
     "vue": "latest",
     "vue-router": "latest"
   }

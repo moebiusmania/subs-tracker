@@ -64,7 +64,7 @@ const toggleActive = (index: number): void => {
       </article>
     </section>
     <Backup />
-    <button class="btn w-full mt-7 btn-error modal-button" @click="deleteAll">
+    <button class="btn w-full mt-7 btn-error" @click="deleteAll">
       ⊗ {{ i18n.delete }}
     </button>
   </Container>

@@ -103,7 +103,7 @@ const onSubmit = (event: Event): void => {
       <option value="yearly">Yearly</option>
     </select>
 
-    <div class="mt-7 flex flex-col gap-5 md:flex-row md: justify-between">
+    <div class="mt-7 flex flex-col gap-5 md:flex-row md:justify-between">
       <button class="btn btn-accent w-full md:w-1/2 lg:w-1/3">
         ⊕ Add this subscription
       </button>

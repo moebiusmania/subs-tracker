@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Subscription } from "./types";
+import type { Subscription } from "./types";
 
 const formatDate = (value: Date): string => format(value, "yyyy-MM-dd");
 
@@ -29,6 +29,13 @@ const getYearlyCost = (data: Subscription[]): number => {
   return parseFloat(value);
 };
 
-const getTranslation = (key: string, value: any): string => key.replace("{{value}}", value);
+const getTranslation = (key: string, value: any): string =>
+  key.replace("{{value}}", value);
 
-export { getInactives, getMonthlyCost, getYearlyCost, formatDate, getTranslation };
+export {
+  getInactives,
+  getMonthlyCost,
+  getYearlyCost,
+  formatDate,
+  getTranslation,
+};
