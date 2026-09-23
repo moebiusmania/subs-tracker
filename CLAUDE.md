@@ -12,6 +12,8 @@ browser's `localStorage`.
 ## Commands
 
 - `deno task serve` — dev server with live reload at http://localhost:3000
+- `deno task dev:host` — same, but listening on all interfaces
+  (`--hostname=0.0.0.0`) to test from other devices on the LAN
 - `deno task build` — build the static site into `_site/`
 - `deno task build:gh` — build for GitHub Pages
   (`--location=https://moebiusmania.github.io/subs-tracker/`). CI

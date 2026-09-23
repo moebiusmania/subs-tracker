@@ -9,6 +9,7 @@
     "build": "deno task lume",
     "build:gh": "deno task lume --location=https://moebiusmania.github.io/subs-tracker/",
     "serve": "deno task lume -s",
+    "dev:host": "deno task lume -s --hostname=0.0.0.0",
     "test": "deno test src/"
   },
   "compilerOptions": {
