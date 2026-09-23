@@ -47,34 +47,30 @@ Feel free to [open an issue on this repo](https://github.com/moebiusmania/subs-t
 
 ### How to develop
 
+You need [Deno](https://deno.com/) 2.x installed, there is no install step.
+
 Clone the repo
 
 ```bash
 $ git clone https://github.com/moebiusmania/subs-tracker
-```
-
-cd into it and install the dependencies
-
-```bash
 $ cd subs-tracker
-$ npm ci
 ```
 
 start the development server
 
 ```bash
-$ npm run dev
+$ deno task serve
 ```
 
 open a browser at `http://localhost:3000` and you will see the application.
 
+Other tasks: `deno task build` (static site in `_site/`) and `deno task test` (unit tests).
+
 ### What has been used
 
-- [Nuxt 3](https://nuxt.com/) - main application framework based on [Vue 3](https://vuejs.org/)
-- [Pinia](https://pinia.vuejs.org/) - state management
-<!-- - [Vitest](https://vitest.dev/) - unit testing -->
-- [TailwindCSS](https://tailwindcss.com/) - CSS as utilility classes
-- [DaisyUI](https://daisyui.com/) - UI components built on top of TailwindCSS
+- [Deno](https://deno.com/) - runtime and toolchain (tests, lint, format)
+- [Lume](https://lume.land/) - static site generator, builds the pages as plain HTML
+- [Alpine.js](https://alpinejs.dev/) - client side interactivity and state
 
 ### Support
 

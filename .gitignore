@@ -1,17 +1,6 @@
-# Nuxt dev/build outputs
-.output
-.data
-.nuxt
-.nitro
-.cache
-dist
-
-# Node dependencies
-node_modules
-
-# Logs
-logs
-*.log
+# Lume build output and cache
+_site
+_cache
 
 # Misc
 .DS_Store

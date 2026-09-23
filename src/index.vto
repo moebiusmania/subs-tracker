@@ -1,0 +1,56 @@
+<div x-data>
+  <template x-if="$store.app.data.length === 0">
+    <section x-data="empty">
+      <h2>{{ i18n.empty.title }}</h2>
+      <p>{{ i18n.empty.message }}</p>
+      <a href="{{ '/add/' |> url }}">⊕ {{ i18n.empty.cta }}</a>
+      <span>{{ i18n.empty.or }}</span>
+      <button type="button" @click="useMock">✏️ {{ i18n.empty.default }}</button>
+    </section>
+  </template>
+
+  <template x-if="$store.app.data.length > 0">
+    <div>
+      <section x-data="dashboard">
+        <h2>{{ i18n.main.title }}</h2>
+        {{ include "partials/stat.vto" { title: i18n.main.total, value: "total", description: "inactives" } }}
+        {{ include "partials/stat.vto" { title: i18n.main.monthly, value: "monthly", description: "$store.app.i18n.main.detail" } }}
+        {{ include "partials/stat.vto" { title: i18n.main.yearly, value: "yearly", description: "$store.app.i18n.main.detail" } }}
+      </section>
+
+      <section x-data="list">
+        <header>
+          <h2>{{ i18n.main.list }}</h2>
+          <a href="{{ '/add/' |> url }}">⊕ {{ i18n.main.cta }}</a>
+        </header>
+        <template x-for="(item, index) in $store.app.data" :key="index">
+          <article>
+            <h3>
+              <button
+                type="button"
+                class="badge"
+                :class="item.isActive ? 'badge-success' : 'badge-error'"
+                @click="toggleActive(index)"
+                x-text="item.isActive ? 'active' : 'inactive'"
+              ></button>
+              <span x-text="item.name"></span>
+            </h3>
+            <p>
+              <span x-text="item.price + item.currency"></span>,
+              <span x-text="item.recurrence"></span> -
+              {{ i18n.main.expires }}
+              <span x-text="new Date(item.expiration).toLocaleDateString()"></span>
+            </p>
+          </article>
+        </template>
+
+        <section x-data="backup">
+          <button type="button" @click="exportData">↓ {{ i18n.backup.export }}</button>
+          <button type="button" @click="importData">↑ {{ i18n.backup.import }}</button>
+        </section>
+
+        <button type="button" @click="deleteAll">⊗ {{ i18n.main.delete }}</button>
+      </section>
+    </div>
+  </template>
+</div>

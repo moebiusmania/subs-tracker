@@ -1,0 +1,54 @@
+<section>
+  <h2>Add a new subscription</h2>
+  <p>
+    The subscription data will be <strong>stored locally</strong>. It will
+    not be available on other device and there are no security or privacy
+    concerns.
+  </p>
+  <hr>
+  <form x-data="addForm('{{ '/' |> url }}')" @submit.prevent="submit">
+    <label for="name">Service name:</label>
+    <input type="text" id="name" name="name" placeholder="ex: Netflix, Prime, etc.." x-model="item.name" required>
+
+    <label for="price">How much does it costs?</label>
+    <input
+      type="number"
+      id="price"
+      name="price"
+      placeholder="10.00"
+      min="0.1"
+      step="0.1"
+      :value="item.price.toString()"
+      @input="item.price = parseFloat($event.target.value)"
+      required
+    >
+
+    <label for="currency">Currency:</label>
+    <select id="currency" name="currency" x-model="item.currency" required disabled>
+      <option value="€">€ Euro</option>
+      <option value="$">$ Dollar</option>
+    </select>
+
+    <label for="isactive">Is active?</label>
+    <input type="checkbox" id="isactive" name="isactive" x-model="item.isActive">
+
+    <label for="expiration">Date of expiration:</label>
+    <input
+      type="date"
+      id="expiration"
+      name="expiration"
+      :value="formatDate(item.expiration)"
+      @input="item.expiration = new Date($event.target.value)"
+      required
+    >
+
+    <label for="recurrence">Recurs:</label>
+    <select id="recurrence" name="recurrence" x-model="item.recurrence" required>
+      <option value="monthly">Monthly</option>
+      <option value="yearly">Yearly</option>
+    </select>
+
+    <button type="submit">⊕ Add this subscription</button>
+    <a href="{{ '/' |> url }}">← Go back to the main screen</a>
+  </form>
+</section>

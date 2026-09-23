@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="it-IT" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <meta name="title" content="{{ title }}">
+    <meta name="description" content="{{ description }}">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' |> url }}">
+    <style>[x-cloak] { display: none !important; }</style>
+    <script type="module" src="{{ '/js/main.js' |> url }}"></script>
+  </head>
+  <body>
+    {{ include "partials/header.vto" }}
+    <main>
+      {{ content }}
+    </main>
+    {{ include "partials/footer.vto" }}
+  </body>
+</html>

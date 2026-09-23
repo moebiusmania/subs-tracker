@@ -1,28 +1,63 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with
+code in this repository.
 
 ## Project
 
-Client-only Nuxt 4 app (Vue 3 + Pinia + Tailwind v4 + DaisyUI 5) for tracking subscription costs. There is no backend: all data lives in the browser's `localStorage`. `server/` holds only a tsconfig.
+Static subscription-cost tracker built with Deno, Lume 3 (static site generator)
+and Alpine.js. There is no backend and no Node/npm: all data lives in the
+browser's `localStorage`. There is no CSS yet (a redesign is planned), so the
+markup is intentionally unstyled.
 
 ## Commands
 
-- `npm ci` — install (runs `nuxt prepare` via postinstall)
-- `npm run dev` — dev server at http://localhost:3000
-- `npm run build` — production build
-- `npm run build:gh` — static GitHub Pages build with base URL `/subs-tracker/`. This is what CI runs (`.github/workflows/build.yml`, Node 24) on every push to `main`, then deploys `.output/public` to GitHub Pages.
-- `npm run generate` / `npm run preview`
-
-There is no lint or test script. Vitest test files exist (`libs/__test__/`, `stores/__test__/`), but Vitest is not in `package.json`, and the README has it commented out. To run them you would have to install `vitest` first (e.g. `npx vitest run libs/__test__/index.test.js`). The store tests may be stale: `getState` now also returns `i18n`.
+- `deno task serve` — dev server with live reload at http://localhost:3000
+- `deno task build` — build the static site into `_site/`
+- `deno task build:gh` — build for GitHub Pages
+  (`--location=https://moebiusmania.github.io/subs-tracker/`). CI
+  (`.github/workflows/build.yml`) runs `deno task test` and then this on every
+  push to `main`, and deploys `_site`.
+- `deno task test` — all unit tests (`src/**/*_test.ts`); run one file with
+  `deno test src/js/lib/store_test.ts`, or one test with
+  `deno test --filter toggleActive src/`
+- `deno lint`, `deno fmt`, `deno check src/js/main.ts`
 
 ## Architecture
 
-- **State**: a single Pinia store, `useMainStore` (`stores/index.ts`), auto-imported by `@pinia/nuxt`. It holds `AppState` (`libs/types.ts`): `locale`, `i18n`, `theme`, `currency`, `data: Subscription[]`.
-- **Persistence is manual**: `libs/storage.ts` reads and writes the whole `AppState` as JSON under the `localStorage` key `subs-tracker`. Store actions do **not** persist on their own. Every component that mutates state calls `save(app.getState)` right after the mutation (see `pages/add.vue`, `components/List.vue`, `Header.vue`, `Backup.vue`, `Empty.vue`). New mutations need the same call.
-- **Hydration**: `app.vue` calls `app.setState(load())` in `onMounted` (client only) and applies the theme by setting `data-theme` on `<html>`. The theme toggle in `Header.vue` does the same thing directly on the DOM.
-- **Calculations**: pure functions in `libs/index.ts` (`getMonthlyCost`, `getYearlyCost`, `getInactives`, `formatDate`). Yearly cost counts monthly items ×12. Both cost functions use `reduce` without an initial value, so they throw on an empty filtered list. Callers only render `Dashboard` when `data.length > 0`, and `toggleActive` keeps at least one item active.
-- **i18n**: not a Nuxt i18n module. `i18n/en.json` is imported into store state and typed by the `I18n` type. Components read `app.i18n.<section>` directly. `getTranslation` replaces a `{{value}}` placeholder. Adding a string means updating both `en.json` and the `I18n` type.
-- **Mock data**: `libs/mocks.ts` feeds `store.loadMock()` (the "load demo data" option on the empty screen) and the unit tests.
-- **Styling**: `public/tailwind.css` imports Tailwind and the DaisyUI plugin, and is wired in through `nuxt.config.ts` with the `@tailwindcss/vite` plugin. Use DaisyUI component classes (`btn`, `stat`, `divider`, `bg-base-*`) and its themes (`light`/`dark`).
-- Pages: `/` (`pages/index.vue`: Empty, or Dashboard + List) and `/add` (`pages/add.vue` → `Form`). Components are auto-imported.
+- **Build side (Lume)**: `_config.ts` sets `src: "./src"`. Pages are Vento
+  templates: `src/index.vto` → `/`, `src/add.vto` → `/add/`. `src/_data.yml`
+  gives every page the `layouts/base.vto` layout plus `title`/`description`.
+  `src/_data/i18n.json` is exposed to templates as `i18n` for static strings.
+  Lume 3 only copies non-page files that are registered with `site.add()` in
+  `_config.ts`, so new assets must be added there.
+- **URLs**: always write internal links with the Vento `url` filter
+  (`{{ '/add/' |> url }}`) so the GitHub Pages `/subs-tracker/` prefix is
+  applied. JS gets the home URL from the template
+  (`addForm('{{ '/' |> url }}')`) for the same reason.
+- **Client side**: `src/js/main.ts` is the only entry point. Lume's esbuild
+  plugin bundles it, including Alpine from `npm:`, into `/js/main.js`. On every
+  page load it builds the store, hydrates it from `localStorage`, applies
+  `data-theme` on `<html>`, registers `Alpine.store("app", …)` and the
+  `Alpine.data` components (`header`, `empty`, `dashboard`, `list`, `backup`,
+  `addForm`), then calls `Alpine.start()`.
+- **Alpine gotcha**: directives only run inside an `x-data` root. That's why
+  `index.vto` is wrapped in `<div x-data>`: its top-level `<template x-if>`
+  switches between the empty state and dashboard+list at runtime, since the HTML
+  is static.
+- **Business logic** (`src/js/lib/`, framework-free and unit tested):
+  - `store.ts`: `createStore()` returns a plain object (state + actions, ported
+    from the old Pinia store) that `Alpine.store()` makes reactive.
+    `toggleActive` refuses to deactivate the last active subscription.
+  - `storage.ts`: reads and writes the whole `AppState` as JSON under the key
+    `subs-tracker`. Persistence is manual: every `Alpine.data` handler that
+    mutates the store calls `persist()` right after. New mutations need the same
+    call.
+  - `index.ts`: cost calculations. Yearly cost counts monthly items ×12.
+    `getMonthlyCost`/`getYearlyCost` use `reduce` without an initial value, so
+    they throw on an empty filtered list (e.g. only yearly subscriptions →
+    monthly throws).
+  - `types.ts` has the `I18n` type, which must stay in sync with `i18n.json`.
+    `getTranslation` replaces a `{{value}}` placeholder at runtime.
+- Dates saved to `localStorage` come back as strings, so render them with
+  `new Date(item.expiration)`.

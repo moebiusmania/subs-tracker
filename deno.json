@@ -1,0 +1,30 @@
+{
+  "imports": {
+    "lume/": "https://cdn.jsdelivr.net/gh/lumeland/lume@v3.3.2/",
+    "alpinejs": "npm:alpinejs@^3.17.4",
+    "@std/assert": "jsr:@std/assert@^1"
+  },
+  "tasks": {
+    "lume": "echo \"import 'lume/cli.ts'\" | deno run -A -",
+    "build": "deno task lume",
+    "build:gh": "deno task lume --location=https://moebiusmania.github.io/subs-tracker/",
+    "serve": "deno task lume -s",
+    "test": "deno test src/"
+  },
+  "compilerOptions": {
+    "types": [
+      "lume/types.ts"
+    ],
+    "lib": [
+      "deno.window",
+      "dom",
+      "dom.iterable"
+    ]
+  },
+  "fmt": {
+    "exclude": [
+      "README.md",
+      "_site"
+    ]
+  }
+}
