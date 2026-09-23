@@ -28,9 +28,19 @@ const persist = (): void => save(app().getState);
 Alpine.data("header", () => ({
   toggleTheme(): void {
     const update: "dark" | "light" = app().theme === "light" ? "dark" : "light";
-    app().setTheme(update);
-    document.documentElement.setAttribute("data-theme", update);
-    persist();
+    const apply = (): void => {
+      app().setTheme(update);
+      document.documentElement.setAttribute("data-theme", update);
+      persist();
+    };
+
+    // Cross-fade the whole page between themes where supported
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (document.startViewTransition && !reduceMotion) {
+      document.startViewTransition(apply);
+    } else {
+      apply();
+    }
   },
 }));
 

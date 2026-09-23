@@ -7,8 +7,7 @@ code in this repository.
 
 Static subscription-cost tracker built with Deno, Lume 3 (static site generator)
 and Alpine.js. There is no backend and no Node/npm: all data lives in the
-browser's `localStorage`. There is no CSS yet (a redesign is planned), so the
-markup is intentionally unstyled.
+browser's `localStorage`.
 
 ## Commands
 
@@ -57,5 +56,17 @@ markup is intentionally unstyled.
     only active subscriptions are counted.
   - `types.ts` has the `I18n` type, which must stay in sync with `i18n.json`.
     `getTranslation` replaces a `{{value}}` placeholder at runtime.
+- **Styling**: one hand-written stylesheet, `src/styles.css`, with no framework
+  or build step. It uses cascade layers
+  (`reset, tokens, base, layout, components`). Every colour is a `light-dark()`
+  token on `:root`, switched by `color-scheme` via `html[data-theme]`; the
+  palette was checked against WCAG 2.1 AA, so recheck the ratios when changing a
+  colour. Components use `@scope`. Scoped rules win on proximity over unscoped
+  ones with the same specificity, so theme overrides for scoped elements must
+  live outside the `@scope` block (see `.theme-toggle__sun`). Icons are Lucide
+  paths in `src/_data/icons.yml`, rendered with `partials/icon.vto`. The Inter
+  font comes from Bunny Fonts. Entry animations use `@starting-style` and
+  keyframes; navigations and the theme switch use view transitions; everything
+  respects `prefers-reduced-motion`.
 - Dates saved to `localStorage` come back as strings, so render them with
   `new Date(item.expiration)`.

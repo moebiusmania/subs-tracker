@@ -1,6 +1,6 @@
 {{# value and description are Alpine expressions, evaluated client side #}}
-<div class="stat">
-  <div class="stat-title">{{ title }}</div>
-  <div class="stat-value" x-text="{{ value }}"></div>
-  <div class="stat-desc" x-text="{{ description }}"></div>
+<div class="stat{{ if accent }} stat--accent{{ /if }}">
+  <p class="stat__label">{{ title }}</p>
+  <p class="stat__value" x-text="{{ value }}"></p>
+  <p class="stat__desc" x-text="{{ description }}"></p>
 </div>

@@ -9,5 +9,6 @@ site.add("js/main.ts");
 site.add("favicon.svg");
 site.add("favicon.ico");
 site.add("robots.txt");
+site.add("styles.css");
 
 export default site;
