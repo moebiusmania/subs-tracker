@@ -1,6 +1,12 @@
 # 💰 Subscriptions Tracker ⚠️
 
+<p align="center">
+  <img src=".github/poster.svg" alt="Illustration of fanned subscription cards with bouncing euro and dollar coins" width="360">
+</p>
+
 Webapp to keep track on subscriptions fees and has some math done for you.
+
+👉 **Try it at [moebiusmania.github.io/subs-tracker](https://moebiusmania.github.io/subs-tracker/)**
 
 ### Motivation
 
@@ -47,7 +53,7 @@ Feel free to [open an issue on this repo](https://github.com/moebiusmania/subs-t
 
 ### How to develop
 
-You need [Deno](https://deno.com/) 2.x installed, there is no install step.
+You only need [Deno](https://deno.com/) 2.x installed: there is no Node.js, no `package.json` and no install step, dependencies are fetched and cached by Deno on first run.
 
 Clone the repo
 
@@ -64,13 +70,41 @@ $ deno task serve
 
 open a browser at `http://localhost:3000` and you will see the application.
 
-Other tasks: `deno task build` (static site in `_site/`) and `deno task test` (unit tests).
+All the available tasks:
+
+| Task                  | What it does                                                             |
+| --------------------- | ------------------------------------------------------------------------ |
+| `deno task serve`     | dev server with live reload on `http://localhost:3000`                   |
+| `deno task dev:host`  | same, but reachable from other devices on your network (phones, tablets) |
+| `deno task build`     | builds the static site into `_site/`                                     |
+| `deno task build:gh`  | builds for GitHub Pages, under the `/subs-tracker/` path                 |
+| `deno task test`      | runs the unit tests                                                      |
+| `deno task check`     | formatting check, lint and type-check                                    |
+
+### How it's built
+
+The app is a static website: every page is plain HTML generated at build time, with a small script adding the interactivity in the browser.
+
+- **Pages** are [Vento](https://vento.js.org/) templates in `src/` (`index.vto` for the home, `add.vto` for the form), shared markup lives in `src/_includes/`.
+- **Interactivity** is handled by [Alpine.js](https://alpinejs.dev/): `src/js/main.ts` is the only script, bundled by Lume with esbuild.
+- **Business logic** (costs math, the store, local storage and the UI components logic) lives in `src/js/lib/` as plain TypeScript with no framework, so it's fully unit tested.
+- **Styles** are a single hand-written stylesheet, `src/styles.css`, using modern CSS (cascade layers, `@scope`, nesting, `light-dark()`, `@starting-style`, view transitions) with no framework or preprocessor. Light and dark themes both meet the WCAG 2.1 AA contrast requirements, and animations are disabled when the system asks for reduced motion.
+
+### Tests & deploy
+
+Unit tests use the built-in [Deno test runner](https://docs.deno.com/runtime/fundamentals/testing/) and live next to the code they test (`*_test.ts` in `src/js/lib/`).
+
+Every push and pull request runs the format, lint, type-check and test steps on GitHub Actions and builds the site. Pushes to `main` that pass them are then deployed to GitHub Pages.
 
 ### What has been used
 
-- [Deno](https://deno.com/) - runtime and toolchain (tests, lint, format)
+- [Deno](https://deno.com/) - runtime and toolchain (tasks, tests, lint, format, type-check)
 - [Lume](https://lume.land/) - static site generator, builds the pages as plain HTML
+- [Vento](https://vento.js.org/) - templating language used by Lume
 - [Alpine.js](https://alpinejs.dev/) - client side interactivity and state
+- [Nunito](https://fonts.bunny.net/family/nunito) - font, served by the privacy friendly [Bunny Fonts](https://fonts.bunny.net/)
+- [Lucide](https://lucide.dev/) - icons
+- [GitHub Actions](https://github.com/features/actions) & [GitHub Pages](https://pages.github.com/) - CI and hosting
 
 ### Support
 

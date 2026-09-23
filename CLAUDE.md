@@ -5,9 +5,18 @@ code in this repository.
 
 ## Project
 
-Static subscription-cost tracker built with Deno, Lume 3 (static site generator)
-and Alpine.js. There is no backend and no Node/npm: all data lives in the
-browser's `localStorage`.
+Static subscription-cost tracker built with Deno 2, Lume 3 (static site
+generator, Vento templates) and Alpine.js, styled with hand-written modern CSS.
+There is no backend and no Node/npm (no `package.json`, no `node_modules`): all
+data lives in the browser's `localStorage`. Live at
+https://moebiusmania.github.io/subs-tracker/.
+
+Dependencies are declared only in the `deno.json` import map: Lume is pinned to
+an exact version via jsDelivr (`lume/`), Alpine comes from `npm:alpinejs`, and
+tests use `jsr:@std/assert`. To upgrade Lume, bump the version in the `lume/`
+URL. `deno.lock` is committed. Running one-off scripts from the repo root with
+extra `npm:`/`jsr:` imports adds them to the lockfile, so don't commit those
+entries.
 
 ## Commands
 
@@ -78,8 +87,11 @@ deploys `_site` to GitHub Pages.
   `.theme-toggle__sun`). Icons are Lucide paths in `src/_data/icons.yml`,
   rendered with `partials/icon.vto`. The empty-state scene is an inline SVG
   (`partials/empty-illustration.vto`), coloured by `--illo-*` tokens and
-  animated by the `.illo` rules. The Nunito font comes from Bunny Fonts. Entry
-  animations use `@starting-style` and keyframes; navigations and the theme
-  switch use view transitions; everything respects `prefers-reduced-motion`.
+  animated by the `.illo` rules. `.github/poster.svg` is a standalone copy for
+  the README with the colours and animations embedded (GitHub renders SVGs as
+  images), so keep the two in sync. Don't use `--` in its XML comments. The
+  Nunito font comes from Bunny Fonts. Entry animations use `@starting-style` and
+  keyframes; navigations and the theme switch use view transitions; everything
+  respects `prefers-reduced-motion`.
 - Dates saved to `localStorage` come back as strings, so render them with
   `new Date(item.expiration)`.
