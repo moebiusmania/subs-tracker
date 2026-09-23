@@ -15,7 +15,7 @@ const getMonthlyCost = (data: Subscription[]): number => {
         item.isActive && item.recurrence === "monthly",
     )
     .map((item: Subscription): number => item.price)
-    .reduce((a: number, b: number): number => a + b)
+    .reduce((a: number, b: number): number => a + b, 0)
     .toFixed(2);
   return parseFloat(value);
 };
@@ -26,7 +26,7 @@ const getYearlyCost = (data: Subscription[]): number => {
     .map((item: Subscription): number =>
       item.recurrence === "monthly" ? item.price * 12 : item.price
     )
-    .reduce((a: number, b: number): number => a + b)
+    .reduce((a: number, b: number): number => a + b, 0)
     .toFixed(2);
   return parseFloat(value);
 };

@@ -53,10 +53,8 @@ markup is intentionally unstyled.
     `subs-tracker`. Persistence is manual: every `Alpine.data` handler that
     mutates the store calls `persist()` right after. New mutations need the same
     call.
-  - `index.ts`: cost calculations. Yearly cost counts monthly items ×12.
-    `getMonthlyCost`/`getYearlyCost` use `reduce` without an initial value, so
-    they throw on an empty filtered list (e.g. only yearly subscriptions →
-    monthly throws).
+  - `index.ts`: cost calculations. Yearly cost counts monthly items ×12, and
+    only active subscriptions are counted.
   - `types.ts` has the `I18n` type, which must stay in sync with `i18n.json`.
     `getTranslation` replaces a `{{value}}` placeholder at runtime.
 - Dates saved to `localStorage` come back as strings, so render them with

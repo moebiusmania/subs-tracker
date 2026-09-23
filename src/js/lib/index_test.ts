@@ -31,3 +31,14 @@ Deno.test("getYearlyCost", () => {
 Deno.test("getTranslation", () => {
   assertEquals(getTranslation("with {{value}} inactive", 2), "with 2 inactive");
 });
+
+Deno.test("getMonthlyCost - no active monthly subscriptions", () => {
+  const yearly = subs.filter((item) => item.recurrence === "yearly");
+  assertEquals(getMonthlyCost(yearly), 0);
+  assertEquals(getYearlyCost(yearly), 49.99);
+});
+
+Deno.test("costs - empty list", () => {
+  assertEquals(getMonthlyCost([]), 0);
+  assertEquals(getYearlyCost([]), 0);
+});
