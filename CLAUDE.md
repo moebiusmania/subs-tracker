@@ -32,9 +32,10 @@ entries.
 - `deno task check` — `deno fmt --check`, `deno lint` and type-checking of
   `src/js/main.ts` and `_config.ts`
 
-CI (`.github/workflows/build.yml`) runs `check`, `test` and `build:gh` on every
-push and pull request. On pushes to `main` a second job then builds again and
-deploys `_site` to GitHub Pages.
+CI (`.github/workflows/build.yml`, Ubuntu 26.04 runners) runs `check`, `test`
+and `build:gh` on every push and pull request. On pushes to `main` that job also
+uploads `_site` as the Pages artifact, and a second job only runs
+`actions/deploy-pages` (no rebuild).
 
 ## Architecture
 
