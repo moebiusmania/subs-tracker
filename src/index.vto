@@ -1,7 +1,7 @@
 <div x-data>
   <template x-if="$store.app.data.length === 0">
     <section class="empty panel" x-data="empty">
-      <span class="empty__icon">{{ include "partials/icon.vto" { name: "inbox" } }}</span>
+      {{ include "partials/empty-illustration.vto" }}
       <h1>{{ i18n.empty.title }}</h1>
       <p>{{ i18n.empty.message }}</p>
       <div class="empty__actions">
@@ -21,9 +21,9 @@
       <section class="stats" x-data="dashboard" aria-labelledby="stats-title">
         <h1 id="stats-title" class="section-title">{{ i18n.main.title }}</h1>
         <div class="stats__grid">
-          {{ include "partials/stat.vto" { title: i18n.main.total, value: "total", description: "inactives" } }}
-          {{ include "partials/stat.vto" { title: i18n.main.monthly, value: "monthly", description: "$store.app.i18n.main.detail", accent: true } }}
-          {{ include "partials/stat.vto" { title: i18n.main.yearly, value: "yearly", description: "$store.app.i18n.main.detail" } }}
+          {{ include "partials/stat.vto" { title: i18n.main.total, value: "total", description: "inactives", tint: "lav" } }}
+          {{ include "partials/stat.vto" { title: i18n.main.monthly, value: "monthly", description: "$store.app.i18n.main.detail", tint: "mint" } }}
+          {{ include "partials/stat.vto" { title: i18n.main.yearly, value: "yearly", description: "$store.app.i18n.main.detail", tint: "peach" } }}
         </div>
       </section>
 
@@ -39,6 +39,11 @@
           <template x-for="(item, index) in $store.app.data" :key="index">
             <li class="sub-card" :class="{ 'is-inactive': !item.isActive }">
               <div class="sub-card__top">
+                <span
+                  class="sub-card__avatar"
+                  aria-hidden="true"
+                  x-text="item.name.trim().charAt(0).toUpperCase() || '?'"
+                ></span>
                 <h3 class="sub-card__name" x-text="item.name"></h3>
                 <button
                   type="button"

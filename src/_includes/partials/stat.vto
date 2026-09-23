@@ -1,5 +1,5 @@
 {{# value and description are Alpine expressions, evaluated client side #}}
-<div class="stat{{ if accent }} stat--accent{{ /if }}">
+<div class="stat stat--{{ tint }}">
   <p class="stat__label">{{ title }}</p>
   <p class="stat__value" x-text="{{ value }}"></p>
   <p class="stat__desc" x-text="{{ description }}"></p>
