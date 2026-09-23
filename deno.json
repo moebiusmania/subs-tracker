@@ -10,7 +10,8 @@
     "build:gh": "deno task lume --location=https://moebiusmania.github.io/subs-tracker/",
     "serve": "deno task lume -s",
     "dev:host": "deno task lume -s --hostname=0.0.0.0",
-    "test": "deno test src/"
+    "test": "deno test src/",
+    "check": "deno fmt --check && deno lint && deno check src/js/main.ts _config.ts"
   },
   "compilerOptions": {
     "types": [

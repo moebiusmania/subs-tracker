@@ -1,27 +1,63 @@
-name: Build & deploy
+name: CI & deploy
 
 on:
   push:
     branches: [main]
+  pull_request:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
-  build:
+  check:
+    name: Lint, type-check & test
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+
       - name: 🦕 Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
+          cache: true
 
-      - name: 🧪 Run tests
+      - name: 🧹 Format, lint & type-check
+        run: deno task check
+
+      - name: 🧪 Run unit tests
         run: deno task test
+
+      - name: 🏗️ Build static website
+        run: deno task build:gh
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.gh-pages.outputs.page_url }}
+
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🦕 Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+          cache: true
 
       - name: 🏗️ Build static website
         run: deno task build:gh

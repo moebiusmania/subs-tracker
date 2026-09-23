@@ -79,3 +79,45 @@ Deno.test("setState", () => {
   assertEquals(app.theme, "dark");
   assertEquals(app.data.length, 1);
 });
+
+Deno.test("importSubs - replaces the current data", () => {
+  const app = createStore();
+  app.loadMock();
+  app.importSubs([testSubscription]);
+  assertEquals(app.data.length, 1);
+  assertEquals(app.data[0].name, "Test");
+});
+
+Deno.test("loadMock - returns a copy, not the shared mock data", () => {
+  const first = createStore();
+  first.loadMock();
+  first.toggleActive(0);
+
+  const second = createStore();
+  second.loadMock();
+  assertEquals(second.data[0].isActive, true);
+});
+
+Deno.test("toggleActive - the last active subscription can't be deactivated", () => {
+  const app = createStore();
+  app.addSubscription({ ...testSubscription, name: "A" });
+  app.addSubscription({ ...testSubscription, name: "B", isActive: false });
+  app.toggleActive(0);
+  assertEquals(app.data[0].isActive, true);
+});
+
+Deno.test("toggleActive - an inactive subscription can always be re-activated", () => {
+  const app = createStore();
+  app.addSubscription({ ...testSubscription, name: "A" });
+  app.addSubscription({ ...testSubscription, name: "B", isActive: false });
+  app.toggleActive(1);
+  assertEquals(app.data[1].isActive, true);
+});
+
+Deno.test("getState - reflects later changes", () => {
+  const app = createStore();
+  app.setTheme("dark");
+  app.addSubscription(testSubscription);
+  assertEquals(app.getState.theme, "dark");
+  assertEquals(app.getState.data.length, 1);
+});

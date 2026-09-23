@@ -42,3 +42,22 @@ Deno.test("costs - empty list", () => {
   assertEquals(getMonthlyCost([]), 0);
   assertEquals(getYearlyCost([]), 0);
 });
+
+Deno.test("formatDate - pads single digit months and days", () => {
+  assertEquals(formatDate(new Date(2023, 0, 5)), "2023-01-05");
+});
+
+Deno.test("getInactives - empty when everything is active", () => {
+  assertEquals(getInactives(subs.filter((item) => item.isActive)).length, 0);
+});
+
+Deno.test("getYearlyCost - ignores inactive subscriptions", () => {
+  const onlyInactive = subs.filter((item) => !item.isActive);
+  assertEquals(getYearlyCost(onlyInactive), 0);
+});
+
+Deno.test("costs - rounded to two decimals", () => {
+  const items = [0.1, 0.2].map((price) => ({ ...subs[0], price }));
+  assertEquals(getMonthlyCost(items), 0.3);
+  assertEquals(getYearlyCost(items), 3.6);
+});

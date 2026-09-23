@@ -16,13 +16,16 @@ browser's `localStorage`.
   (`--hostname=0.0.0.0`) to test from other devices on the LAN
 - `deno task build` — build the static site into `_site/`
 - `deno task build:gh` — build for GitHub Pages
-  (`--location=https://moebiusmania.github.io/subs-tracker/`). CI
-  (`.github/workflows/build.yml`) runs `deno task test` and then this on every
-  push to `main`, and deploys `_site`.
+  (`--location=https://moebiusmania.github.io/subs-tracker/`)
 - `deno task test` — all unit tests (`src/**/*_test.ts`); run one file with
   `deno test src/js/lib/store_test.ts`, or one test with
   `deno test --filter toggleActive src/`
-- `deno lint`, `deno fmt`, `deno check src/js/main.ts`
+- `deno task check` — `deno fmt --check`, `deno lint` and type-checking of
+  `src/js/main.ts` and `_config.ts`
+
+CI (`.github/workflows/build.yml`) runs `check`, `test` and `build:gh` on every
+push and pull request. On pushes to `main` a second job then builds again and
+deploys `_site` to GitHub Pages.
 
 ## Architecture
 
@@ -40,8 +43,12 @@ browser's `localStorage`.
   plugin bundles it, including Alpine from `npm:`, into `/js/main.js`. On every
   page load it builds the store, hydrates it from `localStorage`, applies
   `data-theme` on `<html>`, registers `Alpine.store("app", …)` and the
-  `Alpine.data` components (`header`, `empty`, `dashboard`, `list`, `backup`,
-  `addForm`), then calls `Alpine.start()`.
+  `Alpine.data` components, then calls `Alpine.start()`. The component logic
+  (`header`, `empty`, `dashboard`, `list`, `backup`, `addForm`) lives in
+  `src/js/lib/components.ts` as plain factories. Browser side effects (confirm,
+  navigation, theme attribute, view transition, file download/pick) are passed
+  in as `Deps`, so `main.ts` only wires real DOM implementations and the tests
+  pass fakes.
 - **Alpine gotcha**: directives only run inside an `x-data` root. That's why
   `index.vto` is wrapped in `<div x-data>`: its top-level `<template x-if>`
   switches between the empty state and dashboard+list at runtime, since the HTML
@@ -51,9 +58,10 @@ browser's `localStorage`.
     from the old Pinia store) that `Alpine.store()` makes reactive.
     `toggleActive` refuses to deactivate the last active subscription.
   - `storage.ts`: reads and writes the whole `AppState` as JSON under the key
-    `subs-tracker`. Persistence is manual: every `Alpine.data` handler that
-    mutates the store calls `persist()` right after. New mutations need the same
-    call.
+    `subs-tracker`. Persistence is manual: every component handler that mutates
+    the store calls `persist()` right after, and new mutations need the same
+    call. `storage_test.ts` uses Deno's built-in `localStorage`, cleared around
+    each test.
   - `index.ts`: cost calculations. Yearly cost counts monthly items ×12, and
     only active subscriptions are counted.
   - `types.ts` has the `I18n` type, which must stay in sync with `i18n.json`.
