@@ -2,17 +2,37 @@
   <div class="container site-header__inner">
     <a class="brand" href="{{ '/' |> url }}">
       <span class="brand__logo">{{ include "partials/icon.vto" { name: "wallet" } }}</span>
-      <span>Subscriptions tracker</span>
+      <span x-text="$t.header.brand">{{ i18n.en.header.brand }}</span>
     </a>
-    <button
-      type="button"
-      class="theme-toggle"
-      aria-label="Dark mode"
-      :aria-pressed="($store.app.theme === 'dark').toString()"
-      @click="toggleTheme"
-    >
-      <span class="theme-toggle__sun">{{ include "partials/icon.vto" { name: "sun" } }}</span>
-      <span class="theme-toggle__moon">{{ include "partials/icon.vto" { name: "moon" } }}</span>
-    </button>
+    <div class="site-header__actions">
+      {{# Each language is named in its own language, so it's never translated #}}
+      <div class="lang-switch" role="group" aria-label="{{ i18n.en.header.language }}" :aria-label="$t.header.language">
+        {{ for code, strings of i18n }}
+        <button
+          type="button"
+          class="lang-switch__option"
+          lang="{{ code }}"
+          aria-label="{{ strings.meta.language }}"
+          title="{{ strings.meta.language }}"
+          aria-pressed="{{ code === 'en' ? 'true' : 'false' }}"
+          :aria-pressed="($store.app.locale === '{{ code }}').toString()"
+          @click="setLocale('{{ code }}')"
+        >
+          {{ include "partials/flag.vto" { code } }}
+        </button>
+        {{ /for }}
+      </div>
+      <button
+        type="button"
+        class="theme-toggle"
+        aria-label="{{ i18n.en.header.darkMode }}"
+        :aria-label="$t.header.darkMode"
+        :aria-pressed="($store.app.theme === 'dark').toString()"
+        @click="toggleTheme"
+      >
+        <span class="theme-toggle__sun">{{ include "partials/icon.vto" { name: "sun" } }}</span>
+        <span class="theme-toggle__moon">{{ include "partials/icon.vto" { name: "moon" } }}</span>
+      </button>
+    </div>
   </div>
 </header>

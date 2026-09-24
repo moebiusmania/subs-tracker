@@ -26,6 +26,10 @@ This **may** change in the future if I will consider the idea of adding a backen
 
 At the moment there is an _import/export_ functionality available in the app that will create a `.json` file with your subscriptions data that you can use to eventually move the data on another instance of the app (_on another device_). It isn't the most convenient way to _"sync"_ the data, but it easy to implement and keeps the complete ownership of personal data to the users.
 
+### Languages
+
+The app is available in English and Italian: pick one with the flags at the top of the page. The choice is saved on your device, and on the first visit the app follows your browser's language.
+
 ### Install it & use it offline
 
 The app is a PWA: you can install it on your home screen (or desktop) from the banner at the bottom of the page, or from the browser menu. On iPhone and iPad tap _Share_ and then _Add to Home Screen_.
@@ -39,7 +43,6 @@ After the first visit it works offline too, since both the app and your data are
 - Highlight/prioritize items that are close to expire (_within 30 days from the given expiration date_)
 - Push Notifications?
 - "Help/How it works" screen
-- Localization, maybe...
 - (_still undecided_) Signup/signin + Backend to sync data on multiple devices. As I said above if this will happen it will not be mandatory.
 
 ### Thoughts on the backend

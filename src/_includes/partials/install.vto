@@ -7,18 +7,18 @@
 >
   <span class="install__logo">{{ include "partials/icon.vto" { name: "wallet" } }}</span>
   <div class="install__body">
-    <h2 id="install-title" class="install__title">{{ i18n.install.title }}</h2>
-    <p class="install__text" x-show="mode === 'prompt'">{{ i18n.install.message }}</p>
+    <h2 id="install-title" class="install__title" x-text="$t.install.title">{{ i18n.en.install.title }}</h2>
+    <p class="install__text" x-show="mode === 'prompt'" x-text="$t.install.message">{{ i18n.en.install.message }}</p>
     <p class="install__text" x-show="mode === 'manual'">
-      {{ i18n.install.manualTap }}
-      <span class="install__share">{{ include "partials/icon.vto" { name: "share" } }}<span class="visually-hidden">Share</span></span>
-      {{ i18n.install.manualAdd }}
+      <span x-text="$t.install.manualTap">{{ i18n.en.install.manualTap }}</span>
+      <span class="install__share">{{ include "partials/icon.vto" { name: "share" } }}<span class="visually-hidden" x-text="$t.install.share">{{ i18n.en.install.share }}</span></span>
+      <span x-text="$t.install.manualAdd">{{ i18n.en.install.manualAdd }}</span>
     </p>
   </div>
   <div class="install__actions">
     <button type="button" class="btn btn--primary" x-show="mode === 'prompt'" @click="install">
-      {{ include "partials/icon.vto" { name: "download" } }} {{ i18n.install.cta }}
+      {{ include "partials/icon.vto" { name: "download" } }} <span x-text="$t.install.cta">{{ i18n.en.install.cta }}</span>
     </button>
-    <button type="button" class="btn btn--ghost" @click="dismiss">{{ i18n.install.dismiss }}</button>
+    <button type="button" class="btn btn--ghost" @click="dismiss" x-text="$t.install.dismiss">{{ i18n.en.install.dismiss }}</button>
   </div>
 </aside>

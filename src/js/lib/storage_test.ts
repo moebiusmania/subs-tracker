@@ -21,6 +21,7 @@ const state = (): AppState => {
   const store = createStore();
   store.loadMock();
   store.setTheme("dark");
+  store.setLocale("it");
   return store.getState;
 };
 
@@ -51,7 +52,7 @@ test("load - round-trips what was saved", () => {
   const loaded = load();
 
   assertEquals(loaded.theme, "dark");
-  assertEquals(loaded.locale, saved.locale);
+  assertEquals(loaded.language, saved.language);
   assertEquals(loaded.currency, saved.currency);
   assertEquals(
     loaded.data.map((item) => item.name),

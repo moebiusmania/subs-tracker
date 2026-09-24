@@ -1,22 +1,19 @@
 <section class="panel add">
   <a class="back-link" href="{{ '/' |> url }}">
-    {{ include "partials/icon.vto" { name: "arrow-left" } }} Go back to the main screen
+    {{ include "partials/icon.vto" { name: "arrow-left" } }} <span x-text="$t.add.back">{{ i18n.en.add.back }}</span>
   </a>
-  <h1>Add a new subscription</h1>
-  <p class="add__intro">
-    The subscription data will be <strong>stored locally</strong>. It will
-    not be available on other device and there are no security or privacy
-    concerns.
-  </p>
+  <h1 x-text="$t.add.title">{{ i18n.en.add.title }}</h1>
+  {{# The intro carries its own markup: it only comes from _data/i18n #}}
+  <p class="add__intro" x-html="$t.add.intro">{{ i18n.en.add.intro }}</p>
 
   <form class="form" x-data="addForm('{{ '/' |> url }}')" @submit.prevent="submit">
     <div class="field field--full">
-      <label for="name">Service name</label>
-      <input type="text" id="name" name="name" placeholder="ex: Netflix, Prime, etc.." x-model="item.name" required autofocus>
+      <label for="name" x-text="$t.add.name">{{ i18n.en.add.name }}</label>
+      <input type="text" id="name" name="name" placeholder="{{ i18n.en.add.namePlaceholder }}" :placeholder="$t.add.namePlaceholder" x-model="item.name" required autofocus>
     </div>
 
     <div class="field">
-      <label for="price">How much does it costs?</label>
+      <label for="price" x-text="$t.add.price">{{ i18n.en.add.price }}</label>
       <input
         type="number"
         id="price"
@@ -32,15 +29,15 @@
     </div>
 
     <div class="field">
-      <label for="currency">Currency</label>
+      <label for="currency" x-text="$t.add.currency">{{ i18n.en.add.currency }}</label>
       <select id="currency" name="currency" x-model="item.currency" required disabled>
-        <option value="€">€ Euro</option>
-        <option value="$">$ Dollar</option>
+        <option value="€" x-text="'€ ' + $t.add.euro">€ {{ i18n.en.add.euro }}</option>
+        <option value="$" x-text="'$ ' + $t.add.dollar">$ {{ i18n.en.add.dollar }}</option>
       </select>
     </div>
 
     <div class="field">
-      <label for="expiration">Date of expiration</label>
+      <label for="expiration" x-text="$t.add.expiration">{{ i18n.en.add.expiration }}</label>
       <input
         type="date"
         id="expiration"
@@ -52,23 +49,23 @@
     </div>
 
     <div class="field">
-      <label for="recurrence">Recurs</label>
+      <label for="recurrence" x-text="$t.add.recurrence">{{ i18n.en.add.recurrence }}</label>
       <select id="recurrence" name="recurrence" x-model="item.recurrence" required>
-        <option value="monthly">Monthly</option>
-        <option value="yearly">Yearly</option>
+        <option value="monthly" x-text="$t.recurrence.monthly">{{ i18n.en.recurrence.monthly }}</option>
+        <option value="yearly" x-text="$t.recurrence.yearly">{{ i18n.en.recurrence.yearly }}</option>
       </select>
     </div>
 
     <div class="field field--full field--switch">
       <input type="checkbox" class="switch" id="isactive" name="isactive" role="switch" x-model="item.isActive">
-      <label for="isactive">Is active?</label>
+      <label for="isactive" x-text="$t.add.active">{{ i18n.en.add.active }}</label>
     </div>
 
     <div class="form__actions">
       <button type="submit" class="btn btn--primary">
-        {{ include "partials/icon.vto" { name: "plus" } }} Add this subscription
+        {{ include "partials/icon.vto" { name: "plus" } }} <span x-text="$t.add.submit">{{ i18n.en.add.submit }}</span>
       </button>
-      <a class="btn btn--ghost" href="{{ '/' |> url }}">Cancel</a>
+      <a class="btn btn--ghost" href="{{ '/' |> url }}" x-text="$t.add.cancel">{{ i18n.en.add.cancel }}</a>
     </div>
   </form>
 </section>

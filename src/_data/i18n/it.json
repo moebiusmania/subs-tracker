@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "language": "Italiano",
+    "title": "Tracker abbonamenti ⚠️",
+    "description": "Webapp per tenere traccia dei costi degli abbonamenti e farsi fare un po' di conti."
+  },
+  "header": {
+    "skip": "Vai al contenuto",
+    "brand": "Tracker abbonamenti",
+    "language": "Lingua",
+    "darkMode": "Tema scuro"
+  },
+  "main": {
+    "title": "Le tue statistiche",
+    "total": "Abbonamenti totali:",
+    "inactives": "di cui {{value}} non attivi",
+    "monthly": "Costo mensile totale:",
+    "yearly": "Costo annuale totale:",
+    "detail": "(solo abbonamenti attivi)",
+    "list": "I tuoi abbonamenti",
+    "cta": "Aggiungi un abbonamento",
+    "active": "Attivo",
+    "inactive": "Non attivo",
+    "toggle": "cambia lo stato di {{value}}",
+    "expires": "Scade il",
+    "delete": "Elimina tutto",
+    "confirmDelete": "Vuoi davvero eliminare tutti i dati degli abbonamenti?"
+  },
+  "recurrence": {
+    "monthly": "Mensile",
+    "yearly": "Annuale"
+  },
+  "empty": {
+    "title": "Qui non c'è niente!",
+    "message": "Inizia aggiungendo i dati dei tuoi abbonamenti.",
+    "cta": "Tracciamo qualche abbonamento!",
+    "or": "oppure",
+    "default": "Usa i dati di esempio"
+  },
+  "backup": {
+    "export": "Esporta i dati",
+    "import": "Importa i dati"
+  },
+  "add": {
+    "back": "Torna alla schermata principale",
+    "title": "Aggiungi un nuovo abbonamento",
+    "intro": "I dati dell'abbonamento saranno <strong>salvati in locale</strong>. Non saranno disponibili su altri dispositivi e non ci sono problemi di sicurezza o privacy.",
+    "name": "Nome del servizio",
+    "namePlaceholder": "es: Netflix, Prime, ecc.",
+    "price": "Quanto costa?",
+    "currency": "Valuta",
+    "euro": "Euro",
+    "dollar": "Dollaro",
+    "expiration": "Data di scadenza",
+    "recurrence": "Ricorrenza",
+    "active": "È attivo?",
+    "submit": "Aggiungi questo abbonamento",
+    "cancel": "Annulla"
+  },
+  "install": {
+    "title": "Scarica l'app",
+    "message": "Installala sul tuo dispositivo: si apre dalla schermata Home e funziona anche offline.",
+    "manualTap": "Funziona anche offline: tocca",
+    "share": "Condividi",
+    "manualAdd": "e poi “Aggiungi alla schermata Home”.",
+    "cta": "Installa",
+    "dismiss": "Non ora"
+  },
+  "footer": {
+    "license": "Licenza MIT",
+    "project": "un progetto Open Source",
+    "madeWith": "fatto con",
+    "love": "amore",
+    "by": "da"
+  }
+}

@@ -4,11 +4,15 @@ import Alpine from "alpinejs";
 import { createStore, type Store } from "./lib/store.ts";
 import { hasData, load, save } from "./lib/storage.ts";
 import { createComponents } from "./lib/components.ts";
+import { detectLocale } from "./lib/i18n.ts";
 import { createInstaller, registerServiceWorker } from "./pwa.ts";
 
 registerServiceWorker();
 
 const store: Store = createStore();
+
+// Used until the user picks a language with the switcher
+store.setSystemLocale(detectLocale(navigator.languages));
 
 if (hasData()) {
   store.setState(load());
@@ -19,6 +23,9 @@ Alpine.store("app", store);
 
 // Alpine.store() wraps the object in a reactive proxy: always go through it
 const app = (): Store => Alpine.store("app") as Store;
+
+// Templates read the current strings as $t.section.key
+Alpine.magic("t", () => app().i18n);
 
 const components = createComponents({
   app,
@@ -77,4 +84,17 @@ Alpine.data("backup", components.backup);
 Alpine.data("addForm", components.addForm);
 Alpine.data("install", components.install);
 
+addEventListener("languagechange", () => {
+  app().setSystemLocale(detectLocale(navigator.languages));
+});
+
+Alpine.effect(() => {
+  document.documentElement.lang = app().locale;
+  document.title = app().i18n.meta.title;
+});
+
 Alpine.start();
+
+// Set by the inline script in layouts/base.vto to hide the English markup
+// until Alpine has translated it
+delete document.documentElement.dataset.i18nPending;

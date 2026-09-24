@@ -206,6 +206,20 @@
     flex: none;
   }
 
+  /* Set before first paint when the saved language isn't the English
+     markup: main.js removes it once Alpine has translated the page. If the
+     script never runs, the page shows up (in English) after a second. */
+  :root[data-i18n-pending] body {
+    visibility: hidden;
+    animation: i18n-reveal 0s 1s forwards;
+  }
+
+  @keyframes i18n-reveal {
+    to {
+      visibility: visible;
+    }
+  }
+
   .visually-hidden {
     position: absolute;
     width: 1px;
@@ -381,6 +395,61 @@
 
     .brand:hover .brand__logo {
       rotate: -10deg;
+    }
+
+    .site-header__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    /* Two round flags in a pill; the current one is full colour with an
+       accent ring, the other is faded until hovered or focused */
+    .lang-switch {
+      display: flex;
+      gap: var(--space-1);
+      padding: var(--space-1);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-full);
+      background: var(--color-surface);
+    }
+
+    .lang-switch__option {
+      display: grid;
+      width: 2rem;
+      height: 2rem;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+      border-radius: var(--radius-full);
+      background: none;
+      cursor: pointer;
+      opacity: 0.45;
+      filter: saturate(0.4);
+      transition:
+        opacity var(--duration-fast) ease,
+        filter var(--duration-fast) ease,
+        box-shadow var(--duration-fast) ease;
+
+      &:hover,
+      &:focus-visible {
+        opacity: 1;
+        filter: none;
+      }
+
+      &[aria-pressed="true"] {
+        opacity: 1;
+        filter: none;
+        box-shadow:
+          0 0 0 2px var(--color-surface),
+          0 0 0 3.5px var(--color-accent-strong);
+        cursor: default;
+      }
+
+      .flag {
+        width: 100%;
+        height: 100%;
+      }
     }
 
     .theme-toggle {
@@ -830,14 +899,26 @@
       box-shadow: none;
     }
 
+    /* Status pill under the name, so long (or translated) names get the
+       whole row next to the avatar */
     .sub-card__top {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: auto 1fr;
+      grid-template-areas:
+        "avatar name"
+        "avatar status";
       align-items: center;
-      gap: var(--space-3);
+      column-gap: var(--space-3);
+      row-gap: var(--space-1);
+    }
+
+    .sub-card__top .status {
+      grid-area: status;
+      justify-self: start;
     }
 
     .sub-card__avatar {
+      grid-area: avatar;
       display: grid;
       place-items: center;
       width: 2.5rem;
@@ -859,6 +940,7 @@
     }
 
     .sub-card__name {
+      grid-area: name;
       font-size: 1.125rem;
       font-weight: 800;
       overflow-wrap: anywhere;

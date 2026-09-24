@@ -1,6 +1,7 @@
-{{# value and description are Alpine expressions, evaluated client side #}}
+{{# label is a key of i18n.main; value and description are Alpine
+   expressions, evaluated client side #}}
 <div class="stat stat--{{ tint }}">
-  <p class="stat__label">{{ title }}</p>
+  <p class="stat__label" x-text="$t.main.{{ label }}">{{ i18n.en.main[label] }}</p>
   <p class="stat__value" x-text="{{ value }}"></p>
   <p class="stat__desc" x-text="{{ description }}"></p>
 </div>

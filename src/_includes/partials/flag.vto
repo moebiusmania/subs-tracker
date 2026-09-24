@@ -1,0 +1,20 @@
+{{# Round flag for the language switcher: the square viewBox crops the
+   centre of the flag, the button clips it to a circle #}}
+{{ if code === "it" }}
+<svg class="flag" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
+  <rect width="10" height="30" fill="#009246" />
+  <rect x="10" width="10" height="30" fill="#ffffff" />
+  <rect x="20" width="10" height="30" fill="#ce2b37" />
+</svg>
+{{ else if code === "en" }}
+<svg class="flag" viewBox="15 0 30 30" aria-hidden="true" focusable="false">
+  <clipPath id="flag-en-diagonals">
+    <path d="M30 15h30v15zv15H0zH0V0zV0h30z" />
+  </clipPath>
+  <rect width="60" height="30" fill="#012169" />
+  <path d="M0 0l60 30m0-30L0 30" stroke="#ffffff" stroke-width="6" />
+  <path d="M0 0l60 30m0-30L0 30" clip-path="url(#flag-en-diagonals)" stroke="#c8102e" stroke-width="4" />
+  <path d="M30 0v30M0 15h60" stroke="#ffffff" stroke-width="10" />
+  <path d="M30 0v30M0 15h60" stroke="#c8102e" stroke-width="6" />
+</svg>
+{{ /if }}
