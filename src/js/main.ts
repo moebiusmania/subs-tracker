@@ -11,11 +11,11 @@ registerServiceWorker();
 
 const store: Store = createStore();
 
+// Used until the user picks a language with the switcher
+store.setSystemLocale(detectLocale(navigator.languages));
+
 if (hasData()) {
   store.setState(load());
-} else {
-  // Nothing saved yet: follow the browser until the user picks a language
-  store.setLocale(detectLocale(navigator.languages));
 }
 document.documentElement.setAttribute("data-theme", store.theme);
 
@@ -83,6 +83,10 @@ Alpine.data("list", components.list);
 Alpine.data("backup", components.backup);
 Alpine.data("addForm", components.addForm);
 Alpine.data("install", components.install);
+
+addEventListener("languagechange", () => {
+  app().setSystemLocale(detectLocale(navigator.languages));
+});
 
 Alpine.effect(() => {
   document.documentElement.lang = app().locale;

@@ -87,7 +87,8 @@ export type I18n = {
 };
 
 export type AppState = {
-  locale: Locale;
+  // Picked with the language switcher, null to follow the system language
+  language: Locale | null;
   theme: "dark" | "light";
   currency: string;
   data: Subscription[];

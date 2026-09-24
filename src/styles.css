@@ -899,14 +899,26 @@
       box-shadow: none;
     }
 
+    /* Status pill under the name, so long (or translated) names get the
+       whole row next to the avatar */
     .sub-card__top {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: auto 1fr;
+      grid-template-areas:
+        "avatar name"
+        "avatar status";
       align-items: center;
-      gap: var(--space-3);
+      column-gap: var(--space-3);
+      row-gap: var(--space-1);
+    }
+
+    .sub-card__top .status {
+      grid-area: status;
+      justify-self: start;
     }
 
     .sub-card__avatar {
+      grid-area: avatar;
       display: grid;
       place-items: center;
       width: 2.5rem;
@@ -928,6 +940,7 @@
     }
 
     .sub-card__name {
+      grid-area: name;
       font-size: 1.125rem;
       font-weight: 800;
       overflow-wrap: anywhere;

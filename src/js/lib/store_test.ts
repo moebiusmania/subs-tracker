@@ -2,7 +2,7 @@ import { assertEquals, assertNotEquals } from "@std/assert";
 
 import type { Subscription } from "./types.ts";
 import { createStore } from "./store.ts";
-import type { Locale } from "./types.ts";
+import type { AppState, Locale } from "./types.ts";
 import { translations } from "./i18n.ts";
 
 const testSubscription: Subscription = {
@@ -17,7 +17,7 @@ const testSubscription: Subscription = {
 Deno.test("getState", () => {
   const app = createStore();
   assertEquals(app.getState, {
-    locale: "en",
+    language: null,
     theme: "light",
     currency: "€",
     data: [],
@@ -82,25 +82,51 @@ Deno.test("setLocale - switches the strings too", () => {
   assertEquals(app.i18n.main.title, "Le tue statistiche");
 });
 
-Deno.test("getState - leaves the strings out", () => {
+Deno.test("locale - follows the system language until one is picked", () => {
   const app = createStore();
-  app.setLocale("it");
-  assertEquals(app.getState.locale, "it");
-  assertEquals("i18n" in app.getState, false);
+  app.setSystemLocale("it");
+  assertEquals(app.locale, "it");
+  assertEquals(app.i18n, translations.it);
+
+  app.setLocale("en");
+  assertEquals(app.locale, "en");
+  app.setSystemLocale("it");
+  assertEquals(app.locale, "en");
 });
 
-Deno.test("setState - restores the saved locale", () => {
+Deno.test("getState - saves only the picked language, not the strings", () => {
   const app = createStore();
-  app.setState({ ...app.getState, locale: "it" });
+  app.setSystemLocale("it");
+  assertEquals(app.getState.language, null);
+  app.setLocale("it");
+  assertEquals(app.getState.language, "it");
+  assertEquals("i18n" in app.getState, false);
+  assertEquals("locale" in app.getState, false);
+});
+
+Deno.test("setState - restores the picked language", () => {
+  const app = createStore();
+  app.setState({ ...app.getState, language: "it" });
   assertEquals(app.locale, "it");
   assertEquals(app.i18n, translations.it);
 });
 
-Deno.test("setState - falls back to English for an unknown locale", () => {
+Deno.test("setState - older saves follow the system language", () => {
   const app = createStore();
-  app.setLocale("it");
-  app.setState({ ...app.getState, locale: "fr" as Locale });
-  assertEquals(app.locale, "en");
+  app.setSystemLocale("it");
+  // Before the switcher every save had locale: "en", never picked by the user
+  const old = { locale: "en", theme: "light", currency: "€", data: [] };
+  app.setState(old as unknown as AppState);
+  assertEquals(app.language, null);
+  assertEquals(app.locale, "it");
+});
+
+Deno.test("setState - an unknown language follows the system language", () => {
+  const app = createStore();
+  app.setSystemLocale("it");
+  app.setLocale("en");
+  app.setState({ ...app.getState, language: "fr" as Locale });
+  assertEquals(app.locale, "it");
 });
 
 Deno.test("setState", () => {

@@ -77,19 +77,22 @@ uploads `_site` as the Pages artifact, and a second job only runs
   - `types.ts` has the `I18n` and `Locale` types. `I18n` must stay in sync with
     the files in `_data/i18n/` (`i18n_test.ts` checks that every locale has the
     same keys). `getTranslation` replaces a `{{value}}` placeholder at runtime.
-  - `i18n.ts`: the `translations` map and `detectLocale`. `store.i18n` is a
-    getter derived from `store.locale`, so strings are never persisted.
+  - `i18n.ts`: the `translations` map and `detectLocale`. `store.locale` is a
+    getter: the picked `language`, or else `systemLocale` from
+    `navigator.languages`. `store.i18n` derives from it. Only `language` is
+    persisted, and it stays `null` until the user taps a flag.
 - **i18n**: the language switches at runtime. Every visible string is written as
   `<h1 x-text="$t.empty.title">{{ i18n.en.empty.title }}</h1>`, so the static
   HTML is English and Alpine swaps in the current locale (`$t` is an
   `Alpine.magic` returning `store.i18n`). Attributes use a static English value
   plus a `:attr="$t…"` binding. New strings need a key in every locale file and
-  in the `I18n` type. The locale is saved in `localStorage` with the rest of the
-  state. With nothing saved it follows `navigator.languages`. The inline script
-  in `base.vto` repeats that lookup before first paint. For a non-English locale
-  it sets `data-i18n-pending`, which hides the page until `main.ts` has run
-  (with a one-second CSS fallback). Language names in the flag switcher stay in
-  their own language.
+  in the `I18n` type. The picked language is saved in `localStorage` with the
+  rest of the state (older saves have a `locale` field instead, which is
+  ignored). Without one the app follows the system language, English as
+  fallback. The inline script in `base.vto` repeats that lookup before first
+  paint. For a non-English locale it sets `data-i18n-pending`, which hides the
+  page until `main.ts` has run (with a one-second CSS fallback). Language names
+  in the flag switcher stay in their own language.
 - **Styling**: one hand-written stylesheet, `src/styles.css`, with no framework
   or build step. It uses five cascade layers (reset, tokens, base, layout,
   components). The palette is warm cream/plum-ink with pastel tints (`--tint-*`)

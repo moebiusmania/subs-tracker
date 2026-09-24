@@ -113,6 +113,7 @@ Deno.test("header - setLocale switches language inside a transition", () => {
   const header = components.header();
 
   header.setLocale("it");
+  assertEquals(store.language, "it");
   assertEquals(store.locale, "it");
   assertEquals(store.i18n.main.title, "Le tue statistiche");
   assertEquals(calls.transitions, 1);

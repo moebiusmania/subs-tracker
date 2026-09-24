@@ -24,8 +24,8 @@
         const root = document.documentElement;
         const saved = JSON.parse(localStorage.getItem("subs-tracker"));
         const locales = {{ JSON.stringify(Object.keys(i18n)) }};
-        const locale = saved
-          ? saved.locale
+        const locale = locales.includes(saved?.language)
+          ? saved.language
           : navigator.languages
             .map((language) => language.toLowerCase().split("-")[0])
             .find((language) => locales.includes(language));
