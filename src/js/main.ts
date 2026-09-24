@@ -4,6 +4,9 @@ import Alpine from "alpinejs";
 import { createStore, type Store } from "./lib/store.ts";
 import { hasData, load, save } from "./lib/storage.ts";
 import { createComponents } from "./lib/components.ts";
+import { createInstaller, registerServiceWorker } from "./pwa.ts";
+
+registerServiceWorker();
 
 const store: Store = createStore();
 
@@ -63,6 +66,7 @@ const components = createComponents({
       };
       input.click();
     }),
+  installer: createInstaller(),
 });
 
 Alpine.data("header", components.header);
@@ -71,5 +75,6 @@ Alpine.data("dashboard", components.dashboard);
 Alpine.data("list", components.list);
 Alpine.data("backup", components.backup);
 Alpine.data("addForm", components.addForm);
+Alpine.data("install", components.install);
 
 Alpine.start();

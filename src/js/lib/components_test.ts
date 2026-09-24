@@ -2,10 +2,58 @@ import { assertEquals, assertMatch } from "@std/assert";
 
 import type { Subscription } from "./types.ts";
 import { createStore, type Store } from "./store.ts";
-import { createComponents, DELETE_MESSAGE, type Deps } from "./components.ts";
+import {
+  createComponents,
+  DELETE_MESSAGE,
+  type Deps,
+  type Installer,
+} from "./components.ts";
+
+type InstallerOptions = {
+  installed?: boolean;
+  manual?: boolean;
+  dismissed?: boolean;
+  accept?: boolean;
+};
+
+// Fake install prompt: fire() and install() stand in for the browser events
+const fakeInstaller = (options: InstallerOptions = {}) => {
+  const calls = { dismiss: 0, prompt: 0 };
+  let promptCallback = () => {};
+  let installedCallback = () => {};
+  const installer: Installer = {
+    installed: () => options.installed ?? false,
+    manual: () => options.manual ?? false,
+    dismissed: () => options.dismissed ?? false,
+    dismiss: () => calls.dismiss++,
+    onPrompt: (callback) => {
+      promptCallback = callback;
+    },
+    onInstalled: (callback) => {
+      installedCallback = callback;
+    },
+    prompt: () => {
+      calls.prompt++;
+      return Promise.resolve(options.accept ?? true);
+    },
+  };
+  return {
+    installer,
+    calls,
+    fire: () => promptCallback(),
+    install: () => installedCallback(),
+  };
+};
 
 // Fake browser side effects, recording every call
-const setup = (options: { confirm?: boolean; file?: string | null } = {}) => {
+const setup = (
+  options: {
+    confirm?: boolean;
+    file?: string | null;
+    installer?: InstallerOptions;
+  } = {},
+) => {
+  const install = fakeInstaller(options.installer);
   const store: Store = createStore();
   const calls = {
     persist: 0,
@@ -35,8 +83,9 @@ const setup = (options: { confirm?: boolean; file?: string | null } = {}) => {
       calls.accept.push(accept);
       return Promise.resolve(options.file ?? null);
     },
+    installer: install.installer,
   };
-  return { store, calls, components: createComponents(deps) };
+  return { store, calls, install, components: createComponents(deps) };
 };
 
 const netflix: Subscription = {
@@ -189,4 +238,79 @@ Deno.test("addForm - submit adds the item, persists and goes home", () => {
   assertEquals(store.data[0].name, "Netflix");
   assertEquals(calls.persist, 1);
   assertEquals(calls.navigate, ["/subs-tracker/"]);
+});
+
+Deno.test("install - hidden until the browser offers its prompt", () => {
+  const { install, components } = setup();
+  const banner = components.install();
+
+  banner.init();
+  assertEquals(banner.mode, "");
+
+  install.fire();
+  assertEquals(banner.mode, "prompt");
+});
+
+Deno.test("install - shows the manual steps on iOS", () => {
+  const { components } = setup({ installer: { manual: true } });
+  const banner = components.install();
+
+  banner.init();
+  assertEquals(banner.mode, "manual");
+});
+
+Deno.test("install - stays hidden when installed or dismissed", () => {
+  for (const installer of [{ installed: true }, { dismissed: true }]) {
+    const { install, components } = setup({
+      installer: { ...installer, manual: true },
+    });
+    const banner = components.install();
+
+    banner.init();
+    install.fire();
+    assertEquals(banner.mode, "");
+  }
+});
+
+Deno.test("install - accepted prompt hides the banner for good", async () => {
+  const { install, components } = setup();
+  const banner = components.install();
+
+  banner.init();
+  install.fire();
+  await banner.install();
+  assertEquals(banner.mode, "");
+  assertEquals(install.calls.prompt, 1);
+  assertEquals(install.calls.dismiss, 0);
+});
+
+Deno.test("install - declined prompt counts as dismissed", async () => {
+  const { install, components } = setup({ installer: { accept: false } });
+  const banner = components.install();
+
+  banner.init();
+  install.fire();
+  await banner.install();
+  assertEquals(banner.mode, "");
+  assertEquals(install.calls.dismiss, 1);
+});
+
+Deno.test("install - dismiss hides and remembers it", () => {
+  const { install, components } = setup({ installer: { manual: true } });
+  const banner = components.install();
+
+  banner.init();
+  banner.dismiss();
+  assertEquals(banner.mode, "");
+  assertEquals(install.calls.dismiss, 1);
+});
+
+Deno.test("install - hides once the app gets installed", () => {
+  const { install, components } = setup();
+  const banner = components.install();
+
+  banner.init();
+  install.fire();
+  install.install();
+  assertEquals(banner.mode, "");
 });

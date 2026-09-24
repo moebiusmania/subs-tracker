@@ -206,6 +206,15 @@
     flex: none;
   }
 
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   .skip-link {
     position: absolute;
     top: var(--space-2);
@@ -1112,6 +1121,90 @@
 
         .btn {
           width: 100%;
+        }
+      }
+    }
+  }
+
+  /* Install banner --------------------------------------------------- */
+  /* Floating card, bottom-right on wide screens and full width on phones. */
+
+  @scope (.install) {
+    :scope {
+      position: fixed;
+      inset-inline: var(--gutter);
+      bottom: calc(var(--gutter) + env(safe-area-inset-bottom, 0px));
+      z-index: 20;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--space-3) var(--space-4);
+      max-width: 27rem;
+      margin-inline-start: auto;
+      padding: var(--space-5);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      box-shadow: var(--shadow-md);
+      view-transition-name: install;
+      transition:
+        opacity var(--duration-slow) ease,
+        translate var(--duration-slow) var(--ease-spring);
+
+      @starting-style {
+        opacity: 0;
+        translate: 0 1.5rem;
+      }
+    }
+
+    .install__logo {
+      display: grid;
+      place-items: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: var(--radius-sm);
+      background: var(--color-accent);
+      color: var(--color-on-accent);
+      rotate: -6deg;
+    }
+
+    .install__body {
+      display: grid;
+      gap: var(--space-1);
+    }
+
+    .install__title {
+      font-size: 1.125rem;
+    }
+
+    .install__text {
+      color: var(--color-text-muted);
+      font-size: 0.9375rem;
+      line-height: 1.5;
+    }
+
+    /* Mirrors the iOS Share button so it is easy to spot */
+    .install__share {
+      display: inline-grid;
+      place-items: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      margin-inline: 0.1em;
+      border-radius: 0.5rem;
+      background: var(--tint-sky);
+      color: var(--color-text);
+      vertical-align: middle;
+    }
+
+    .install__actions {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: var(--space-2);
+
+      @media (width < 40rem) {
+        .btn {
+          flex: 1;
         }
       }
     }

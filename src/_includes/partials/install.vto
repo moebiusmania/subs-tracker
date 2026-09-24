@@ -1,0 +1,24 @@
+<aside
+  class="install"
+  x-data="install"
+  x-show="mode"
+  x-cloak
+  aria-labelledby="install-title"
+>
+  <span class="install__logo">{{ include "partials/icon.vto" { name: "wallet" } }}</span>
+  <div class="install__body">
+    <h2 id="install-title" class="install__title">{{ i18n.install.title }}</h2>
+    <p class="install__text" x-show="mode === 'prompt'">{{ i18n.install.message }}</p>
+    <p class="install__text" x-show="mode === 'manual'">
+      {{ i18n.install.manualTap }}
+      <span class="install__share">{{ include "partials/icon.vto" { name: "share" } }}<span class="visually-hidden">Share</span></span>
+      {{ i18n.install.manualAdd }}
+    </p>
+  </div>
+  <div class="install__actions">
+    <button type="button" class="btn btn--primary" x-show="mode === 'prompt'" @click="install">
+      {{ include "partials/icon.vto" { name: "download" } }} {{ i18n.install.cta }}
+    </button>
+    <button type="button" class="btn btn--ghost" @click="dismiss">{{ i18n.install.dismiss }}</button>
+  </div>
+</aside>
