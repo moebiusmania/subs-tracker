@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "language": "English",
+    "title": "Subscriptions Tracker ⚠️",
+    "description": "Webapp to keep track of subscriptions fees and have some math done for you."
+  },
+  "header": {
+    "skip": "Skip to content",
+    "brand": "Subscriptions tracker",
+    "language": "Language",
+    "darkMode": "Dark mode"
+  },
+  "main": {
+    "title": "Your stats",
+    "total": "Total subscriptions:",
+    "inactives": "with {{value}} inactive subscriptions",
+    "monthly": "Total monthly cost:",
+    "yearly": "Total yearly cost:",
+    "detail": "(only active subscriptions)",
+    "list": "Your subscriptions",
+    "cta": "Add a new subscription",
+    "active": "Active",
+    "inactive": "Inactive",
+    "toggle": "toggle {{value}}",
+    "expires": "Expires on",
+    "delete": "Delete all",
+    "confirmDelete": "Sure you want to delete all subscriptions data?"
+  },
+  "recurrence": {
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "empty": {
+    "title": "There is nothing here!",
+    "message": "Let's start by adding your subscriptions data.",
+    "cta": "Let's track some subscriptions!",
+    "or": "or",
+    "default": "Use the example data"
+  },
+  "backup": {
+    "export": "Export the data",
+    "import": "Import data"
+  },
+  "add": {
+    "back": "Go back to the main screen",
+    "title": "Add a new subscription",
+    "intro": "The subscription data will be <strong>stored locally</strong>. It will not be available on other devices and there are no security or privacy concerns.",
+    "name": "Service name",
+    "namePlaceholder": "ex: Netflix, Prime, etc..",
+    "price": "How much does it cost?",
+    "currency": "Currency",
+    "euro": "Euro",
+    "dollar": "Dollar",
+    "expiration": "Date of expiration",
+    "recurrence": "Recurs",
+    "active": "Is active?",
+    "submit": "Add this subscription",
+    "cancel": "Cancel"
+  },
+  "install": {
+    "title": "Get the app",
+    "message": "Install it on your device: it opens from your home screen and works offline too.",
+    "manualTap": "Works offline too: tap",
+    "share": "Share",
+    "manualAdd": "then “Add to Home Screen”.",
+    "cta": "Install",
+    "dismiss": "Not now"
+  },
+  "footer": {
+    "license": "MIT license",
+    "project": "an Open Source project",
+    "madeWith": "made with",
+    "love": "love",
+    "by": "by"
+  }
+}

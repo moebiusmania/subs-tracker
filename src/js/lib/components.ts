@@ -1,4 +1,4 @@
-import type { Subscription } from "./types.ts";
+import type { Locale, Subscription } from "./types.ts";
 import type { Store } from "./store.ts";
 import {
   formatDate,
@@ -43,8 +43,6 @@ export type Deps = {
   installer: Installer;
 };
 
-export const DELETE_MESSAGE = "Sure you want to delete all subscriptions data?";
-
 export const createComponents = (deps: Deps) => {
   const { app, persist } = deps;
 
@@ -55,6 +53,13 @@ export const createComponents = (deps: Deps) => {
         deps.transition(() => {
           app().setTheme(update);
           deps.setThemeAttribute(update);
+          persist();
+        });
+      },
+      setLocale(locale: Locale): void {
+        if (app().locale === locale) return;
+        deps.transition(() => {
+          app().setLocale(locale);
           persist();
         });
       },
@@ -86,12 +91,29 @@ export const createComponents = (deps: Deps) => {
     }),
 
     list: () => ({
+      status(item: Subscription): string {
+        const { main } = app().i18n;
+        return item.isActive ? main.active : main.inactive;
+      },
+      statusLabel(item: Subscription): string {
+        const toggle = getTranslation(app().i18n.main.toggle, item.name);
+        return `${this.status(item)}, ${toggle}`;
+      },
+      recurrence(item: Subscription): string {
+        return app().i18n.recurrence[item.recurrence];
+      },
+      // Dates come back from localStorage as strings
+      expiration(item: Subscription): string {
+        return new Date(item.expiration).toLocaleDateString(app().locale, {
+          dateStyle: "medium",
+        });
+      },
       toggleActive(index: number): void {
         app().toggleActive(index);
         persist();
       },
       deleteAll(): void {
-        if (deps.confirm(DELETE_MESSAGE)) {
+        if (deps.confirm(app().i18n.main.confirmDelete)) {
           app().deleteSubs();
           persist();
         }

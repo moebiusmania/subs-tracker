@@ -41,10 +41,10 @@ uploads `_site` as the Pages artifact, and a second job only runs
 
 - **Build side (Lume)**: `_config.ts` sets `src: "./src"`. Pages are Vento
   templates: `src/index.vto` → `/`, `src/add.vto` → `/add/`. `src/_data.yml`
-  gives every page the `layouts/base.vto` layout plus `title`/`description`.
-  `src/_data/i18n.json` is exposed to templates as `i18n` for static strings.
-  Lume 3 only copies non-page files that are registered with `site.add()` in
-  `_config.ts`, so new assets must be added there.
+  gives every page the `layouts/base.vto` layout. `src/_data/i18n/*.json` (one
+  file per locale, `en` and `it`) is exposed to templates as `i18n.en`,
+  `i18n.it`. Lume 3 only copies non-page files that are registered with
+  `site.add()` in `_config.ts`, so new assets must be added there.
 - **URLs**: always write internal links with the Vento `url` filter
   (`{{ '/add/' |> url }}`) so the GitHub Pages `/subs-tracker/` prefix is
   applied. JS gets the home URL from the template
@@ -74,8 +74,22 @@ uploads `_site` as the Pages artifact, and a second job only runs
     each test.
   - `index.ts`: cost calculations. Yearly cost counts monthly items ×12, and
     only active subscriptions are counted.
-  - `types.ts` has the `I18n` type, which must stay in sync with `i18n.json`.
-    `getTranslation` replaces a `{{value}}` placeholder at runtime.
+  - `types.ts` has the `I18n` and `Locale` types. `I18n` must stay in sync with
+    the files in `_data/i18n/` (`i18n_test.ts` checks that every locale has the
+    same keys). `getTranslation` replaces a `{{value}}` placeholder at runtime.
+  - `i18n.ts`: the `translations` map and `detectLocale`. `store.i18n` is a
+    getter derived from `store.locale`, so strings are never persisted.
+- **i18n**: the language switches at runtime. Every visible string is written as
+  `<h1 x-text="$t.empty.title">{{ i18n.en.empty.title }}</h1>`, so the static
+  HTML is English and Alpine swaps in the current locale (`$t` is an
+  `Alpine.magic` returning `store.i18n`). Attributes use a static English value
+  plus a `:attr="$t…"` binding. New strings need a key in every locale file and
+  in the `I18n` type. The locale is saved in `localStorage` with the rest of the
+  state. With nothing saved it follows `navigator.languages`. The inline script
+  in `base.vto` repeats that lookup before first paint. For a non-English locale
+  it sets `data-i18n-pending`, which hides the page until `main.ts` has run
+  (with a one-second CSS fallback). Language names in the flag switcher stay in
+  their own language.
 - **Styling**: one hand-written stylesheet, `src/styles.css`, with no framework
   or build step. It uses five cascade layers (reset, tokens, base, layout,
   components). The palette is warm cream/plum-ink with pastel tints (`--tint-*`)

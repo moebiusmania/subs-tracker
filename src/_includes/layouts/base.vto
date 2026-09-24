@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="it-IT" data-theme="light">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <meta name="title" content="{{ title }}">
-    <meta name="description" content="{{ description }}">
+    <title>{{ i18n.en.meta.title }}</title>
+    <meta name="title" content="{{ i18n.en.meta.title }}">
+    <meta name="description" content="{{ i18n.en.meta.description }}">
     <meta name="theme-color" content="#fbf8f3" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#17141f" media="(prefers-color-scheme: dark)">
     <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' |> url }}">
@@ -16,16 +16,30 @@
     <link rel="stylesheet" href="https://fonts.bunny.net/css?family=nunito:400,600,700,800&display=swap">
     <link rel="stylesheet" href="{{ '/styles.css' |> url }}">
     <script>
-      // Apply the saved theme before first paint (main.js is deferred)
+      // Apply the saved theme and language before first paint (main.js is
+      // deferred). The markup is in English: for any other language keep the
+      // page hidden until main.js has translated it (see detectLocale in
+      // js/lib/i18n.ts for the same browser language lookup).
       try {
-        const theme = JSON.parse(localStorage.getItem("subs-tracker"))?.theme;
-        if (theme) document.documentElement.dataset.theme = theme;
+        const root = document.documentElement;
+        const saved = JSON.parse(localStorage.getItem("subs-tracker"));
+        const locales = {{ JSON.stringify(Object.keys(i18n)) }};
+        const locale = saved
+          ? saved.locale
+          : navigator.languages
+            .map((language) => language.toLowerCase().split("-")[0])
+            .find((language) => locales.includes(language));
+        if (saved?.theme) root.dataset.theme = saved.theme;
+        if (locales.includes(locale) && locale !== "en") {
+          root.lang = locale;
+          root.dataset.i18nPending = "";
+        }
       } catch {}
     </script>
     <script type="module" src="{{ '/js/main.js' |> url }}"></script>
   </head>
-  <body>
-    <a class="skip-link" href="#content">Skip to content</a>
+  <body x-data>
+    <a class="skip-link" href="#content" x-text="$t.header.skip">{{ i18n.en.header.skip }}</a>
     {{ include "partials/header.vto" }}
     <main id="content" class="container">
       {{ content }}

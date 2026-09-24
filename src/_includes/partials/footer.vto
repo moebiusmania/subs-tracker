@@ -1,8 +1,10 @@
-<footer class="site-footer" x-data>
+<footer class="site-footer">
   <p class="container">
-    MIT license <span x-text="new Date().getFullYear()"></span> ·
-    <a href="https://github.com/moebiusmania/subs-tracker" target="_blank" rel="noopener noreferrer">an Open Source project</a>
-    made with <span class="heart" aria-label="love">&lt;3</span> by
+    <span x-text="$t.footer.license">{{ i18n.en.footer.license }}</span> <span x-text="new Date().getFullYear()"></span> ·
+    <a href="https://github.com/moebiusmania/subs-tracker" target="_blank" rel="noopener noreferrer" x-text="$t.footer.project">{{ i18n.en.footer.project }}</a>
+    <span x-text="$t.footer.madeWith">{{ i18n.en.footer.madeWith }}</span>
+    <span class="heart" aria-label="{{ i18n.en.footer.love }}" :aria-label="$t.footer.love">&lt;3</span>
+    <span x-text="$t.footer.by">{{ i18n.en.footer.by }}</span>
     <a href="https://salvatorelaisa.blog" target="_blank" rel="noopener noreferrer">Salvatore Laisa</a>
   </p>
 </footer>

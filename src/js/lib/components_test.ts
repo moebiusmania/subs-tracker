@@ -2,12 +2,7 @@ import { assertEquals, assertMatch } from "@std/assert";
 
 import type { Subscription } from "./types.ts";
 import { createStore, type Store } from "./store.ts";
-import {
-  createComponents,
-  DELETE_MESSAGE,
-  type Deps,
-  type Installer,
-} from "./components.ts";
+import { createComponents, type Deps, type Installer } from "./components.ts";
 
 type InstallerOptions = {
   installed?: boolean;
@@ -113,6 +108,25 @@ Deno.test("header - toggleTheme switches theme inside a transition", () => {
   assertEquals(calls.persist, 2);
 });
 
+Deno.test("header - setLocale switches language inside a transition", () => {
+  const { store, calls, components } = setup();
+  const header = components.header();
+
+  header.setLocale("it");
+  assertEquals(store.locale, "it");
+  assertEquals(store.i18n.main.title, "Le tue statistiche");
+  assertEquals(calls.transitions, 1);
+  assertEquals(calls.persist, 1);
+});
+
+Deno.test("header - setLocale does nothing for the current language", () => {
+  const { store, calls, components } = setup();
+  components.header().setLocale("en");
+  assertEquals(store.locale, "en");
+  assertEquals(calls.transitions, 0);
+  assertEquals(calls.persist, 0);
+});
+
 Deno.test("empty - useMock loads the example data and persists", () => {
   const { store, calls, components } = setup();
   components.empty().useMock();
@@ -162,9 +176,56 @@ Deno.test("list - deleteAll clears data after confirmation", () => {
   const { store, calls, components } = setup({ confirm: true });
   store.loadMock();
   components.list().deleteAll();
-  assertEquals(calls.confirm, [DELETE_MESSAGE]);
+  assertEquals(calls.confirm, [
+    "Sure you want to delete all subscriptions data?",
+  ]);
   assertEquals(store.data.length, 0);
   assertEquals(calls.persist, 1);
+});
+
+Deno.test("list - deleteAll asks in the current language", () => {
+  const { store, calls, components } = setup({ confirm: false });
+  store.setLocale("it");
+  components.list().deleteAll();
+  assertEquals(calls.confirm, [
+    "Vuoi davvero eliminare tutti i dati degli abbonamenti?",
+  ]);
+});
+
+Deno.test("list - status, recurrence and dates follow the locale", () => {
+  const { store, components } = setup();
+  const list = components.list();
+  const paused = { ...netflix, isActive: false, recurrence: "yearly" as const };
+
+  assertEquals(list.status(netflix), "Active");
+  assertEquals(list.statusLabel(paused), "Inactive, toggle Netflix");
+  assertEquals(list.recurrence(netflix), "Monthly");
+  assertEquals(list.expiration(netflix), "Jan 15, 2027");
+
+  store.setLocale("it");
+  assertEquals(list.status(netflix), "Attivo");
+  assertEquals(
+    list.statusLabel(paused),
+    "Non attivo, cambia lo stato di Netflix",
+  );
+  assertEquals(list.recurrence(paused), "Annuale");
+  assertEquals(list.expiration(netflix), "15 gen 2027");
+});
+
+Deno.test("list - expiration accepts the string dates from localStorage", () => {
+  const { components } = setup();
+  const saved = { ...netflix, expiration: "2027-01-15T00:00:00.000Z" };
+  assertEquals(
+    components.list().expiration(saved as unknown as Subscription),
+    "Jan 15, 2027",
+  );
+});
+
+Deno.test("dashboard - inactives follows the locale", () => {
+  const { store, components } = setup();
+  store.loadMock();
+  store.setLocale("it");
+  assertEquals(components.dashboard().inactives, "di cui 1 non attivi");
 });
 
 Deno.test("list - deleteAll keeps data when not confirmed", () => {

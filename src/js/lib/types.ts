@@ -7,7 +7,20 @@ export type Subscription = {
   recurrence: "monthly" | "yearly";
 };
 
+export type Locale = "en" | "it";
+
 export type I18n = {
+  meta: {
+    language: string;
+    title: string;
+    description: string;
+  };
+  header: {
+    skip: string;
+    brand: string;
+    language: string;
+    darkMode: string;
+  };
   main: {
     title: string;
     total: string;
@@ -17,8 +30,16 @@ export type I18n = {
     detail: string;
     list: string;
     cta: string;
+    active: string;
+    inactive: string;
+    toggle: string;
     expires: string;
     delete: string;
+    confirmDelete: string;
+  };
+  recurrence: {
+    monthly: string;
+    yearly: string;
   };
   empty: {
     title: string;
@@ -31,19 +52,42 @@ export type I18n = {
     export: string;
     import: string;
   };
+  add: {
+    back: string;
+    title: string;
+    intro: string;
+    name: string;
+    namePlaceholder: string;
+    price: string;
+    currency: string;
+    euro: string;
+    dollar: string;
+    expiration: string;
+    recurrence: string;
+    active: string;
+    submit: string;
+    cancel: string;
+  };
   install: {
     title: string;
     message: string;
     manualTap: string;
+    share: string;
     manualAdd: string;
     cta: string;
     dismiss: string;
   };
+  footer: {
+    license: string;
+    project: string;
+    madeWith: string;
+    love: string;
+    by: string;
+  };
 };
 
 export type AppState = {
-  locale: string;
-  i18n: I18n;
+  locale: Locale;
   theme: "dark" | "light";
   currency: string;
   data: Subscription[];

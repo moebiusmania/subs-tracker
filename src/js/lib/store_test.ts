@@ -2,7 +2,8 @@ import { assertEquals, assertNotEquals } from "@std/assert";
 
 import type { Subscription } from "./types.ts";
 import { createStore } from "./store.ts";
-import en from "../../_data/i18n.json" with { type: "json" };
+import type { Locale } from "./types.ts";
+import { translations } from "./i18n.ts";
 
 const testSubscription: Subscription = {
   name: "Test",
@@ -17,7 +18,6 @@ Deno.test("getState", () => {
   const app = createStore();
   assertEquals(app.getState, {
     locale: "en",
-    i18n: en,
     theme: "light",
     currency: "€",
     data: [],
@@ -71,6 +71,36 @@ Deno.test("toggleActive - don't update isActive if there is only 1 element", () 
   assertEquals(app.data[0].isActive, true);
   app.toggleActive(0);
   assertNotEquals(app.data[0].isActive, false);
+});
+
+Deno.test("setLocale - switches the strings too", () => {
+  const app = createStore();
+  assertEquals(app.i18n, translations.en);
+  app.setLocale("it");
+  assertEquals(app.locale, "it");
+  assertEquals(app.i18n, translations.it);
+  assertEquals(app.i18n.main.title, "Le tue statistiche");
+});
+
+Deno.test("getState - leaves the strings out", () => {
+  const app = createStore();
+  app.setLocale("it");
+  assertEquals(app.getState.locale, "it");
+  assertEquals("i18n" in app.getState, false);
+});
+
+Deno.test("setState - restores the saved locale", () => {
+  const app = createStore();
+  app.setState({ ...app.getState, locale: "it" });
+  assertEquals(app.locale, "it");
+  assertEquals(app.i18n, translations.it);
+});
+
+Deno.test("setState - falls back to English for an unknown locale", () => {
+  const app = createStore();
+  app.setLocale("it");
+  app.setState({ ...app.getState, locale: "fr" as Locale });
+  assertEquals(app.locale, "en");
 });
 
 Deno.test("setState", () => {

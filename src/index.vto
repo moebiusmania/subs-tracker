@@ -2,15 +2,15 @@
   <template x-if="$store.app.data.length === 0">
     <section class="empty panel" x-data="empty">
       {{ include "partials/empty-illustration.vto" }}
-      <h1>{{ i18n.empty.title }}</h1>
-      <p>{{ i18n.empty.message }}</p>
+      <h1 x-text="$t.empty.title">{{ i18n.en.empty.title }}</h1>
+      <p x-text="$t.empty.message">{{ i18n.en.empty.message }}</p>
       <div class="empty__actions">
         <a class="btn btn--primary" href="{{ '/add/' |> url }}">
-          {{ include "partials/icon.vto" { name: "plus" } }} {{ i18n.empty.cta }}
+          {{ include "partials/icon.vto" { name: "plus" } }} <span x-text="$t.empty.cta">{{ i18n.en.empty.cta }}</span>
         </a>
-        <span class="empty__or">{{ i18n.empty.or }}</span>
+        <span class="empty__or" x-text="$t.empty.or">{{ i18n.en.empty.or }}</span>
         <button type="button" class="btn" @click="useMock">
-          {{ include "partials/icon.vto" { name: "sparkles" } }} {{ i18n.empty.default }}
+          {{ include "partials/icon.vto" { name: "sparkles" } }} <span x-text="$t.empty.default">{{ i18n.en.empty.default }}</span>
         </button>
       </div>
     </section>
@@ -19,19 +19,19 @@
   <template x-if="$store.app.data.length > 0">
     <div class="stack">
       <section class="stats" x-data="dashboard" aria-labelledby="stats-title">
-        <h1 id="stats-title" class="section-title">{{ i18n.main.title }}</h1>
+        <h1 id="stats-title" class="section-title" x-text="$t.main.title">{{ i18n.en.main.title }}</h1>
         <div class="stats__grid">
-          {{ include "partials/stat.vto" { title: i18n.main.total, value: "total", description: "inactives", tint: "lav" } }}
-          {{ include "partials/stat.vto" { title: i18n.main.monthly, value: "monthly", description: "$store.app.i18n.main.detail", tint: "mint" } }}
-          {{ include "partials/stat.vto" { title: i18n.main.yearly, value: "yearly", description: "$store.app.i18n.main.detail", tint: "peach" } }}
+          {{ include "partials/stat.vto" { label: "total", value: "total", description: "inactives", tint: "lav" } }}
+          {{ include "partials/stat.vto" { label: "monthly", value: "monthly", description: "$t.main.detail", tint: "mint" } }}
+          {{ include "partials/stat.vto" { label: "yearly", value: "yearly", description: "$t.main.detail", tint: "peach" } }}
         </div>
       </section>
 
       <section class="subs" x-data="list" aria-labelledby="subs-title">
         <header class="subs__header">
-          <h2 id="subs-title" class="section-title">{{ i18n.main.list }}</h2>
+          <h2 id="subs-title" class="section-title" x-text="$t.main.list">{{ i18n.en.main.list }}</h2>
           <a class="btn btn--primary" href="{{ '/add/' |> url }}">
-            {{ include "partials/icon.vto" { name: "plus" } }} {{ i18n.main.cta }}
+            {{ include "partials/icon.vto" { name: "plus" } }} <span x-text="$t.main.cta">{{ i18n.en.main.cta }}</span>
           </a>
         </header>
 
@@ -48,23 +48,23 @@
                 <button
                   type="button"
                   class="status"
-                  :aria-label="(item.isActive ? 'Active' : 'Inactive') + ', toggle ' + item.name"
+                  :aria-label="statusLabel(item)"
                   @click="toggleActive(index)"
                 >
                   <span class="status__dot" aria-hidden="true"></span>
-                  <span x-text="item.isActive ? 'Active' : 'Inactive'"></span>
+                  <span x-text="status(item)"></span>
                 </button>
               </div>
               <p class="sub-card__price">
                 <span x-text="item.price + item.currency"></span>
-                <span class="sub-card__recurrence" x-text="item.recurrence"></span>
+                <span class="sub-card__recurrence" x-text="recurrence(item)"></span>
               </p>
               <p class="sub-card__expires">
                 {{ include "partials/icon.vto" { name: "calendar" } }}
-                {{ i18n.main.expires }}
+                <span x-text="$t.main.expires">{{ i18n.en.main.expires }}</span>
                 <time
                   :datetime="new Date(item.expiration).toISOString()"
-                  x-text="new Date(item.expiration).toLocaleDateString()"
+                  x-text="expiration(item)"
                 ></time>
               </p>
             </li>
@@ -74,14 +74,14 @@
         <footer class="subs__actions">
           <div class="subs__backup" x-data="backup">
             <button type="button" class="btn" @click="exportData">
-              {{ include "partials/icon.vto" { name: "download" } }} {{ i18n.backup.export }}
+              {{ include "partials/icon.vto" { name: "download" } }} <span x-text="$t.backup.export">{{ i18n.en.backup.export }}</span>
             </button>
             <button type="button" class="btn" @click="importData">
-              {{ include "partials/icon.vto" { name: "upload" } }} {{ i18n.backup.import }}
+              {{ include "partials/icon.vto" { name: "upload" } }} <span x-text="$t.backup.import">{{ i18n.en.backup.import }}</span>
             </button>
           </div>
           <button type="button" class="btn btn--danger" @click="deleteAll">
-            {{ include "partials/icon.vto" { name: "trash" } }} {{ i18n.main.delete }}
+            {{ include "partials/icon.vto" { name: "trash" } }} <span x-text="$t.main.delete">{{ i18n.en.main.delete }}</span>
           </button>
         </footer>
       </section>
