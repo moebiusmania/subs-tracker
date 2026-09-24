@@ -9,6 +9,9 @@
     <meta name="theme-color" content="#fbf8f3" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#17141f" media="(prefers-color-scheme: dark)">
     <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' |> url }}">
+    <link rel="apple-touch-icon" href="{{ '/icons/apple-touch-icon.png' |> url }}">
+    <link rel="manifest" href="{{ '/manifest.webmanifest' |> url }}">
+    <meta name="apple-mobile-web-app-title" content="Subs tracker">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link rel="stylesheet" href="https://fonts.bunny.net/css?family=nunito:400,600,700,800&display=swap">
     <link rel="stylesheet" href="{{ '/styles.css' |> url }}">
@@ -28,5 +31,6 @@
       {{ content }}
     </main>
     {{ include "partials/footer.vto" }}
+    {{ include "partials/install.vto" }}
   </body>
 </html>

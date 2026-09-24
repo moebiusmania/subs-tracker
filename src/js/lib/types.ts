@@ -31,6 +31,14 @@ export type I18n = {
     export: string;
     import: string;
   };
+  install: {
+    title: string;
+    message: string;
+    manualTap: string;
+    manualAdd: string;
+    cta: string;
+    dismiss: string;
+  };
 };
 
 export type AppState = {

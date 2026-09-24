@@ -21,5 +21,13 @@
   "backup": {
     "export": "Export the data",
     "import": "Import data"
+  },
+  "install": {
+    "title": "Get the app",
+    "message": "Install it on your device: it opens from your home screen and works offline too.",
+    "manualTap": "Works offline too: tap",
+    "manualAdd": "then “Add to Home Screen”.",
+    "cta": "Install",
+    "dismiss": "Not now"
   }
 }

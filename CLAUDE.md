@@ -54,11 +54,11 @@ uploads `_site` as the Pages artifact, and a second job only runs
   page load it builds the store, hydrates it from `localStorage`, applies
   `data-theme` on `<html>`, registers `Alpine.store("app", …)` and the
   `Alpine.data` components, then calls `Alpine.start()`. The component logic
-  (`header`, `empty`, `dashboard`, `list`, `backup`, `addForm`) lives in
-  `src/js/lib/components.ts` as plain factories. Browser side effects (confirm,
-  navigation, theme attribute, view transition, file download/pick) are passed
-  in as `Deps`, so `main.ts` only wires real DOM implementations and the tests
-  pass fakes.
+  (`header`, `empty`, `dashboard`, `list`, `backup`, `addForm`, `install`) lives
+  in `src/js/lib/components.ts` as plain factories. Browser side effects
+  (confirm, navigation, theme attribute, view transition, file download/pick)
+  are passed in as `Deps`, so `main.ts` only wires real DOM implementations and
+  the tests pass fakes.
 - **Alpine gotcha**: directives only run inside an `x-data` root. That's why
   `index.vto` is wrapped in `<div x-data>`: its top-level `<template x-if>`
   switches between the empty state and dashboard+list at runtime, since the HTML
@@ -94,5 +94,19 @@ uploads `_site` as the Pages artifact, and a second job only runs
   Nunito font comes from Bunny Fonts. Entry animations use `@starting-style` and
   keyframes; navigations and the theme switch use view transitions; everything
   respects `prefers-reduced-motion`.
+- **PWA**: `src/sw.js` is a plain JS service worker (esbuild bundles it too).
+  Same-origin GETs are network-first with `cache: "no-cache"` and a 4s timeout
+  that falls back to the cache, so online users always get the latest deploy;
+  Bunny Fonts are stale-while-revalidate. A `site.process()` in `_config.ts`
+  replaces its `"__SW_VERSION__"` and `"__SW_PRECACHE__"` placeholders with a
+  hash of every built file and the precache list (all pages plus the `assets`
+  array). New static files go in that array so they are precached and hashed.
+  `src/js/pwa.ts` registers the worker (resolved from `import.meta.url` to keep
+  the path prefix) and implements the `Installer` dep behind the `install`
+  banner component (`partials/install.vto`): Chromium's `beforeinstallprompt`,
+  manual Share-menu steps on iOS, and a "not now" flag under the separate
+  `localStorage` key `subs-tracker:install-dismissed`. The PNG icons are
+  rendered from `src/icons/icon.svg` and `icon-maskable.svg` (not published), so
+  re-render them if the logo changes.
 - Dates saved to `localStorage` come back as strings, so render them with
   `new Date(item.expiration)`.

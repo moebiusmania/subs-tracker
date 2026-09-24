@@ -10,6 +10,25 @@ import {
 
 type Theme = "light" | "dark";
 
+// Install banner: "prompt" where the browser can show its own install
+// dialog, "manual" on iOS where users add the app from the Share menu
+export type InstallMode = "" | "prompt" | "manual";
+
+export type Installer = {
+  // Already running as an installed app
+  installed: () => boolean;
+  // Installing only works by hand (iOS has no install prompt)
+  manual: () => boolean;
+  // The user closed the banner before
+  dismissed: () => boolean;
+  dismiss: () => void;
+  // Called when the browser's install prompt becomes available
+  onPrompt: (callback: () => void) => void;
+  onInstalled: (callback: () => void) => void;
+  // Shows the browser's install prompt, resolves to true if accepted
+  prompt: () => Promise<boolean>;
+};
+
 // Browser side effects are injected so the components stay plain objects
 // that can be unit tested; main.ts provides the real implementations.
 export type Deps = {
@@ -21,6 +40,7 @@ export type Deps = {
   transition: (update: () => void) => void;
   download: (filename: string, content: string) => void;
   pickFile: (accept: string) => Promise<string | null>;
+  installer: Installer;
 };
 
 export const DELETE_MESSAGE = "Sure you want to delete all subscriptions data?";
@@ -91,6 +111,30 @@ export const createComponents = (deps: Deps) => {
           app().importSubs(JSON.parse(content));
           persist();
         }
+      },
+    }),
+
+    install: () => ({
+      mode: "" as InstallMode,
+      init(): void {
+        const { installer } = deps;
+        if (installer.installed() || installer.dismissed()) return;
+        if (installer.manual()) this.mode = "manual";
+        installer.onPrompt(() => {
+          this.mode = "prompt";
+        });
+        installer.onInstalled(() => {
+          this.mode = "";
+        });
+      },
+      async install(): Promise<void> {
+        this.mode = "";
+        // A declined prompt counts as "not now": don't nag again
+        if (!(await deps.installer.prompt())) deps.installer.dismiss();
+      },
+      dismiss(): void {
+        this.mode = "";
+        deps.installer.dismiss();
       },
     }),
 

@@ -26,6 +26,12 @@ This **may** change in the future if I will consider the idea of adding a backen
 
 At the moment there is an _import/export_ functionality available in the app that will create a `.json` file with your subscriptions data that you can use to eventually move the data on another instance of the app (_on another device_). It isn't the most convenient way to _"sync"_ the data, but it easy to implement and keeps the complete ownership of personal data to the users.
 
+### Install it & use it offline
+
+The app is a PWA: you can install it on your home screen (or desktop) from the banner at the bottom of the page, or from the browser menu. On iPhone and iPad tap _Share_ and then _Add to Home Screen_.
+
+After the first visit it works offline too, since both the app and your data are kept on the device. When you open it online you always get the latest version: the offline copy is updated in the background.
+
 ### Roadmap
 
 - Edit & delete entries
@@ -34,7 +40,6 @@ At the moment there is an _import/export_ functionality available in the app tha
 - Push Notifications?
 - "Help/How it works" screen
 - Localization, maybe...
-- PWA (_install in your homescreen and works offline_)
 - (_still undecided_) Signup/signin + Backend to sync data on multiple devices. As I said above if this will happen it will not be mandatory.
 
 ### Thoughts on the backend
@@ -88,6 +93,7 @@ The app is a static website: every page is plain HTML generated at build time, w
 - **Pages** are [Vento](https://vento.js.org/) templates in `src/` (`index.vto` for the home, `add.vto` for the form), shared markup lives in `src/_includes/`.
 - **Interactivity** is handled by [Alpine.js](https://alpinejs.dev/): `src/js/main.ts` is the only script, bundled by Lume with esbuild.
 - **Business logic** (costs math, the store, local storage and the UI components logic) lives in `src/js/lib/` as plain TypeScript with no framework, so it's fully unit tested.
+- **Offline & install**: `src/sw.js` is the service worker. It loads everything from the network first and falls back to the cached copy when offline. At build time `_config.ts` fills in the list of files to precache and a version hashed from the whole site, so every deploy installs a fresh worker. `src/manifest.webmanifest` and the icons in `src/icons/` make the app installable.
 - **Styles** are a single hand-written stylesheet, `src/styles.css`, using modern CSS (cascade layers, `@scope`, nesting, `light-dark()`, `@starting-style`, view transitions) with no framework or preprocessor. Light and dark themes both meet the WCAG 2.1 AA contrast requirements, and animations are disabled when the system asks for reduced motion.
 
 ### Tests & deploy
