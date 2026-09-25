@@ -37,7 +37,13 @@
 
         <ul class="subs__grid" role="list">
           <template x-for="(item, index) in $store.app.data" :key="index">
-            <li class="sub-card" :class="{ 'is-inactive': !item.isActive }">
+            <li
+              class="sub-card"
+              :class="{
+                'is-inactive': !item.isActive,
+                'is-due': expiresThisMonth(item),
+              }"
+            >
               <div class="sub-card__top">
                 <span
                   class="sub-card__avatar"
@@ -66,6 +72,11 @@
                   :datetime="new Date(item.expiration).toISOString()"
                   x-text="expiration(item)"
                 ></time>
+                <span
+                  class="sub-card__due"
+                  x-show="expiresThisMonth(item)"
+                  x-text="$t.main.thisMonth"
+                >{{ i18n.en.main.thisMonth }}</span>
               </p>
             </li>
           </template>

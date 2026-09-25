@@ -34,6 +34,7 @@ export type I18n = {
     inactive: string;
     toggle: string;
     expires: string;
+    thisMonth: string;
     delete: string;
     confirmDelete: string;
   };

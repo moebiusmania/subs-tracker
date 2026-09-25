@@ -1,5 +1,5 @@
 import type { AppState, I18n, Locale, Subscription } from "./types.ts";
-import { subs as mock } from "./mocks.ts";
+import { mockSubs } from "./mocks.ts";
 import { DEFAULT_LOCALE, isLocale, translations } from "./i18n.ts";
 
 export type Store = AppState & {
@@ -46,7 +46,7 @@ export const createStore = (): Store => ({
   },
 
   loadMock(): void {
-    this.data = structuredClone(mock);
+    this.data = mockSubs();
   },
   addSubscription(item: Subscription): void {
     this.data.push(item);

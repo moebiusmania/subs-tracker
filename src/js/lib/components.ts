@@ -6,6 +6,7 @@ import {
   getMonthlyCost,
   getTranslation,
   getYearlyCost,
+  isExpiringThisMonth,
 } from "./index.ts";
 
 type Theme = "light" | "dark";
@@ -107,6 +108,9 @@ export const createComponents = (deps: Deps) => {
         return new Date(item.expiration).toLocaleDateString(app().locale, {
           dateStyle: "medium",
         });
+      },
+      expiresThisMonth(item: Subscription): boolean {
+        return isExpiringThisMonth(item);
       },
       toggleActive(index: number): void {
         app().toggleActive(index);

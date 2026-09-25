@@ -1168,12 +1168,15 @@ export class App {
       const focused = ctx.focus === id;
       const hover = ctx.hover === id;
       const active = item.isActive;
+      const due = list.expiresThisMonth(item);
       const fill = active ? p.surface : p.surface2;
       frame(painter, id, { column, row, width: cardWidth, height: 7 }, {
         border: focused
           ? p.accentStrong
           : hover
           ? p.fieldBorder
+          : due
+          ? p.accent
           : this.#panelBorder(),
         fill,
         outside: p.bg,
@@ -1241,9 +1244,23 @@ export class App {
         column + 2,
         row + 5,
         truncate(`▦ ${t.main.expires} ${list.expiration(item)}`, cardWidth - 4),
-        { fg: p.muted, bg: fill },
+        due
+          ? { fg: p.accentStrong, bg: fill, bold: true }
+          : { fg: p.muted, bg: fill },
         2,
       );
+      // Expiring this month: a badge set into the top border
+      const badge = ` ${t.main.thisMonth} `;
+      if (due && textWidth(badge) <= cardWidth - 4) {
+        painter.text(
+          `${id}.due`,
+          column + cardWidth - 2 - textWidth(badge),
+          row,
+          badge,
+          { fg: p.accentStrong, bg: p.accentSoft, bold: true },
+          2,
+        );
+      }
 
       // The whole card toggles, the pill shows the state
       const toggle = () => list.toggleActive(index);

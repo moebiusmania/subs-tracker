@@ -908,6 +908,25 @@
       box-shadow: none;
     }
 
+    /* Expiring in the current month: accent border and a badge */
+    :scope.is-due {
+      border-color: var(--color-accent);
+    }
+
+    :scope.is-due .sub-card__expires {
+      color: var(--color-accent-strong);
+      font-weight: 700;
+    }
+
+    .sub-card__due {
+      padding: 0 var(--space-2);
+      border-radius: var(--radius-full);
+      background: var(--color-accent-soft);
+      font-size: 0.8125rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
     /* Status pill under the name, so long (or translated) names get the
        whole row next to the avatar */
     .sub-card__top {
@@ -973,6 +992,7 @@
 
     .sub-card__expires {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: var(--space-2);
       color: var(--color-text-muted);

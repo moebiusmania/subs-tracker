@@ -3,7 +3,9 @@ import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { App } from "./app.ts";
 import type { Key } from "./painter.ts";
 import { createStore } from "../src/js/lib/store.ts";
-import { subs } from "../src/js/lib/mocks.ts";
+import { mockSubs } from "../src/js/lib/mocks.ts";
+
+const subs = mockSubs();
 
 // Drives the app like the terminal would, with fake files and timers
 const setup = (
@@ -98,7 +100,16 @@ Deno.test("app - dashboard shows the web app's numbers", () => {
   assertStringIncludes(texts(), "┏━┓ ┏━┓ ┏━┓   ┏━┓ ╺━┓ ┏━╸");
   // The description wraps in the tile
   assertStringIncludes(texts(), "with 1 inactive\nsubscriptions");
-  assertStringIncludes(texts(), "Expires on May 23, 2022");
+  const date = subs[0].expiration.toLocaleDateString("en", {
+    dateStyle: "medium",
+  });
+  assertStringIncludes(texts(), `Expires on ${date}`);
+});
+
+Deno.test("app - cards expiring this month get a badge", () => {
+  const { texts } = setup({ mock: true });
+  // Only the first example item expires in the current month
+  assertEquals(texts().split(" Due this month ").length - 1, 1);
 });
 
 Deno.test("app - add a subscription with the keyboard", () => {
@@ -309,7 +320,11 @@ Deno.test("app - theme and language, from keys and the header", () => {
   press("l");
   assertEquals(store.locale, "it");
   assertStringIncludes(texts(), "Le tue statistiche");
-  assertStringIncludes(texts(), "Scade il 23 mag 2022");
+  const date = subs[0].expiration.toLocaleDateString("it", {
+    dateStyle: "medium",
+  });
+  assertStringIncludes(texts(), `Scade il ${date}`);
+  assertStringIncludes(texts(), " Scade questo mese ");
 
   click("lang.en");
   assertEquals(store.language, "en");

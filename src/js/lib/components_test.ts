@@ -173,6 +173,18 @@ Deno.test("list - toggleActive updates the store and persists", () => {
   assertEquals(calls.persist, 1);
 });
 
+Deno.test("list - expiresThisMonth flags the current month", () => {
+  const { store, components } = setup();
+  store.loadMock();
+  const list = components.list();
+  assertEquals(store.data.map((item) => list.expiresThisMonth(item)), [
+    true,
+    false,
+    false,
+    false,
+  ]);
+});
+
 Deno.test("list - deleteAll clears data after confirmation", () => {
   const { store, calls, components } = setup({ confirm: true });
   store.loadMock();

@@ -61,9 +61,10 @@ test("load - round-trips what was saved", () => {
 });
 
 test("load - dates come back as ISO strings", () => {
-  save(state());
+  const saved = state();
+  save(saved);
   const expiration: unknown = load().data[0].expiration;
-  assertEquals(expiration, "2022-05-23T19:31:26.925Z");
+  assertEquals(expiration, saved.data[0].expiration.toISOString());
 });
 
 test("save - overwrites the previous state", () => {

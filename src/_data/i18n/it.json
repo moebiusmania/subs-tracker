@@ -23,6 +23,7 @@
     "inactive": "Non attivo",
     "toggle": "cambia lo stato di {{value}}",
     "expires": "Scade il",
+    "thisMonth": "Scade questo mese",
     "delete": "Elimina tutto",
     "confirmDelete": "Vuoi davvero eliminare tutti i dati degli abbonamenti?"
   },

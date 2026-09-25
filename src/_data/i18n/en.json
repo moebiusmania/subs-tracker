@@ -23,6 +23,7 @@
     "inactive": "Inactive",
     "toggle": "toggle {{value}}",
     "expires": "Expires on",
+    "thisMonth": "Due this month",
     "delete": "Delete all",
     "confirmDelete": "Sure you want to delete all subscriptions data?"
   },

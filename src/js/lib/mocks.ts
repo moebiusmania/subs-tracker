@@ -1,13 +1,24 @@
 import type { Subscription } from "./types.ts";
 
-export const subs: Subscription[] = [
+// A day `months` after `now`'s month, clamped to that month's length, at
+// noon so time zones never move it to another day
+const inMonths = (now: Date, months: number, day: number): Date => {
+  const year = now.getFullYear();
+  const month = now.getMonth() + months;
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  return new Date(year, month, Math.min(day, lastDay), 12);
+};
+
+// Example data with expirations relative to `now`: one later this month,
+// one next month and the others further ahead
+export const mockSubs = (now: Date = new Date()): Subscription[] => [
   {
     name: "Movies streaming",
     price: 9.99,
     currency: "€",
     isActive: true,
     recurrence: "monthly",
-    expiration: new Date("2022-05-23T19:31:26.925Z"),
+    expiration: inMonths(now, 0, now.getDate() + 5),
   },
   {
     name: "Music streaming",
@@ -15,7 +26,7 @@ export const subs: Subscription[] = [
     currency: "€",
     isActive: true,
     recurrence: "yearly",
-    expiration: new Date("2022-06-23T19:31:26.925Z"),
+    expiration: inMonths(now, 5, 23),
   },
   {
     name: "App hosting",
@@ -23,7 +34,7 @@ export const subs: Subscription[] = [
     currency: "$",
     isActive: false,
     recurrence: "monthly",
-    expiration: new Date("2022-06-12T19:31:26.925Z"),
+    expiration: inMonths(now, 2, 12),
   },
   {
     name: "Gaming bundles",
@@ -31,6 +42,6 @@ export const subs: Subscription[] = [
     currency: "€",
     isActive: true,
     recurrence: "monthly",
-    expiration: new Date("2022-07-12T19:31:26.925Z"),
+    expiration: inMonths(now, 1, 18),
   },
 ];

@@ -16,7 +16,9 @@ import {
   toSubscription,
   validate,
 } from "./form.ts";
-import { subs } from "../src/js/lib/mocks.ts";
+import { mockSubs } from "../src/js/lib/mocks.ts";
+
+const subs = mockSubs();
 
 Deno.test("field - typing inserts at the cursor", () => {
   let f = field("Netlix");

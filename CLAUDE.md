@@ -84,7 +84,11 @@ their own browser (`deno task dev:host` serves it to the LAN).
     call. `storage_test.ts` uses Deno's built-in `localStorage`, cleared around
     each test.
   - `index.ts`: cost calculations. Yearly cost counts monthly items ×12, and
-    only active subscriptions are counted.
+    only active subscriptions are counted. `isExpiringThisMonth` drives the "due
+    this month" highlight on cards (web `.is-due`, TUI accent border and badge).
+  - `mocks.ts`: `mockSubs(now)` builds the example data with expirations
+    relative to `now` (one this month, one next month, the rest later), so tests
+    assert dates computed from it rather than fixed strings.
   - `types.ts` has the `I18n` and `Locale` types. `I18n` must stay in sync with
     the files in `_data/i18n/` (`i18n_test.ts` checks that every locale has the
     same keys). `getTranslation` replaces a `{{value}}` placeholder at runtime.

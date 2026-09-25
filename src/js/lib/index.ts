@@ -31,6 +31,16 @@ const getYearlyCost = (data: Subscription[]): number => {
   return parseFloat(value);
 };
 
+// Expires in the same calendar month as `now` (stored dates are strings)
+const isExpiringThisMonth = (
+  item: Subscription,
+  now: Date = new Date(),
+): boolean => {
+  const date = new Date(item.expiration);
+  return date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth();
+};
+
 // deno-lint-ignore no-explicit-any
 const getTranslation = (key: string, value: any): string =>
   key.replace("{{value}}", value);
@@ -41,4 +51,5 @@ export {
   getMonthlyCost,
   getTranslation,
   getYearlyCost,
+  isExpiringThisMonth,
 };
