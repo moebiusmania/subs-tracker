@@ -43,6 +43,11 @@ and `build:gh` on every push and pull request. On pushes to `main` that job also
 uploads `_site` as the Pages artifact, and a second job only runs
 `actions/deploy-pages` (no rebuild).
 
+Development happens on a Raspberry Pi: never install or run a headless browser
+(Chromium, Playwright, Puppeteer, …) to check changes. For visual changes, run
+`deno task check`/`build`, explain what to look for, and let the user verify in
+their own browser (`deno task dev:host` serves it to the LAN).
+
 ## Architecture
 
 - **Build side (Lume)**: `_config.ts` sets `src: "./src"`. Pages are Vento
