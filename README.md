@@ -8,6 +8,8 @@ Webapp to keep track on subscriptions fees and has some math done for you.
 
 👉 **Try it at [moebiusmania.github.io/subs-tracker](https://moebiusmania.github.io/subs-tracker/)**
 
+🖥️ Prefer the terminal? There's also a [terminal version](#terminal-version) with the same features.
+
 ### Motivation
 
 > "...but exactly how much I'm spending right now with all the subscriptions services that I'm using right now?"
@@ -35,6 +37,40 @@ The app is available in English and Italian: pick one with the flags at the top 
 The app is a PWA: you can install it on your home screen (or desktop) from the banner at the bottom of the page, or from the browser menu. On iPhone and iPad tap _Share_ and then _Add to Home Screen_.
 
 After the first visit it works offline too, since both the app and your data are kept on the device. When you open it online you always get the latest version: the offline copy is updated in the background.
+
+### Terminal version
+
+There's also a version that runs in the terminal, with the same features: the stats, the subscription cards (toggle them active/inactive), adding a subscription, export/import, delete all, light and dark themes, English and Italian. It works with both the keyboard and the mouse (click, hover and scroll wheel).
+
+#### Why a terminal version?
+
+The web app needs a browser, and a browser isn't always there or isn't always handy:
+
+- **No graphical environment**: headless servers, a Raspberry Pi without a display, minimal Linux installs or containers where there's only a shell.
+- **Over SSH**: you can check and update your subscriptions on a remote machine from any terminal, without port forwarding or exposing a web server.
+- **Terminal-first workflows**: if you live in the terminal (tmux, tiling window managers, keyboard-driven setups), it's quicker to run a command than to open a browser tab.
+- **Your data as a plain file**: the data is a JSON file you can back up, sync with your own tools (git, rsync, Syncthing…) or move between machines, instead of being tied to one browser's storage.
+- **A single binary**: `deno task tui:build` produces a standalone executable with no runtime to install, easy to copy onto another machine.
+
+It's not a separate app: it reuses the same logic as the web version, so the numbers always match, and the export/import files work in both. You can move your data from one to the other at any time.
+
+```bash
+$ deno task tui          # run it
+$ deno task tui:build    # compile a standalone binary to dist/subs-tracker
+```
+
+| Key                         | What it does                                                   |
+| --------------------------- | -------------------------------------------------------------- |
+| `Tab` / `Shift+Tab`, arrows | move between buttons, cards and fields                         |
+| `Enter` / `Space`           | press a button, toggle a card, submit the form                 |
+| `↑` `↓` / mouse wheel       | change the price or the date in the form (`PgUp`/`PgDn` month) |
+| `a` `e` `i`                 | add a subscription, export, import                             |
+| `t` / `l`                   | switch theme / language                                        |
+| `Esc`                       | back, or close a dialog                                        |
+| `PgUp` `PgDn` `Home` `End`  | scroll                                                         |
+| `q` / `Ctrl+C`              | quit                                                           |
+
+The data is saved in `~/.config/subs-tracker/data.json` (`%APPDATA%\subs-tracker\data.json` on Windows, or wherever `SUBS_TRACKER_DATA` points). It's the same format as the web app, and the export/import files work in both. The language follows your system locale until you pick one.
 
 ### Roadmap
 
@@ -88,6 +124,8 @@ All the available tasks:
 | `deno task build:gh`  | builds for GitHub Pages, under the `/subs-tracker/` path                 |
 | `deno task test`      | runs the unit tests                                                      |
 | `deno task check`     | formatting check, lint and type-check                                    |
+| `deno task tui`       | runs the terminal version                                                |
+| `deno task tui:build` | compiles the terminal version to a standalone binary in `dist/`          |
 
 ### How it's built
 
@@ -97,11 +135,12 @@ The app is a static website: every page is plain HTML generated at build time, w
 - **Interactivity** is handled by [Alpine.js](https://alpinejs.dev/): `src/js/main.ts` is the only script, bundled by Lume with esbuild.
 - **Business logic** (costs math, the store, local storage and the UI components logic) lives in `src/js/lib/` as plain TypeScript with no framework, so it's fully unit tested.
 - **Offline & install**: `src/sw.js` is the service worker. It loads everything from the network first and falls back to the cached copy when offline. At build time `_config.ts` fills in the list of files to precache and a version hashed from the whole site, so every deploy installs a fresh worker. `src/manifest.webmanifest` and the icons in `src/icons/` make the app installable.
+- **Terminal version** lives in `tui/` and uses [deno_tui](https://github.com/Im-Beast/deno_tui) to draw and read the keyboard and mouse. A small declarative layer on top of it (`tui/scene.ts`) redraws only what changed, and the screens reuse the web app's store and component logic from `src/js/lib/`, so both versions behave the same.
 - **Styles** are a single hand-written stylesheet, `src/styles.css`, using modern CSS (cascade layers, `@scope`, nesting, `light-dark()`, `@starting-style`, view transitions) with no framework or preprocessor. Light and dark themes both meet the WCAG 2.1 AA contrast requirements, and animations are disabled when the system asks for reduced motion.
 
 ### Tests & deploy
 
-Unit tests use the built-in [Deno test runner](https://docs.deno.com/runtime/fundamentals/testing/) and live next to the code they test (`*_test.ts` in `src/js/lib/`).
+Unit tests use the built-in [Deno test runner](https://docs.deno.com/runtime/fundamentals/testing/) and live next to the code they test (`*_test.ts` in `src/js/lib/` and `tui/`).
 
 Every push and pull request runs the format, lint, type-check and test steps on GitHub Actions and builds the site. Pushes to `main` that pass them are then deployed to GitHub Pages.
 
@@ -111,6 +150,7 @@ Every push and pull request runs the format, lint, type-check and test steps on 
 - [Lume](https://lume.land/) - static site generator, builds the pages as plain HTML
 - [Vento](https://vento.js.org/) - templating language used by Lume
 - [Alpine.js](https://alpinejs.dev/) - client side interactivity and state
+- [deno_tui](https://github.com/Im-Beast/deno_tui) - terminal rendering and keyboard/mouse input for the terminal version
 - [Nunito](https://fonts.bunny.net/family/nunito) - font, served by the privacy friendly [Bunny Fonts](https://fonts.bunny.net/)
 - [Lucide](https://lucide.dev/) - icons
 - [GitHub Actions](https://github.com/features/actions) & [GitHub Pages](https://pages.github.com/) - CI and hosting

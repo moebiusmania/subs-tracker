@@ -1,8 +1,10 @@
 {
   "imports": {
     "lume/": "https://cdn.jsdelivr.net/gh/lumeland/lume@v3.3.2/",
+    "deno_tui/": "https://cdn.jsdelivr.net/gh/Im-Beast/deno_tui@2.1.11/",
     "alpinejs": "npm:alpinejs@^3.17.4",
-    "@std/assert": "jsr:@std/assert@^1"
+    "@std/assert": "jsr:@std/assert@^1",
+    "@std/path": "jsr:@std/path@^1"
   },
   "tasks": {
     "lume": "echo \"import 'lume/cli.ts'\" | deno run -A -",
@@ -10,8 +12,10 @@
     "build:gh": "deno task lume --location=https://moebiusmania.github.io/subs-tracker/",
     "serve": "deno task lume -s",
     "dev:host": "deno task lume -s --hostname=0.0.0.0",
-    "test": "deno test src/",
-    "check": "deno fmt --check && deno lint && deno check src/js/main.ts _config.ts"
+    "test": "deno test --allow-read --allow-write src/ tui/",
+    "check": "deno fmt --check && deno lint && deno check src/js/main.ts _config.ts tui/",
+    "tui": "deno run --allow-env --allow-read --allow-write tui/main.ts",
+    "tui:build": "deno compile --allow-env --allow-read --allow-write --output dist/subs-tracker tui/main.ts"
   },
   "compilerOptions": {
     "types": [
@@ -26,7 +30,8 @@
   "fmt": {
     "exclude": [
       "README.md",
-      "_site"
+      "_site",
+      "dist"
     ]
   }
 }
