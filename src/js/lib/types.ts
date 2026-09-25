@@ -84,6 +84,34 @@ export type I18n = {
     love: string;
     by: string;
   };
+  // Only used by the terminal version (tui/)
+  tui: {
+    hints: {
+      move: string;
+      select: string;
+      back: string;
+      add: string;
+      theme: string;
+      language: string;
+      quit: string;
+      adjust: string;
+      scroll: string;
+    };
+    fileTitle: string;
+    exportMessage: string;
+    importMessage: string;
+    save: string;
+    open: string;
+    exported: string;
+    imported: string;
+    readError: string;
+    writeError: string;
+    invalidFile: string;
+    required: string;
+    invalidPrice: string;
+    invalidDate: string;
+    storage: string;
+  };
 };
 
 export type AppState = {

@@ -72,5 +72,32 @@
     "madeWith": "fatto con",
     "love": "amore",
     "by": "da"
+  },
+  "tui": {
+    "hints": {
+      "move": "sposta",
+      "select": "scegli",
+      "back": "indietro",
+      "add": "aggiungi",
+      "theme": "tema",
+      "language": "lingua",
+      "quit": "esci",
+      "adjust": "cambia",
+      "scroll": "scorri"
+    },
+    "fileTitle": "Percorso del file",
+    "exportMessage": "Salva una copia dei tuoi abbonamenti in un file JSON.",
+    "importMessage": "Sostituisci i tuoi abbonamenti con quelli di un file JSON esportato dall'app.",
+    "save": "Salva",
+    "open": "Importa",
+    "exported": "Dati salvati in {{value}}",
+    "imported": "Dati importati da {{value}}",
+    "readError": "Impossibile leggere {{value}}",
+    "writeError": "Impossibile scrivere {{value}}",
+    "invalidFile": "Questo file non contiene dati di abbonamenti",
+    "required": "Compila questo campo",
+    "invalidPrice": "Inserisci un prezzo di almeno 0.1",
+    "invalidDate": "Inserisci una data valida come AAAA-MM-GG",
+    "storage": "Salvati in {{value}}"
   }
 }

@@ -11,3 +11,6 @@ _cache
 .env
 .env.*
 !.env.example
+
+# Compiled TUI (deno task tui:build)
+dist

@@ -9,14 +9,16 @@ Static subscription-cost tracker built with Deno 2, Lume 3 (static site
 generator, Vento templates) and Alpine.js, styled with hand-written modern CSS.
 There is no backend and no Node/npm (no `package.json`, no `node_modules`): all
 data lives in the browser's `localStorage`. Live at
-https://moebiusmania.github.io/subs-tracker/.
+https://moebiusmania.github.io/subs-tracker/. A terminal version with the same
+features lives in `tui/` (see below).
 
 Dependencies are declared only in the `deno.json` import map: Lume is pinned to
-an exact version via jsDelivr (`lume/`), Alpine comes from `npm:alpinejs`, and
-tests use `jsr:@std/assert`. To upgrade Lume, bump the version in the `lume/`
-URL. `deno.lock` is committed. Running one-off scripts from the repo root with
-extra `npm:`/`jsr:` imports adds them to the lockfile, so don't commit those
-entries.
+an exact version via jsDelivr (`lume/`), Alpine comes from `npm:alpinejs`,
+deno_tui is pinned the same way as Lume (`deno_tui/`), the TUI uses
+`jsr:@std/path`, and tests use `jsr:@std/assert`. To upgrade Lume, bump the
+version in the `lume/` URL. `deno.lock` is committed. Running one-off scripts
+from the repo root with extra `npm:`/`jsr:` imports adds them to the lockfile,
+so don't commit those entries.
 
 ## Commands
 
@@ -26,11 +28,15 @@ entries.
 - `deno task build` — build the static site into `_site/`
 - `deno task build:gh` — build for GitHub Pages
   (`--location=https://moebiusmania.github.io/subs-tracker/`)
-- `deno task test` — all unit tests (`src/**/*_test.ts`); run one file with
+- `deno task test` — all unit tests (`src/**/*_test.ts`, `tui/*_test.ts`, with
+  read/write permissions for the TUI's file tests); run one file with
   `deno test src/js/lib/store_test.ts`, or one test with
   `deno test --filter toggleActive src/`
 - `deno task check` — `deno fmt --check`, `deno lint` and type-checking of
-  `src/js/main.ts` and `_config.ts`
+  `src/js/main.ts`, `_config.ts` and `tui/`
+- `deno task tui` — run the terminal version; `deno task tui:build` compiles it
+  to `dist/subs-tracker` (git-ignored). Set `SUBS_TRACKER_DATA=/some/file.json`
+  to keep test runs away from the real data file.
 
 CI (`.github/workflows/build.yml`, Ubuntu 26.04 runners) runs `check`, `test`
 and `build:gh` on every push and pull request. On pushes to `main` that job also
@@ -127,3 +133,32 @@ uploads `_site` as the Pages artifact, and a second job only runs
   re-render them if the logo changes.
 - Dates saved to `localStorage` come back as strings, so render them with
   `new Date(item.expiration)`.
+- **Terminal version** (`tui/`, entry `tui/main.ts`): feature parity with the
+  web app, driven by keyboard and mouse. It reuses `createStore()` and
+  `createComponents()` from `src/js/lib/`: `App` (`tui/app.ts`) passes its own
+  `Deps` (writes/reads files for export/import, a no-op installer, and
+  `confirm: () => true` because it shows its own dialog before calling
+  `deleteAll()`), so business rules stay in one place. The state is the same
+  `AppState` JSON, saved by `tui/system.ts` to
+  `$XDG_CONFIG_HOME/subs-tracker/data.json` (`~/.config/…`, `%APPDATA%` on
+  Windows, `SUBS_TRACKER_DATA` overrides); an unreadable file is moved to
+  `.bak`. The system language comes from `LANGUAGE`/`LC_ALL`/`LC_MESSAGES`/
+  `LANG`. TUI-only strings are in the `tui` section of the locale files.
+  - Rendering: `App.render()` returns a flat list of box/text nodes plus hit
+    regions (built with `Painter`, which offsets and clips layers: page, header,
+    status bar, toast, modal) and has no terminal dependency, so `app_test.ts`
+    drives it with fake keys and clicks. `Scene` (`tui/scene.ts`) reconciles the
+    nodes by key onto deno_tui `BoxObject`/ `TextObject`s. deno_tui only
+    recomputes which cells of an object are covered when that object moves, so
+    `Scene` marks everything under a changed, moved or erased node for repaint:
+    keep that when touching it. Nodes sharing a z-index are drawn in creation
+    order, so a background box must have a lower z than the text on it.
+  - Interaction is the app's own (not deno_tui's components): focus by id, Tab
+    order = registration order with the header first, arrows move spatially,
+    clicks go to the topmost layer then the first registered hit (small controls
+    are registered before the field they sit on). Mouse uses any-motion SGR
+    tracking (1003/1006) for hover. `tui/keys.ts` splits one stdin read into
+    several keys (pastes, fast typing).
+  - Colours are the CSS tokens copied into `tui/palette.ts` (keep them in sync
+    with `styles.css`), 24-bit when the terminal supports it, else the nearest
+    xterm-256 colour.
