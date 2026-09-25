@@ -144,6 +144,11 @@ uploads `_site` as the Pages artifact, and a second job only runs
   Windows, `SUBS_TRACKER_DATA` overrides); an unreadable file is moved to
   `.bak`. The system language comes from `LANGUAGE`/`LC_ALL`/`LC_MESSAGES`/
   `LANG`. TUI-only strings are in the `tui` section of the locale files.
+  - Keeping parity: when adding or changing a feature in the web version,
+    evaluate whether it can be ported to the TUI too, and port it in the same
+    change when it makes sense (put shared logic in `src/js/lib/` so both use
+    it). If it's browser-only (like the PWA install banner) or doesn't fit a
+    terminal, say so instead of silently skipping it.
   - Rendering: `App.render()` returns a flat list of box/text nodes plus hit
     regions (built with `Painter`, which offsets and clips layers: page, header,
     status bar, toast, modal) and has no terminal dependency, so `app_test.ts`
