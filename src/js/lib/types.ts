@@ -14,6 +14,7 @@ export type I18n = {
     language: string;
     title: string;
     description: string;
+    imageAlt: string;
   };
   header: {
     skip: string;

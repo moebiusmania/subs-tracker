@@ -141,8 +141,18 @@ their own browser (`deno task dev:host` serves it to the LAN).
   banner component (`partials/install.vto`): Chromium's `beforeinstallprompt`,
   manual Share-menu steps on iOS, and a "not now" flag under the separate
   `localStorage` key `subs-tracker:install-dismissed`. The PNG icons are
-  rendered from `src/icons/icon.svg` and `icon-maskable.svg` (not published), so
-  re-render them if the logo changes.
+  rendered from `src/icons/icon.svg` and `icon-maskable.svg` (not published),
+  `favicon.ico` (16/32/48 PNG entries) from `src/favicon.svg`, so re-render them
+  if the logo or the accent colour changes. They use the light `--color-accent`
+  and `--color-on-accent` values.
+- **Social previews**: `base.vto` has Open Graph/Twitter tags and a canonical
+  link, with absolute URLs from the `url(true)` filter. They're read by crawlers
+  that don't run JS, so they stay in English. `src/og-image.png` (1200×630,
+  added in `_config.ts` but not precached) is rendered from `src/og-image.svg`,
+  a static variant of the empty-state illustration with the light tokens
+  hard-coded: keep it in sync with the palette and the illustration. Its text
+  needs static Nunito weights (600/700/800) at render time, since resvg ignores
+  the weight of the variable font.
 - Dates saved to `localStorage` come back as strings, so render them with
   `new Date(item.expiration)`.
 - **Terminal version** (`tui/`, entry `tui/main.ts`): feature parity with the

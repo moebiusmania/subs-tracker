@@ -21,6 +21,8 @@ const assets = [
 
 site.add("js/main.ts");
 site.add("sw.js");
+// Only fetched by social media crawlers, so it's not precached
+site.add("og-image.png");
 assets.forEach((file) => site.add(file));
 
 // Fill in the service worker's precache list and a version hashed from every

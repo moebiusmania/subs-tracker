@@ -8,6 +8,28 @@
     <meta name="description" content="{{ i18n.en.meta.description }}">
     <meta name="theme-color" content="#f3f7f6" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0f1a1d" media="(prefers-color-scheme: dark)">
+    <link rel="canonical" href="{{ url |> url(true) }}">
+    {{# Social previews: crawlers don't run JS, so these stay in English.
+       og:image needs an absolute URL; og-image.png is rendered from
+       og-image.svg #}}
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ i18n.en.meta.title }}">
+    <meta property="og:url" content="{{ url |> url(true) }}">
+    <meta property="og:title" content="{{ i18n.en.meta.title }}">
+    <meta property="og:description" content="{{ i18n.en.meta.description }}">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="it_IT">
+    <meta property="og:image" content="{{ '/og-image.png' |> url(true) }}">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ i18n.en.meta.imageAlt }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ i18n.en.meta.title }}">
+    <meta name="twitter:description" content="{{ i18n.en.meta.description }}">
+    <meta name="twitter:image" content="{{ '/og-image.png' |> url(true) }}">
+    <meta name="twitter:image:alt" content="{{ i18n.en.meta.imageAlt }}">
+    <link rel="icon" href="{{ '/favicon.ico' |> url }}" sizes="16x16 32x32 48x48">
     <link rel="icon" type="image/svg+xml" href="{{ '/favicon.svg' |> url }}">
     <link rel="apple-touch-icon" href="{{ '/icons/apple-touch-icon.png' |> url }}">
     <link rel="manifest" href="{{ '/manifest.webmanifest' |> url }}">

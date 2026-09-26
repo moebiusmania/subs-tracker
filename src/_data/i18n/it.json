@@ -1,8 +1,9 @@
 {
   "meta": {
     "language": "Italiano",
-    "title": "Tracker abbonamenti ⚠️",
-    "description": "Webapp per tenere traccia dei costi degli abbonamenti e farsi fare un po' di conti."
+    "title": "Tracker abbonamenti",
+    "description": "Webapp per tenere traccia dei costi degli abbonamenti e farsi fare un po' di conti.",
+    "imageAlt": "Tracker abbonamenti: carte di abbonamenti a ventaglio con monete in euro e dollari"
   },
   "header": {
     "skip": "Vai al contenuto",

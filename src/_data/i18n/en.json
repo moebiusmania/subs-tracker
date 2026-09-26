@@ -1,8 +1,9 @@
 {
   "meta": {
     "language": "English",
-    "title": "Subscriptions Tracker ⚠️",
-    "description": "Webapp to keep track of subscriptions fees and have some math done for you."
+    "title": "Subscriptions Tracker",
+    "description": "Webapp to keep track of subscriptions fees and have some math done for you.",
+    "imageAlt": "Subscriptions Tracker: fanned subscription cards with euro and dollar coins"
   },
   "header": {
     "skip": "Skip to content",
