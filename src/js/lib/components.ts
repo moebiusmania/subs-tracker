@@ -44,6 +44,16 @@ export type Deps = {
   installer: Installer;
 };
 
+// What the add form starts with
+const newItem = (): Subscription => ({
+  name: "",
+  price: 1,
+  currency: "€",
+  isActive: true,
+  expiration: new Date(),
+  recurrence: "monthly",
+});
+
 export const createComponents = (deps: Deps) => {
   const { app, persist } = deps;
 
@@ -116,6 +126,9 @@ export const createComponents = (deps: Deps) => {
         app().toggleActive(index);
         persist();
       },
+      editLabel(item: Subscription): string {
+        return getTranslation(app().i18n.main.editItem, item.name);
+      },
       deleteLabel(item: Subscription): string {
         return getTranslation(app().i18n.main.deleteItem, item.name);
       },
@@ -180,14 +193,7 @@ export const createComponents = (deps: Deps) => {
     }),
 
     addForm: (homeUrl: string) => ({
-      item: {
-        name: "",
-        price: 1,
-        currency: "€",
-        isActive: true,
-        expiration: new Date(),
-        recurrence: "monthly",
-      } as Subscription,
+      item: newItem(),
       formatDate,
       submit(): void {
         app().addSubscription(this.item);
@@ -195,5 +201,29 @@ export const createComponents = (deps: Deps) => {
         deps.navigate(homeUrl);
       },
     }),
+
+    // Same fields as addForm, filled with the item at that index. An index
+    // with no item (a stale link, data deleted meanwhile) goes back home.
+    editForm: (homeUrl: string, index: number) => {
+      const saved = Number.isInteger(index) ? app().data[index] : undefined;
+      return {
+        found: saved !== undefined,
+        // A copy, so leaving without saving changes nothing. Dates come back
+        // from localStorage as strings
+        item: saved
+          ? { ...saved, expiration: new Date(saved.expiration) }
+          : newItem(),
+        formatDate,
+        init(): void {
+          if (!this.found) deps.navigate(homeUrl);
+        },
+        submit(): void {
+          if (!this.found) return deps.navigate(homeUrl);
+          app().updateSubscription(index, this.item);
+          persist();
+          deps.navigate(homeUrl);
+        },
+      };
+    },
   };
 };

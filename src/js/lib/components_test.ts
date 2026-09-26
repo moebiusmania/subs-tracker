@@ -344,6 +344,62 @@ Deno.test("addForm - submit adds the item, persists and goes home", () => {
   assertEquals(calls.navigate, ["/subs-tracker/"]);
 });
 
+Deno.test("editForm - starts with a copy of the item", () => {
+  const { store, components } = setup();
+  // As loaded from localStorage, with a string date
+  store.importSubs([
+    netflix,
+    {
+      ...netflix,
+      name: "Spotify",
+      expiration: "2027-02-01" as unknown as Date,
+    },
+  ]);
+  const form = components.editForm("/", 1);
+
+  assertEquals(form.found, true);
+  assertEquals(form.item.name, "Spotify");
+  assertEquals(form.formatDate(form.item.expiration), "2027-02-01");
+  form.item.name = "Changed";
+  assertEquals(store.data[1].name, "Spotify");
+});
+
+Deno.test("editForm - submit updates the item, persists and goes home", () => {
+  const { store, calls, components } = setup();
+  store.importSubs([netflix, { ...netflix, name: "Spotify" }]);
+  const form = components.editForm("/subs-tracker/", 0);
+  form.item = { ...form.item, price: 15, recurrence: "yearly" };
+
+  form.submit();
+  assertEquals(store.data.length, 2);
+  assertEquals(store.data[0].name, "Netflix");
+  assertEquals(store.data[0].price, 15);
+  assertEquals(store.data[0].recurrence, "yearly");
+  assertEquals(store.data[1].name, "Spotify");
+  assertEquals(calls.persist, 1);
+  assertEquals(calls.navigate, ["/subs-tracker/"]);
+});
+
+Deno.test("editForm - a missing item goes home without saving", () => {
+  for (const index of [2, -1, NaN, 0.5]) {
+    const { store, calls, components } = setup();
+    store.importSubs([netflix, { ...netflix, name: "Spotify" }]);
+    const form = components.editForm("/", index);
+    assertEquals(form.found, false);
+
+    form.init();
+    form.submit();
+    assertEquals(calls.navigate, ["/", "/"]);
+    assertEquals(calls.persist, 0);
+    assertEquals(store.data.length, 2);
+  }
+});
+
+Deno.test("list - editLabel names the item", () => {
+  const { components } = setup();
+  assertEquals(components.list().editLabel(netflix), "Edit Netflix");
+});
+
 Deno.test("install - hidden until the browser offers its prompt", () => {
   const { install, components } = setup();
   const banner = components.install();

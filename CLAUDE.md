@@ -51,7 +51,8 @@ their own browser (`deno task dev:host` serves it to the LAN).
 ## Architecture
 
 - **Build side (Lume)**: `_config.ts` sets `src: "./src"`. Pages are Vento
-  templates: `src/index.vto` → `/`, `src/add.vto` → `/add/`. `src/_data.yml`
+  templates: `src/index.vto` → `/`, `src/add.vto` → `/add/`, `src/edit.vto` →
+  `/edit/` (both forms share `partials/subscription-form.vto`). `src/_data.yml`
   gives every page the `layouts/base.vto` layout. `src/_data/i18n/*.json` (one
   file per locale, `en` and `it`) is exposed to templates as `i18n.en`,
   `i18n.it`. Lume 3 only copies non-page files that are registered with
@@ -65,11 +66,16 @@ their own browser (`deno task dev:host` serves it to the LAN).
   page load it builds the store, hydrates it from `localStorage`, applies
   `data-theme` on `<html>`, registers `Alpine.store("app", …)` and the
   `Alpine.data` components, then calls `Alpine.start()`. The component logic
-  (`header`, `empty`, `dashboard`, `list`, `backup`, `addForm`, `install`) lives
-  in `src/js/lib/components.ts` as plain factories. Browser side effects
-  (confirm, navigation, theme attribute, view transition, file download/pick)
-  are passed in as `Deps`, so `main.ts` only wires real DOM implementations and
-  the tests pass fakes.
+  (`header`, `empty`, `dashboard`, `list`, `backup`, `addForm`, `editForm`,
+  `install`) lives in `src/js/lib/components.ts` as plain factories. Browser
+  side effects (confirm, navigation, theme attribute, view transition, file
+  download/pick) are passed in as `Deps`, so `main.ts` only wires real DOM
+  implementations and the tests pass fakes.
+- **Editing**: a card's pencil links to `/edit/?item=<index>` (a static site
+  can't have `/edit/<index>` pages; the service worker matches the cached page
+  with `ignoreSearch`). `main.ts` parses the index and hands it to `editForm`,
+  which edits a copy of the item, saves with `store.updateSubscription` and goes
+  home; an index with no item goes home right away.
 - **Alpine gotcha**: directives only run inside an `x-data` root. That's why
   `index.vto` is wrapped in `<div x-data>`: its top-level `<template x-if>`
   switches between the empty state and dashboard+list at runtime, since the HTML

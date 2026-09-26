@@ -11,6 +11,7 @@ export type Store = AppState & {
   readonly i18n: I18n;
   loadMock(): void;
   addSubscription(item: Subscription): void;
+  updateSubscription(index: number, item: Subscription): void;
   toggleActive(index: number): void;
   deleteSubscription(index: number): void;
   setTheme(value: "light" | "dark"): void;
@@ -51,6 +52,9 @@ export const createStore = (): Store => ({
   },
   addSubscription(item: Subscription): void {
     this.data.push(item);
+  },
+  updateSubscription(index: number, item: Subscription): void {
+    this.data = this.data.map((current, i) => i === index ? item : current);
   },
   toggleActive(index: number): void {
     const items: Subscription[] = [...this.data];

@@ -222,6 +222,46 @@ Deno.test("app - a card's ✕ deletes only that card, after asking", () => {
   assertEquals(app.focus, "card.1");
 });
 
+Deno.test("app - a card's ✎ edits that card in the form", () => {
+  const { app, store, calls, click, press, type, texts } = setup({
+    mock: true,
+  });
+  click("card.2.edit");
+  assertEquals(app.screen, "edit");
+  assertEquals(app.focus, "add.name");
+  assertEquals(app.form?.values.name.value, subs[2].name);
+  assertStringIncludes(texts(), "Edit the subscription");
+
+  // Esc leaves without saving, back on the ✎
+  type("!");
+  press("escape");
+  assertEquals(app.screen, "home");
+  assertEquals(app.focus, "card.2.edit");
+  assertEquals(store.data[2].name, subs[2].name);
+  assertEquals(calls.persist, 0);
+
+  press("return");
+  type(" Plus");
+  click("add.submit");
+  assertEquals(app.screen, "home");
+  assertEquals(app.focus, "card.2.edit");
+  assertEquals(store.data.length, 4);
+  assertEquals(store.data[2].name, `${subs[2].name} Plus`);
+  assertEquals(store.data[2].price, subs[2].price);
+  assertEquals(store.data[1].name, subs[1].name);
+  assertEquals(calls.persist, 1);
+});
+
+Deno.test("app - editing keeps the card's currency", () => {
+  const { app, store, click, texts } = setup({ mock: true });
+  const dollars = subs.findIndex((item) => item.currency === "$");
+  click(`card.${dollars}.edit`);
+  assertStringIncludes(texts(), "$ Dollar");
+  click("add.submit");
+  assertEquals(app.screen, "home");
+  assertEquals(store.data[dollars].currency, "$");
+});
+
 Deno.test("app - Delete on a focused card asks first", () => {
   const { app, store, click, press } = setup({ mock: true });
   click("card.3");

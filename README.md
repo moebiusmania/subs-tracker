@@ -40,7 +40,7 @@ After the first visit it works offline too, since both the app and your data are
 
 ### Terminal version
 
-There's also a version that runs in the terminal, with the same features: the stats, the subscription cards (toggle them active/inactive), adding a subscription, export/import, delete all, light and dark themes, English and Italian. It works with both the keyboard and the mouse (click, hover and scroll wheel).
+There's also a version that runs in the terminal, with the same features: the stats, the subscription cards (toggle them active/inactive, edit or delete them), adding a subscription, export/import, delete all, light and dark themes, English and Italian. It works with both the keyboard and the mouse (click, hover and scroll wheel).
 
 #### Why a terminal version?
 
@@ -74,7 +74,6 @@ The data is saved in `~/.config/subs-tracker/data.json` (`%APPDATA%\subs-tracker
 
 ### Roadmap
 
-- Edit entries
 - Manage currencies (_both per-entry and globally_)
 - Push Notifications?
 - "Help/How it works" screen

@@ -73,7 +73,8 @@ export type AppDeps = {
   animate?: boolean;
 };
 
-type Screen = "home" | "add";
+// "edit" is the add form filled with one card, like the web /edit/ page
+type Screen = "home" | "add" | "edit";
 
 // The web app's pages, as navigate() gets them
 const HOME = "/";
@@ -86,7 +87,15 @@ type Modal =
 
 type Toast = { kind: "success" | "error"; text: string };
 
-type Form = { values: FormValues; errors: Errors; submitted: boolean };
+type Form = {
+  values: FormValues;
+  errors: Errors;
+  submitted: boolean;
+  // The card being edited, null when adding
+  index: number | null;
+  // Can't be changed yet: € when adding, the card's own when editing
+  currency: string;
+};
 
 // Layers, bottom to top
 const Z = { page: 10, chrome: 50, toast: 80, modal: 100 };
@@ -220,22 +229,29 @@ export class App {
 
   // Navigation ------------------------------------------------------------
 
-  #go(screen: Screen): void {
+  #go(screen: Screen, index: number | null = null): void {
+    const edited = this.#form?.index ?? null;
     this.#screen = screen;
     this.#scroll = 0;
     this.#modal = null;
-    if (screen === "add") {
-      const { item } = this.#components.addForm(HOME);
+    if (screen !== "home") {
+      const { item } = screen === "edit"
+        ? this.#components.editForm(HOME, index!)
+        : this.#components.addForm(HOME);
       this.#form = {
         values: initialValues(item),
         errors: {},
         submitted: false,
+        index: screen === "edit" ? index : null,
+        currency: item.currency,
       };
       // The web form autofocuses the name
       this.#focus = "add.name";
     } else {
       this.#form = null;
-      this.#focus = null;
+      // Back from editing: on the card's ✎, like after a dialog
+      this.#focus = edited === null ? null : `card.${edited}.edit`;
+      this.#reveal = edited !== null;
     }
   }
 
@@ -358,9 +374,11 @@ export class App {
       this.#reveal = true;
       return;
     }
-    const add = this.#components.addForm(HOME);
-    add.item = toSubscription(form.values, add.item.currency);
-    add.submit();
+    const target = form.index === null
+      ? this.#components.addForm(HOME)
+      : this.#components.editForm(HOME, form.index);
+    target.item = toSubscription(form.values, target.item.currency);
+    target.submit();
   }
 
   #updateField(name: FieldName, update: (f: Field) => Field): void {
@@ -393,7 +411,7 @@ export class App {
 
     if (key.key === "escape") {
       if (this.#modal) return this.#closeModal();
-      if (this.#screen === "add") return this.#go("home");
+      if (this.#screen !== "home") return this.#go("home");
       this.#focus = null;
       return;
     }
@@ -695,7 +713,7 @@ export class App {
       clip: viewport,
       dy: 1 - this.#scroll,
     });
-    this.#pageHeight = this.#screen === "add"
+    this.#pageHeight = this.#screen !== "home"
       ? this.#drawAdd(page)
       : this.#store.data.length
       ? this.#drawDashboard(page)
@@ -816,7 +834,7 @@ export class App {
         ...(/^card\.\d+$/.test(this.#focus ?? "")
           ? [["Del", h.delete] as [string, string]]
           : []),
-        ...(this.#screen === "add"
+        ...(this.#screen !== "home"
           ? [["Esc", h.back] as [string, string]]
           : [["a", h.add] as [string, string]]),
         ...(focused?.input ? [] : [
@@ -1329,6 +1347,37 @@ export class App {
         },
       });
 
+      // Edit icon under the ✕, registered before the card too
+      const editId = `${id}.edit`;
+      painter.text(
+        editId,
+        column + cardWidth - 5,
+        row + 2,
+        " ✎ ",
+        ctx.focus === editId
+          ? { fg: p.bg, bg: p.accentStrong, bold: true }
+          : ctx.hover === editId
+          ? { fg: p.accentStrong, bg: p.accentSoft, bold: true }
+          : { fg: p.muted, bg: fill },
+        2,
+      );
+      painter.hit({
+        id: editId,
+        rect: {
+          column: column + cardWidth - 5,
+          row: row + 2,
+          width: 3,
+          height: 1,
+        },
+        focusable: true,
+        onClick: () => this.#go("edit", index),
+        onKey: (key) => {
+          if (key.key !== "return" && key.key !== "space") return false;
+          this.#go("edit", index);
+          return true;
+        },
+      });
+
       // The whole card toggles, the pill shows the state
       const toggle = () => list.toggleActive(index);
       painter.hit({
@@ -1563,14 +1612,24 @@ export class App {
     });
     y += 2;
 
-    painter.text("title", x0, y, truncate(t.add.title, inner), {
-      fg: p.text,
-      bg,
-      bold: true,
-    }, 2);
+    const editing = form.index !== null;
+    painter.text(
+      "title",
+      x0,
+      y,
+      truncate((editing ? t.edit : t.add).title, inner),
+      {
+        fg: p.text,
+        bg,
+        bold: true,
+      },
+      2,
+    );
     y += 2;
 
-    wrapSpans(parseStrong(t.add.intro), inner).forEach((line, index) => {
+    // Like the web /edit/ page, editing has no intro
+    const intro = editing ? [] : wrapSpans(parseStrong(t.add.intro), inner);
+    intro.forEach((line, index) => {
       painter.line(
         `intro.${index}`,
         x0,
@@ -1583,7 +1642,7 @@ export class App {
       );
       y += 1;
     });
-    y += 1;
+    if (!editing) y += 1;
 
     const twoColumns = inner >= 50;
     const half = twoColumns ? Math.floor((inner - 3) / 2) : inner;
@@ -1632,7 +1691,8 @@ export class App {
         onWheel: (direction) => this.#step("price", direction === 1 ? -1 : 1),
         onClick: (offset) => this.#clickField("price", offset),
       });
-    // Disabled on the web too: only euros for now
+    // Disabled on the web too: new items are in euros, edited ones keep theirs
+    const currencyName = form.currency === "$" ? t.add.dollar : t.add.euro;
     const currencyField = (row: number) =>
       input(painter, ctx, {
         id: "add.currency",
@@ -1640,7 +1700,7 @@ export class App {
         row,
         label: t.add.currency,
         field: field(),
-        display: `€ ${t.add.euro}`,
+        display: `${form.currency} ${currencyName}`,
         disabled: true,
         bg,
       });
@@ -1724,8 +1784,8 @@ export class App {
       id: "add.submit",
       column: x0,
       row: y,
-      label: t.add.submit,
-      icon: "+",
+      label: (editing ? t.edit : t.add).submit,
+      icon: editing ? "✓" : "+",
       variant: "primary",
       bg,
       onPress: () => this.#submit(),

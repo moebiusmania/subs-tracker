@@ -41,6 +41,7 @@ export type I18n = {
     confirmDelete: string;
     deleteItem: string;
     confirmDeleteItem: string;
+    editItem: string;
   };
   recurrence: {
     monthly: string;
@@ -72,6 +73,10 @@ export type I18n = {
     active: string;
     submit: string;
     cancel: string;
+  };
+  edit: {
+    title: string;
+    submit: string;
   };
   install: {
     title: string;

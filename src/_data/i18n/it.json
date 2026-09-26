@@ -29,7 +29,8 @@
     "delete": "Elimina tutto",
     "confirmDelete": "Vuoi davvero eliminare tutti i dati degli abbonamenti?",
     "deleteItem": "Elimina {{value}}",
-    "confirmDeleteItem": "Vuoi davvero eliminare {{value}}? Non si potrà annullare."
+    "confirmDeleteItem": "Vuoi davvero eliminare {{value}}? Non si potrà annullare.",
+    "editItem": "Modifica {{value}}"
   },
   "recurrence": {
     "monthly": "Mensile",
@@ -61,6 +62,10 @@
     "active": "È attivo?",
     "submit": "Aggiungi questo abbonamento",
     "cancel": "Annulla"
+  },
+  "edit": {
+    "title": "Modifica l'abbonamento",
+    "submit": "Salva le modifiche"
   },
   "install": {
     "title": "Scarica l'app",

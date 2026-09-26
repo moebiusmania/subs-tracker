@@ -1,0 +1,64 @@
+{{# The add and edit pages' form. component: the Alpine component (x-data),
+   strings: the i18n section with the submit label, icon: the submit icon #}}
+<form class="form" x-data="{{ component }}" @submit.prevent="submit">
+  <div class="field field--full">
+    <label for="name" x-text="$t.add.name">{{ i18n.en.add.name }}</label>
+    <input type="text" id="name" name="name" placeholder="{{ i18n.en.add.namePlaceholder }}" :placeholder="$t.add.namePlaceholder" x-model="item.name" required autofocus>
+  </div>
+
+  <div class="field">
+    <label for="price" x-text="$t.add.price">{{ i18n.en.add.price }}</label>
+    <input
+      type="number"
+      id="price"
+      name="price"
+      inputmode="decimal"
+      placeholder="10.00"
+      min="0.1"
+      step="0.1"
+      :value="item.price.toString()"
+      @input="item.price = parseFloat($event.target.value)"
+      required
+    >
+  </div>
+
+  <div class="field">
+    <label for="currency" x-text="$t.add.currency">{{ i18n.en.add.currency }}</label>
+    <select id="currency" name="currency" x-model="item.currency" required disabled>
+      <option value="€" x-text="'€ ' + $t.add.euro">€ {{ i18n.en.add.euro }}</option>
+      <option value="$" x-text="'$ ' + $t.add.dollar">$ {{ i18n.en.add.dollar }}</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="expiration" x-text="$t.add.expiration">{{ i18n.en.add.expiration }}</label>
+    <input
+      type="date"
+      id="expiration"
+      name="expiration"
+      :value="formatDate(item.expiration)"
+      @input="item.expiration = new Date($event.target.value)"
+      required
+    >
+  </div>
+
+  <div class="field">
+    <label for="recurrence" x-text="$t.add.recurrence">{{ i18n.en.add.recurrence }}</label>
+    <select id="recurrence" name="recurrence" x-model="item.recurrence" required>
+      <option value="monthly" x-text="$t.recurrence.monthly">{{ i18n.en.recurrence.monthly }}</option>
+      <option value="yearly" x-text="$t.recurrence.yearly">{{ i18n.en.recurrence.yearly }}</option>
+    </select>
+  </div>
+
+  <div class="field field--full field--switch">
+    <input type="checkbox" class="switch" id="isactive" name="isactive" role="switch" x-model="item.isActive">
+    <label for="isactive" x-text="$t.add.active">{{ i18n.en.add.active }}</label>
+  </div>
+
+  <div class="form__actions">
+    <button type="submit" class="btn btn--primary">
+      {{ include "partials/icon.vto" { name: icon } }} <span x-text="$t.{{ strings }}.submit">{{ i18n.en[strings].submit }}</span>
+    </button>
+    <a class="btn btn--ghost" href="{{ '/' |> url }}" x-text="$t.add.cancel">{{ i18n.en.add.cancel }}</a>
+  </div>
+</form>

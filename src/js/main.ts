@@ -82,6 +82,12 @@ Alpine.data("dashboard", components.dashboard);
 Alpine.data("list", components.list);
 Alpine.data("backup", components.backup);
 Alpine.data("addForm", components.addForm);
+// The edit page gets the item's index as /edit/?item=<index>: a static site
+// has no /edit/<index> pages. A missing or bad one sends editForm home
+Alpine.data("editForm", (homeUrl: string) => {
+  const item = new URLSearchParams(location.search).get("item") ?? "";
+  return components.editForm(homeUrl, /^\d+$/.test(item) ? Number(item) : NaN);
+});
 Alpine.data("install", components.install);
 
 addEventListener("languagechange", () => {

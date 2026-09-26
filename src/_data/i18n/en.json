@@ -29,7 +29,8 @@
     "delete": "Delete all",
     "confirmDelete": "Sure you want to delete all subscriptions data?",
     "deleteItem": "Delete {{value}}",
-    "confirmDeleteItem": "Sure you want to delete {{value}}? This can't be undone."
+    "confirmDeleteItem": "Sure you want to delete {{value}}? This can't be undone.",
+    "editItem": "Edit {{value}}"
   },
   "recurrence": {
     "monthly": "Monthly",
@@ -61,6 +62,10 @@
     "active": "Is active?",
     "submit": "Add this subscription",
     "cancel": "Cancel"
+  },
+  "edit": {
+    "title": "Edit the subscription",
+    "submit": "Save changes"
   },
   "install": {
     "title": "Get the app",

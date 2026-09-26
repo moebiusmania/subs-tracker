@@ -186,6 +186,22 @@ Deno.test("deleteSubscription - an index out of range changes nothing", () => {
   assertEquals(app.data.map((item) => item.name), ["A"]);
 });
 
+Deno.test("updateSubscription - replaces only the item at that index", () => {
+  const app = createStore();
+  app.addSubscription({ ...testSubscription, name: "A" });
+  app.addSubscription({ ...testSubscription, name: "B" });
+  app.updateSubscription(1, { ...testSubscription, name: "B2", price: 5 });
+  assertEquals(app.data.map((item) => item.name), ["A", "B2"]);
+  assertEquals(app.data[1].price, 5);
+});
+
+Deno.test("updateSubscription - an index out of range changes nothing", () => {
+  const app = createStore();
+  app.addSubscription({ ...testSubscription, name: "A" });
+  app.updateSubscription(3, { ...testSubscription, name: "B" });
+  assertEquals(app.data.map((item) => item.name), ["A"]);
+});
+
 Deno.test("getState - reflects later changes", () => {
   const app = createStore();
   app.setTheme("dark");
