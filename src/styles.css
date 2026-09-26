@@ -41,9 +41,10 @@
 
 /* ------------------------------------------------------------------ */
 /* Design tokens                                                       */
-/* Warm cream / plum-ink base with pastel tints. Every text colour is  */
-/* checked for WCAG 2.1 AA (>= 4.5:1) against bg, surfaces and every   */
-/* tint; form control borders for non-text contrast (>= 3:1).          */
+/* Misty sea-glass / slate-ink base with pastel tints. Every text     */
+/* colour is checked for WCAG 2.1 AA (>= 4.5:1) against bg, surfaces  */
+/* and every tint; form control borders for non-text contrast        */
+/* (>= 3:1).                                                          */
 /* ------------------------------------------------------------------ */
 
 @layer tokens {
@@ -51,60 +52,60 @@
     color-scheme: light;
 
     /* light-dark(light value, dark value), switched by color-scheme */
-    --color-bg: light-dark(#fbf8f3, #17141f);
-    --color-surface: light-dark(#ffffff, #211d2b);
-    --color-surface-2: light-dark(#f5f0e9, #2a2536);
-    --color-border: light-dark(#ece4da, #332d40);
-    --color-field-border: light-dark(#968c9f, #7d738c);
-    --color-text: light-dark(#2a2433, #efeaf6);
-    --color-text-muted: light-dark(#665d70, #b3aac0);
+    --color-bg: light-dark(#f3f7f6, #0f1a1d);
+    --color-surface: light-dark(#ffffff, #16242a);
+    --color-surface-2: light-dark(#e9f0ee, #1d2e34);
+    --color-border: light-dark(#d9e4e1, #27393f);
+    --color-field-border: light-dark(#6c817d, #6f8a8f);
+    --color-text: light-dark(#1c2b30, #e6f0ef);
+    --color-text-muted: light-dark(#4f6268, #a3b6b8);
 
-    /* Lavender is the accent: pastel fill with ink text on top */
-    --color-accent: light-dark(#cbbcff, #c9b8ff);
-    --color-on-accent: light-dark(#2a2433, #17141f);
-    --color-accent-soft: light-dark(#efe9ff, #2f2945);
-    --color-accent-strong: light-dark(#5a44a6, #cfc2ff);
+    /* Seafoam is the accent: pastel fill with ink text on top */
+    --color-accent: light-dark(#9fded0, #8fdccb);
+    --color-on-accent: light-dark(#1c2b30, #0f1a1d);
+    --color-accent-soft: light-dark(#e0f4ef, #1c3a37);
+    --color-accent-strong: light-dark(#1d6b5f, #9fe6d6);
 
     --color-success: light-dark(#1d6644, #8fdcb4);
-    --color-success-soft: light-dark(#dcf3e8, #1f3a30);
+    --color-success-soft: light-dark(#dcf3e8, #1a3530);
     --color-danger: light-dark(#a3283d, #ffa3b1);
-    --color-danger-soft: light-dark(#fde6ea, #3d2330);
+    --color-danger-soft: light-dark(#fde6ea, #3a2430);
 
     /* Pastel tints for tiles and avatars (text on them stays --color-text) */
-    --tint-lav: light-dark(#ece6ff, #2f2945);
-    --tint-mint: light-dark(#dcf3e8, #1f3a30);
-    --tint-peach: light-dark(#ffe3d3, #3d2c25);
-    --tint-sky: light-dark(#dbeafb, #1e2f40);
-    --tint-butter: light-dark(#fcefc2, #393222);
-    --tint-pink: light-dark(#fbe0eb, #3d2330);
+    --tint-lav: light-dark(#ece6ff, #29283f);
+    --tint-mint: light-dark(#dcf3e8, #1a3530);
+    --tint-peach: light-dark(#ffe3d3, #3a2b26);
+    --tint-sky: light-dark(#dbeafb, #1a2e3e);
+    --tint-butter: light-dark(#fcefc2, #353022);
+    --tint-pink: light-dark(#fbe0eb, #3a2430);
 
     /* Soft background glows */
-    --glow-1: light-dark(#efe9ff, #241e35);
-    --glow-2: light-dark(#ffece2, #2a1f27);
+    --glow-1: light-dark(#dcf2ec, #132c2b);
+    --glow-2: light-dark(#ffeade, #28201f);
 
     /* Illustration colours: decorative only, a bit richer than the tints */
-    --illo-blob: light-dark(#efe9ff, #262036);
-    --illo-card: light-dark(#ffffff, #2f2a3b);
-    --illo-stroke: light-dark(#2a2433, #0e0c13);
-    --illo-line: light-dark(#e6dff0, #443c54);
+    --illo-blob: light-dark(#e0f4ef, #1a2d31);
+    --illo-card: light-dark(#ffffff, #203138);
+    --illo-stroke: light-dark(#1c2b30, #081012);
+    --illo-line: light-dark(#dbe6e3, #36494f);
     --illo-lav: light-dark(#cbbcff, #9d8ae0);
     --illo-mint: light-dark(#a8e6c9, #6fbf9b);
     --illo-peach: light-dark(#ffc9ae, #d99a80);
     --illo-butter: light-dark(#ffe08a, #e0bf62);
     --illo-pink: light-dark(#f9bcd3, #d48aa7);
-    --illo-shadow: light-dark(rgb(42 36 51 / 0.1), rgb(0 0 0 / 0.35));
+    --illo-shadow: light-dark(rgb(28 43 48 / 0.1), rgb(0 0 0 / 0.35));
 
     --font-sans: "Nunito", ui-rounded, ui-sans-serif, system-ui, -apple-system,
       "Segoe UI", Roboto, sans-serif;
 
-    --radius-sm: 0.75rem;
-    --radius-md: 1.25rem;
-    --radius-lg: 1.75rem;
+    --radius-sm: 0.5rem;
+    --radius-md: 0.875rem;
+    --radius-lg: 1.25rem;
     --radius-full: 999px;
 
-    --shadow-sm: 0 1px 2px rgb(42 36 51 / 0.05);
-    --shadow-md: 0 2px 4px rgb(42 36 51 / 0.04),
-      0 12px 32px -12px rgb(90 68 166 / 0.18);
+    --shadow-sm: 0 1px 2px rgb(28 43 48 / 0.05);
+    --shadow-md: 0 2px 4px rgb(28 43 48 / 0.04),
+      0 12px 32px -12px rgb(29 107 95 / 0.16);
 
     --space-1: 0.25rem;
     --space-2: 0.5rem;
@@ -309,7 +310,7 @@
     min-height: 2.875rem;
     padding: var(--space-2) var(--space-5);
     border: 1.5px solid var(--btn-border);
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-sm);
     background: var(--btn-bg);
     color: var(--btn-fg);
     font-weight: 700;
@@ -1056,7 +1057,7 @@
       min-height: 2rem;
       padding: var(--space-1) var(--space-3);
       border: 1.5px solid transparent;
-      border-radius: var(--radius-full);
+      border-radius: var(--radius-sm);
       background: var(--status-bg);
       color: var(--status-fg);
       font-size: 0.875rem;
@@ -1133,7 +1134,7 @@
 
       strong {
         padding: 0 0.3em;
-        border-radius: 0.4em;
+        border-radius: 0.3em;
         background: var(--tint-mint);
         color: var(--color-text);
         font-weight: 700;
@@ -1346,7 +1347,7 @@
       width: 1.75rem;
       height: 1.75rem;
       margin-inline: 0.1em;
-      border-radius: 0.5rem;
+      border-radius: 0.375rem;
       background: var(--tint-sky);
       color: var(--color-text);
       vertical-align: middle;

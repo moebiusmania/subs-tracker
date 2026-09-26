@@ -10,24 +10,24 @@
   -->
   <style>
   svg {
-    --blob: #efe9ff;
+    --blob: #e0f4ef;
     --card: #ffffff;
-    --stroke: #2a2433;
-    --line: #e6dff0;
+    --stroke: #1c2b30;
+    --line: #dbe6e3;
     --lav: #cbbcff;
     --mint: #a8e6c9;
     --peach: #ffc9ae;
     --butter: #ffe08a;
     --pink: #f9bcd3;
-    --shadow: rgb(42 36 51 / 0.1);
+    --shadow: rgb(28 43 48 / 0.1);
   }
 
   @media (prefers-color-scheme: dark) {
     svg {
-      --blob: #262036;
-      --card: #2f2a3b;
-      --stroke: #0e0c13;
-      --line: #443c54;
+      --blob: #1a2d31;
+      --card: #203138;
+      --stroke: #081012;
+      --line: #36494f;
       --lav: #9d8ae0;
       --mint: #6fbf9b;
       --peach: #d99a80;

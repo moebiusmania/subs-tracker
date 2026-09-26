@@ -113,13 +113,13 @@ their own browser (`deno task dev:host` serves it to the LAN).
   in the flag switcher stay in their own language.
 - **Styling**: one hand-written stylesheet, `src/styles.css`, with no framework
   or build step. It uses five cascade layers (reset, tokens, base, layout,
-  components). The palette is warm cream/plum-ink with pastel tints (`--tint-*`)
-  and a lavender accent. Every colour is a `light-dark()` token on `:root`,
-  switched by `color-scheme` via `html[data-theme]`. All text colours were
-  checked against WCAG 2.1 AA on bg, surfaces and every tint, so recheck the
-  ratios when changing a colour. Components use `@scope`. Scoped rules win on
-  proximity over unscoped ones with the same specificity, so theme overrides for
-  scoped elements must live outside the `@scope` block (see
+  components). The palette is misty sea-glass/slate-ink with pastel tints
+  (`--tint-*`) and a seafoam accent. Every colour is a `light-dark()` token on
+  `:root`, switched by `color-scheme` via `html[data-theme]`. All text colours
+  were checked against WCAG 2.1 AA on bg, surfaces and every tint, so recheck
+  the ratios when changing a colour. Components use `@scope`. Scoped rules win
+  on proximity over unscoped ones with the same specificity, so theme overrides
+  for scoped elements must live outside the `@scope` block (see
   `.theme-toggle__sun`). Icons are Lucide paths in `src/_data/icons.yml`,
   rendered with `partials/icon.vto`. The empty-state scene is an inline SVG
   (`partials/empty-illustration.vto`), coloured by `--illo-*` tokens and
