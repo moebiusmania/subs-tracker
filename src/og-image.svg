@@ -21,7 +21,7 @@
   <rect width="1200" height="630" fill="url(#glow-1)" />
   <rect width="1200" height="630" fill="url(#glow-2)" />
 
-  <g font-family="Nunito" fill="#1c2b30">
+  <g font-family="Nunito" fill="#1c2b30" transform="translate(0 44)">
     <rect x="80" y="96" width="88" height="88" rx="18" fill="#9fded0" />
     <g transform="translate(94 94) scale(2.5)" fill="none" stroke="#1c2b30"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -39,10 +39,6 @@
       fill="#4f6268">Keep track of your subscription fees</text>
     <text x="80" y="480" font-size="30" font-weight="600"
       fill="#4f6268">and have some math done for you.</text>
-
-    <rect x="80" y="522" width="446" height="48" rx="8" fill="#e0f4ef" />
-    <text x="303" y="554" font-size="24" font-weight="700" fill="#1d6b5f"
-      text-anchor="middle">moebiusmania.github.io/subs-tracker</text>
   </g>
 
   <!-- partials/empty-illustration.vto, scaled up, at rest -->

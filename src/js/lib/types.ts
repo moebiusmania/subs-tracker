@@ -13,6 +13,7 @@ export type I18n = {
   meta: {
     language: string;
     title: string;
+    shareTitle: string;
     description: string;
     imageAlt: string;
   };

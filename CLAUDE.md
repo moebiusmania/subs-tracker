@@ -147,12 +147,14 @@ their own browser (`deno task dev:host` serves it to the LAN).
   and `--color-on-accent` values.
 - **Social previews**: `base.vto` has Open Graph/Twitter tags and a canonical
   link, with absolute URLs from the `url(true)` filter. They're read by crawlers
-  that don't run JS, so they stay in English. `src/og-image.png` (1200×630,
-  added in `_config.ts` but not precached) is rendered from `src/og-image.svg`,
-  a static variant of the empty-state illustration with the light tokens
-  hard-coded: keep it in sync with the palette and the illustration. Its text
-  needs static Nunito weights (600/700/800) at render time, since resvg ignores
-  the weight of the variable font.
+  that don't run JS, so they stay in English. `og:title`/`twitter:title` use
+  `meta.shareTitle`, longer than `meta.title` (30-60 characters is what the
+  preview checkers want). `src/og-image.png` (1200×630, added in `_config.ts`
+  but not precached) is rendered from `src/og-image.svg`, a static variant of
+  the empty-state illustration with the light tokens hard-coded: keep it in sync
+  with the palette and the illustration. Its text needs static Nunito weights
+  (600/700/800) at render time, since resvg ignores the weight of the variable
+  font.
 - Dates saved to `localStorage` come back as strings, so render them with
   `new Date(item.expiration)`.
 - **Terminal version** (`tui/`, entry `tui/main.ts`): feature parity with the

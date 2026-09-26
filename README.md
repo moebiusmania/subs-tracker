@@ -1,4 +1,4 @@
-# 💰 Subscriptions Tracker ⚠️
+# 💰 Subscriptions Tracker
 
 <p align="center">
   <img src=".github/poster.svg" alt="Illustration of fanned subscription cards with bouncing euro and dollar coins" width="360">
