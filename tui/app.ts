@@ -8,7 +8,13 @@ import type { I18n, Locale } from "../src/js/lib/types.ts";
 import { createComponents, type Deps } from "../src/js/lib/components.ts";
 import { getTranslation } from "../src/js/lib/index.ts";
 import { translations } from "../src/js/lib/i18n.ts";
-import { contains, type Key, Painter, type PlacedHit } from "./painter.ts";
+import {
+  contains,
+  encloses,
+  type Key,
+  Painter,
+  type PlacedHit,
+} from "./painter.ts";
 import type { Node, Rect } from "./scene.ts";
 import { mix, type Palette, palettes, type StyleOptions } from "./palette.ts";
 import {
@@ -74,7 +80,9 @@ const HOME = "/";
 
 type Modal =
   | { kind: "export" | "import"; path: Field; error?: string }
-  | { kind: "delete" };
+  | { kind: "delete" }
+  // One card's ✕, or Delete on a focused card: focus goes back there
+  | { kind: "deleteItem"; index: number; from: string };
 
 type Toast = { kind: "success" | "error"; text: string };
 
@@ -233,14 +241,19 @@ export class App {
 
   #openModal(modal: Modal): void {
     this.#modal = modal;
-    this.#focus = modal.kind === "delete" ? "modal.cancel" : "modal.path";
+    this.#focus = modal.kind === "delete" || modal.kind === "deleteItem"
+      ? "modal.cancel"
+      : "modal.path";
   }
 
   #closeModal(): void {
-    const kind = this.#modal?.kind;
+    const modal = this.#modal;
+    const kind = modal?.kind;
     this.#modal = null;
     // Back on the button that opened it
-    this.#focus = kind === "export"
+    this.#focus = modal?.kind === "deleteItem"
+      ? modal.from
+      : kind === "export"
       ? "backup.export"
       : kind === "import"
       ? "backup.import"
@@ -313,6 +326,16 @@ export class App {
     this.#scroll = 0;
     this.#notify("success", getTranslation(this.#t.tui.imported, shown));
     this.#deps.changed();
+  }
+
+  #deleteItem(index: number): void {
+    this.#components.list().deleteItem(index);
+    this.#modal = null;
+    // On the card that took its place, or the new last one
+    const count = this.#store.data.length;
+    this.#focus = count ? `card.${Math.min(index, count - 1)}` : null;
+    this.#reveal = true;
+    if (!count) this.#scroll = 0;
   }
 
   #deleteAll(): void {
@@ -506,13 +529,20 @@ export class App {
       x: rect.column + rect.width / 2,
       y: rect.row + rect.height / 2,
     });
-    const from = current.unclipped;
+    // Controls set inside another one (a card's ✕) are skipped: arrows move
+    // between cards, Tab and the mouse reach the ✕, and moving from it
+    // starts from its card
+    const containerOf = (hit: PlacedHit) =>
+      focusables.find((other) =>
+        other !== hit && encloses(other.unclipped, hit.unclipped)
+      );
+    const from = (containerOf(current) ?? current).unclipped;
     const origin = middle(from);
     let best: PlacedHit | null = null;
     let bestScore = Infinity;
 
     for (const hit of focusables) {
-      if (hit === current) continue;
+      if (hit === current || containerOf(hit)) continue;
       const rect = hit.unclipped;
       const target = middle(rect);
       const dx = target.x - origin.x;
@@ -783,6 +813,9 @@ export class App {
         ["Tab", h.move],
         ...(stepper ? [["↑↓", h.adjust] as [string, string]] : []),
         ["Enter", h.select],
+        ...(/^card\.\d+$/.test(this.#focus ?? "")
+          ? [["Del", h.delete] as [string, string]]
+          : []),
         ...(this.#screen === "add"
           ? [["Esc", h.back] as [string, string]]
           : [["a", h.add] as [string, string]]),
@@ -1200,7 +1233,8 @@ export class App {
         bold: true,
       }, 3);
       const textColumn = column + 9;
-      const textWidthLeft = cardWidth - 11;
+      // Room for the ✕ in the top right corner
+      const textWidthLeft = cardWidth - 14;
       painter.text(
         `${id}.name`,
         textColumn,
@@ -1262,6 +1296,39 @@ export class App {
         );
       }
 
+      // Delete icon, registered before the card so clicks on it win
+      const deleteId = `${id}.delete`;
+      const askDelete = (from: string) =>
+        this.#openModal({ kind: "deleteItem", index, from });
+      painter.text(
+        deleteId,
+        column + cardWidth - 5,
+        row + 1,
+        " ✕ ",
+        ctx.focus === deleteId
+          ? { fg: p.bg, bg: p.accentStrong, bold: true }
+          : ctx.hover === deleteId
+          ? { fg: p.danger, bg: p.dangerSoft, bold: true }
+          : { fg: p.muted, bg: fill },
+        2,
+      );
+      painter.hit({
+        id: deleteId,
+        rect: {
+          column: column + cardWidth - 5,
+          row: row + 1,
+          width: 3,
+          height: 1,
+        },
+        focusable: true,
+        onClick: () => askDelete(deleteId),
+        onKey: (key) => {
+          if (key.key !== "return" && key.key !== "space") return false;
+          askDelete(deleteId);
+          return true;
+        },
+      });
+
       // The whole card toggles, the pill shows the state
       const toggle = () => list.toggleActive(index);
       painter.hit({
@@ -1270,6 +1337,10 @@ export class App {
         focusable: true,
         onClick: toggle,
         onKey: (key) => {
+          if (key.key === "delete" || key.key === "backspace") {
+            askDelete(id);
+            return true;
+          }
           if (key.key !== "return" && key.key !== "space") return false;
           toggle();
           return true;
@@ -1717,21 +1788,30 @@ export class App {
     const column = Math.floor((columns - width) / 2);
     const bg = p.surface;
 
-    const isDelete = modal.kind === "delete";
+    const isDelete = modal.kind === "delete" || modal.kind === "deleteItem";
+    const name = modal.kind === "deleteItem"
+      ? this.#store.data[modal.index]?.name ?? ""
+      : "";
     const title = modal.kind === "export"
       ? t.backup.export
       : modal.kind === "import"
       ? t.backup.import
+      : modal.kind === "deleteItem"
+      ? getTranslation(t.main.deleteItem, name)
       : t.main.delete;
     const message = wrap(
       modal.kind === "export"
         ? t.tui.exportMessage
         : modal.kind === "import"
         ? t.tui.importMessage
+        : modal.kind === "deleteItem"
+        ? getTranslation(t.main.confirmDeleteItem, name)
         : t.main.confirmDelete,
       inner,
     );
-    const error = !isDelete && modal.error ? modal.error : undefined;
+    const error = modal.kind === "export" || modal.kind === "import"
+      ? modal.error
+      : undefined;
     const height = 2 + 2 + message.length + 1 +
       (isDelete ? 0 : (error ? 5 : 4) + 1) + 1 + 1;
     const row = Math.max(1, Math.floor((rows - height) / 2));
@@ -1775,7 +1855,7 @@ export class App {
     });
     y += message.length + 1;
 
-    if (!isDelete) {
+    if (modal.kind === "export" || modal.kind === "import") {
       const modalPath = modal;
       y += input(
         painter.sub({ layer: "modal", z: Z.modal + 2, clip: painter.clip }),
@@ -1823,6 +1903,8 @@ export class App {
       ? t.tui.save
       : modal.kind === "import"
       ? t.tui.open
+      : modal.kind === "deleteItem"
+      ? t.tui.delete
       : t.main.delete;
     const buttons = painter.sub({
       layer: "modal",
@@ -1863,6 +1945,8 @@ export class App {
         return;
       case "delete":
         return this.#deleteAll();
+      case "deleteItem":
+        return this.#deleteItem(this.#modal.index);
     }
   }
 }

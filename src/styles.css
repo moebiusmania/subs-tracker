@@ -862,6 +862,7 @@
     :scope {
       --tint: var(--tint-lav);
 
+      position: relative;
       display: grid;
       gap: var(--space-3);
       padding: var(--space-5);
@@ -945,6 +946,49 @@
       justify-self: start;
     }
 
+    /* Delete tab set into the top right corner, out of the grid so the name
+       keeps the whole row. Its outer corner follows the card's (inside the
+       1.5px border), so it looks clipped by the card without overflow:
+       hidden, which would also clip focus rings. Red on hover, asks before
+       deleting. */
+    .sub-card__delete {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-end: 0;
+      display: grid;
+      place-items: center;
+      width: 2.5rem;
+      height: 2.25rem;
+      border: 0;
+      border-start-end-radius: calc(var(--radius-md) - 1.5px);
+      border-end-start-radius: var(--radius-md);
+      background: var(--color-surface-2);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition:
+        color var(--duration) ease,
+        background-color var(--duration) ease;
+
+      & .icon {
+        width: 1rem;
+        height: 1rem;
+        transition: scale var(--duration) var(--ease-spring);
+      }
+
+      &:hover {
+        background: var(--color-danger-soft);
+        color: var(--color-danger);
+      }
+
+      &:active .icon {
+        scale: 0.85;
+      }
+    }
+
+    :scope.is-inactive .sub-card__delete:not(:hover) {
+      background: var(--color-surface);
+    }
+
     .sub-card__avatar {
       grid-area: avatar;
       display: grid;
@@ -969,6 +1013,8 @@
 
     .sub-card__name {
       grid-area: name;
+      /* Long names stop short of the corner delete icon */
+      padding-inline-end: var(--space-4);
       font-size: 1.125rem;
       font-weight: 800;
       overflow-wrap: anywhere;

@@ -205,6 +205,36 @@ Deno.test("list - deleteAll asks in the current language", () => {
   ]);
 });
 
+Deno.test("list - deleteItem removes one item after confirmation", () => {
+  const { store, calls, components } = setup({ confirm: true });
+  store.loadMock();
+  const [first, second] = store.data.map((item) => item.name);
+  components.list().deleteItem(0);
+  assertEquals(calls.confirm, [
+    `Sure you want to delete ${first}? This can't be undone.`,
+  ]);
+  assertEquals(store.data.length, 3);
+  assertEquals(store.data[0].name, second);
+  assertEquals(calls.persist, 1);
+});
+
+Deno.test("list - deleteItem keeps the item when not confirmed", () => {
+  const { store, calls, components } = setup({ confirm: false });
+  store.loadMock();
+  store.setLocale("it");
+  components.list().deleteItem(1);
+  assertEquals(calls.confirm, [
+    `Vuoi davvero eliminare ${store.data[1].name}? Non si potrà annullare.`,
+  ]);
+  assertEquals(store.data.length, 4);
+  assertEquals(calls.persist, 0);
+});
+
+Deno.test("list - deleteLabel names the item", () => {
+  const { components } = setup();
+  assertEquals(components.list().deleteLabel(netflix), "Delete Netflix");
+});
+
 Deno.test("list - status, recurrence and dates follow the locale", () => {
   const { store, components } = setup();
   const list = components.list();

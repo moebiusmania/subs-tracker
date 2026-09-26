@@ -52,6 +52,12 @@ export const contains = (rect: Rect, x: number, y: number): boolean =>
   x >= rect.column && x < rect.column + rect.width && y >= rect.row &&
   y < rect.row + rect.height;
 
+// Whether inner lies entirely within outer
+export const encloses = (outer: Rect, inner: Rect): boolean =>
+  inner.column >= outer.column && inner.row >= outer.row &&
+  inner.column + inner.width <= outer.column + outer.width &&
+  inner.row + inner.height <= outer.row + outer.height;
+
 const segmenter = new Intl.Segmenter();
 
 // The part of a one-line text between two screen columns

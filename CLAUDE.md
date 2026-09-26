@@ -77,7 +77,10 @@ their own browser (`deno task dev:host` serves it to the LAN).
 - **Business logic** (`src/js/lib/`, framework-free and unit tested):
   - `store.ts`: `createStore()` returns a plain object (state + actions, ported
     from the old Pinia store) that `Alpine.store()` makes reactive.
-    `toggleActive` refuses to deactivate the last active subscription.
+    `toggleActive` refuses to deactivate the last active subscription. Deleting
+    (`deleteSubscription`, one card; `deleteSubs`, everything) always goes
+    through a confirmation: the `list` component's `deleteItem`/ `deleteAll`
+    call `deps.confirm` on the web, the TUI shows its own dialog.
   - `storage.ts`: reads and writes the whole `AppState` as JSON under the key
     `subs-tracker`. Persistence is manual: every component handler that mutates
     the store calls `persist()` right after, and new mutations need the same
@@ -170,8 +173,10 @@ their own browser (`deno task dev:host` serves it to the LAN).
   - Interaction is the app's own (not deno_tui's components): focus by id, Tab
     order = registration order with the header first, arrows move spatially,
     clicks go to the topmost layer then the first registered hit (small controls
-    are registered before the field they sit on). Mouse uses any-motion SGR
-    tracking (1003/1006) for hover. `tui/keys.ts` splits one stdin read into
+    are registered before the field they sit on). Arrows skip a focusable
+    control that sits inside another one (a card's ✕): Tab and the mouse reach
+    it, and a focused card opens the same dialog with Del. Mouse uses any-motion
+    SGR tracking (1003/1006) for hover. `tui/keys.ts` splits one stdin read into
     several keys (pastes, fast typing).
   - Colours are the CSS tokens copied into `tui/palette.ts` (keep them in sync
     with `styles.css`), 24-bit when the terminal supports it, else the nearest

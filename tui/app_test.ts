@@ -197,6 +197,46 @@ Deno.test("app - cards toggle with a click or Enter", () => {
   assertEquals(calls.persist, 2);
 });
 
+Deno.test("app - a card's ✕ deletes only that card, after asking", () => {
+  const { app, store, calls, click, press, texts } = setup({ mock: true });
+  click("card.1.delete");
+  assertEquals(app.modal, "deleteItem");
+  assertEquals(app.focus, "modal.cancel");
+  assertStringIncludes(texts(), `Delete ${subs[1].name}`);
+  // Cancel: nothing changes, focus goes back to the ✕
+  press("return");
+  assertEquals(app.modal, null);
+  assertEquals(app.focus, "card.1.delete");
+  assertEquals(store.data.length, 4);
+  assertEquals(calls.persist, 0);
+
+  press("return");
+  click("modal.confirm");
+  assertEquals(app.modal, null);
+  assertEquals(store.data.map((item) => item.name), [
+    subs[0].name,
+    subs[2].name,
+    subs[3].name,
+  ]);
+  assertEquals(calls.persist, 1);
+  assertEquals(app.focus, "card.1");
+});
+
+Deno.test("app - Delete on a focused card asks first", () => {
+  const { app, store, click, press } = setup({ mock: true });
+  click("card.3");
+  press("delete");
+  assertEquals(app.modal, "deleteItem");
+  press("escape");
+  assertEquals(app.focus, "card.3");
+  press("delete");
+  press("tab");
+  press("return");
+  assertEquals(store.data.length, 3);
+  // The last card is gone: focus moves to the new last one
+  assertEquals(app.focus, "card.2");
+});
+
 Deno.test("app - delete all asks first", () => {
   const { app, store, click, press } = setup({ mock: true });
   click("list.delete");
@@ -359,6 +399,18 @@ Deno.test("app - arrows move between cards", () => {
   assertEquals(app.focus, "card.3");
   press("up");
   assertEquals(app.focus, "card.0");
+});
+
+Deno.test("app - arrows skip a card's ✕, moving from it starts at its card", () => {
+  const { app, press, click } = setup({ mock: true, size: [100, 60] });
+  click("card.0");
+  press("tab");
+  assertEquals(app.focus, "card.1.delete");
+  press("left");
+  assertEquals(app.focus, "card.0");
+  press("tab");
+  press("right");
+  assertEquals(app.focus, "card.2");
 });
 
 Deno.test("app - the page scrolls and keeps the focus in view", () => {
