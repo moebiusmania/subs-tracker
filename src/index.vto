@@ -60,6 +60,15 @@
                   <span class="status__dot" aria-hidden="true"></span>
                   <span x-text="status(item)"></span>
                 </button>
+                <button
+                  type="button"
+                  class="sub-card__delete"
+                  :aria-label="deleteLabel(item)"
+                  :title="deleteLabel(item)"
+                  @click="deleteItem(index)"
+                >
+                  {{ include "partials/icon.vto" { name: "trash" } }}
+                </button>
               </div>
               <p class="sub-card__price">
                 <span x-text="item.price + item.currency"></span>

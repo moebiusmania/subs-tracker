@@ -170,6 +170,22 @@ Deno.test("toggleActive - an inactive subscription can always be re-activated", 
   assertEquals(app.data[1].isActive, true);
 });
 
+Deno.test("deleteSubscription - removes only the item at that index", () => {
+  const app = createStore();
+  app.addSubscription({ ...testSubscription, name: "A" });
+  app.addSubscription({ ...testSubscription, name: "B" });
+  app.addSubscription({ ...testSubscription, name: "C" });
+  app.deleteSubscription(1);
+  assertEquals(app.data.map((item) => item.name), ["A", "C"]);
+});
+
+Deno.test("deleteSubscription - an index out of range changes nothing", () => {
+  const app = createStore();
+  app.addSubscription({ ...testSubscription, name: "A" });
+  app.deleteSubscription(3);
+  assertEquals(app.data.map((item) => item.name), ["A"]);
+});
+
 Deno.test("getState - reflects later changes", () => {
   const app = createStore();
   app.setTheme("dark");

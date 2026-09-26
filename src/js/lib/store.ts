@@ -12,6 +12,7 @@ export type Store = AppState & {
   loadMock(): void;
   addSubscription(item: Subscription): void;
   toggleActive(index: number): void;
+  deleteSubscription(index: number): void;
   setTheme(value: "light" | "dark"): void;
   setLocale(value: Locale): void;
   setSystemLocale(value: Locale): void;
@@ -58,6 +59,9 @@ export const createStore = (): Store => ({
     ).length;
     items[index]!.isActive = actives > 1 ? !items[index]!.isActive : true;
     this.data = items;
+  },
+  deleteSubscription(index: number): void {
+    this.data = this.data.filter((_, i) => i !== index);
   },
   setTheme(value: "light" | "dark"): void {
     this.theme = value;

@@ -116,6 +116,21 @@ export const createComponents = (deps: Deps) => {
         app().toggleActive(index);
         persist();
       },
+      deleteLabel(item: Subscription): string {
+        return getTranslation(app().i18n.main.deleteItem, item.name);
+      },
+      deleteItem(index: number): void {
+        const item = app().data[index];
+        if (!item) return;
+        const message = getTranslation(
+          app().i18n.main.confirmDeleteItem,
+          item.name,
+        );
+        if (deps.confirm(message)) {
+          app().deleteSubscription(index);
+          persist();
+        }
+      },
       deleteAll(): void {
         if (deps.confirm(app().i18n.main.confirmDelete)) {
           app().deleteSubs();

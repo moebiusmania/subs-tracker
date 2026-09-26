@@ -37,6 +37,8 @@ export type I18n = {
     thisMonth: string;
     delete: string;
     confirmDelete: string;
+    deleteItem: string;
+    confirmDeleteItem: string;
   };
   recurrence: {
     monthly: string;
@@ -97,12 +99,14 @@ export type I18n = {
       quit: string;
       adjust: string;
       scroll: string;
+      delete: string;
     };
     fileTitle: string;
     exportMessage: string;
     importMessage: string;
     save: string;
     open: string;
+    delete: string;
     exported: string;
     imported: string;
     readError: string;

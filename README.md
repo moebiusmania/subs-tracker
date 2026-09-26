@@ -74,7 +74,7 @@ The data is saved in `~/.config/subs-tracker/data.json` (`%APPDATA%\subs-tracker
 
 ### Roadmap
 
-- Edit & delete entries
+- Edit entries
 - Manage currencies (_both per-entry and globally_)
 - Highlight/prioritize items that are close to expire (_within 30 days from the given expiration date_)
 - Push Notifications?

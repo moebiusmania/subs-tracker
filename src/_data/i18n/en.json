@@ -25,7 +25,9 @@
     "expires": "Expires on",
     "thisMonth": "Due this month",
     "delete": "Delete all",
-    "confirmDelete": "Sure you want to delete all subscriptions data?"
+    "confirmDelete": "Sure you want to delete all subscriptions data?",
+    "deleteItem": "Delete {{value}}",
+    "confirmDeleteItem": "Sure you want to delete {{value}}? This can't be undone."
   },
   "recurrence": {
     "monthly": "Monthly",
@@ -84,13 +86,15 @@
       "language": "language",
       "quit": "quit",
       "adjust": "change",
-      "scroll": "scroll"
+      "scroll": "scroll",
+      "delete": "delete"
     },
     "fileTitle": "File path",
     "exportMessage": "Save a copy of your subscriptions as a JSON file.",
     "importMessage": "Replace your subscriptions with the ones in a JSON file exported from the app.",
     "save": "Save",
     "open": "Import",
+    "delete": "Delete",
     "exported": "Data saved to {{value}}",
     "imported": "Data imported from {{value}}",
     "readError": "Can't read {{value}}",
