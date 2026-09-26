@@ -76,7 +76,6 @@ The data is saved in `~/.config/subs-tracker/data.json` (`%APPDATA%\subs-tracker
 
 - Edit entries
 - Manage currencies (_both per-entry and globally_)
-- Highlight/prioritize items that are close to expire (_within 30 days from the given expiration date_)
 - Push Notifications?
 - "Help/How it works" screen
 - (_still undecided_) Signup/signin + Backend to sync data on multiple devices. As I said above if this will happen it will not be mandatory.
