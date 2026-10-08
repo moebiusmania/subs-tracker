@@ -94,8 +94,8 @@ their own browser (`deno task dev:host` serves it to the LAN).
     each test.
   - `index.ts`: cost calculations. Yearly cost counts monthly items ×12, and
     only active subscriptions are counted. `isExpiringThisMonth` drives the "due
-    this month" highlight (web `.is-due` card with an accent bar and badge, TUI
-    accent border and badge).
+    this month" highlight (web `.is-due` card with an accent border, a slow
+    pulsing glow and a badge, TUI accent border and badge).
   - `mocks.ts`: `mockSubs(now)` builds the example data with expirations
     relative to `now` (one this month, one next month, the rest later), so tests
     assert dates computed from it rather than fixed strings.
@@ -129,12 +129,13 @@ their own browser (`deno task dev:host` serves it to the LAN).
   for scoped elements must live outside the `@scope` block (see
   `.theme-toggle__sun`). Icons are Lucide paths in `src/_data/icons.yml`,
   rendered with `partials/icon.vto`. The look is functional rather than playful:
-  flat bordered panels, small radii, no decorative motion. The stats are one
-  strip of cells, and the subscriptions are a grid of cards (`.sub-card`). The
-  header, empty state and install banner show `favicon.svg` as the logo. The
-  Inter font (400/500/600 only) comes from Bunny Fonts. Sections fade in with
-  `@starting-style`; navigations and the theme switch use view transitions;
-  everything respects `prefers-reduced-motion`.
+  flat bordered panels, small radii, no decorative motion (the due-card glow is
+  the one exception). The stats are one strip of cells, and the subscriptions
+  are a grid of cards (`.sub-card`). The header, empty state and install banner
+  show `favicon.svg` as the logo. The Inter font (400/500/600 only) comes from
+  Bunny Fonts. Sections fade in with `@starting-style`; navigations and the
+  theme switch use view transitions; everything respects
+  `prefers-reduced-motion`.
 - **PWA**: `src/sw.js` is a plain JS service worker (esbuild bundles it too).
   Same-origin GETs are network-first with `cache: "no-cache"` and a 4s timeout
   that falls back to the cache, so online users always get the latest deploy;

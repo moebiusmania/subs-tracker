@@ -692,6 +692,17 @@
     }
   }
 
+  /* Pulse for the cards due this month (keyframes can't live in @scope) */
+  @keyframes due-glow {
+    from {
+      box-shadow: 0 0 4px 0 var(--due-glow), var(--shadow-sm);
+    }
+
+    to {
+      box-shadow: 0 0 14px 2px var(--due-glow), var(--shadow-sm);
+    }
+  }
+
   @scope (.sub-card) {
     :scope {
       --tint: var(--tint-lav);
@@ -732,9 +743,18 @@
       --tint: var(--tint-pink);
     }
 
-    /* Expiring in the current month: an accent bar and a badge */
+    /* Expiring in the current month: an accent border, a slow glow and a
+       badge */
     :scope.is-due {
-      box-shadow: inset 3px 0 0 var(--color-accent-strong), var(--shadow-sm);
+      --due-glow: color-mix(in oklab, var(--color-accent), transparent 35%);
+
+      border-color: var(--color-accent-strong);
+      box-shadow: 0 0 10px 1px var(--due-glow), var(--shadow-sm);
+      animation: due-glow 2.4s ease-in-out infinite alternate;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
     }
 
     :scope.is-inactive {
@@ -742,6 +762,7 @@
       background: var(--color-surface-2);
       box-shadow: none;
       color: var(--color-text-muted);
+      animation: none;
     }
 
     .sub-card__top {
