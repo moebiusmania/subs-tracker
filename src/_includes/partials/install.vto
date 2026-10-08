@@ -5,7 +5,7 @@
   x-cloak
   aria-labelledby="install-title"
 >
-  <span class="install__logo">{{ include "partials/icon.vto" { name: "wallet" } }}</span>
+  <img class="install__logo" src="{{ '/favicon.svg' |> url }}" alt="" width="40" height="40">
   <div class="install__body">
     <h2 id="install-title" class="install__title" x-text="$t.install.title">{{ i18n.en.install.title }}</h2>
     <p class="install__text" x-show="mode === 'prompt'" x-text="$t.install.message">{{ i18n.en.install.message }}</p>

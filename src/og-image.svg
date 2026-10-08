@@ -1,85 +1,197 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200"
   height="630">
   <!--
-    Source of og-image.png, the social share preview (not published). A static
-    variant of partials/empty-illustration.vto beside the app name, with the
-    light theme tokens from styles.css. Render it with Nunito installed, since
-    the text is not converted to paths.
+    Source of og-image.png, the social share preview (not published): the
+    app icon (a copy of icons/icon.svg) and name beside a static mock of the
+    dashboard, with the light theme tokens from styles.css. Render it with
+    Inter installed (static 400, 500 and 600 weights), since the text is not
+    converted to paths.
   -->
-  <defs>
-    <radialGradient id="glow-1" cx="0" cy="-0.1" r="1">
-      <stop offset="0" stop-color="#dcf2ec" />
-      <stop offset="0.7" stop-color="#dcf2ec" stop-opacity="0" />
-    </radialGradient>
-    <radialGradient id="glow-2" cx="1" cy="0" r="1">
-      <stop offset="0" stop-color="#ffeade" />
-      <stop offset="0.7" stop-color="#ffeade" stop-opacity="0" />
-    </radialGradient>
-  </defs>
-
   <rect width="1200" height="630" fill="#f3f7f6" />
-  <rect width="1200" height="630" fill="url(#glow-1)" />
-  <rect width="1200" height="630" fill="url(#glow-2)" />
 
-  <g font-family="Nunito" fill="#1c2b30" transform="translate(0 44)">
-    <rect x="80" y="96" width="88" height="88" rx="18" fill="#9fded0" />
-    <g transform="translate(94 94) scale(2.5)" fill="none" stroke="#1c2b30"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path
-        d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
-      <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+  <svg x="80" y="112" width="120" height="120" viewBox="0 0 512 512">
+    <defs>
+      <linearGradient id="icon-bg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#aee4d8" />
+        <stop offset="1" stop-color="#86cfbf" />
+      </linearGradient>
+      <linearGradient id="icon-paper" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffffff" />
+        <stop offset="1" stop-color="#f3f7f6" />
+      </linearGradient>
+      <filter id="icon-shadow" x="-20%" y="-20%" width="140%" height="150%">
+        <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#1c2b30"
+          flood-opacity="0.22" />
+      </filter>
+    </defs>
+
+    <rect width="512" height="512" rx="112" fill="url(#icon-bg)" />
+
+    <g>
+      <!-- The card behind, the previous statement -->
+      <rect x="128" y="88" width="256" height="292" rx="26" fill="#ffffff"
+        fill-opacity="0.55" />
+
+      <!-- Statement card with a dark header -->
+      <g filter="url(#icon-shadow)">
+        <rect x="96" y="116" width="320" height="296" rx="30"
+          fill="url(#icon-paper)" />
+      </g>
+      <path d="M96 146a30 30 0 0 1 30-30h260a30 30 0 0 1 30 30v34H96z"
+        fill="#1c2b30" />
+      <rect x="124" y="140" width="104" height="16" rx="8" fill="#9fded0" />
+      <rect x="336" y="140" width="52" height="16" rx="8" fill="#ffe08a" />
+
+      <!-- Three subscriptions: avatar, name and price -->
+      <rect x="124" y="204" width="32" height="32" rx="8" fill="#cbbcff" />
+      <rect x="172" y="213" width="100" height="14" rx="7" fill="#c3d2ce" />
+      <rect x="332" y="213" width="56" height="14" rx="7" fill="#1c2b30" />
+      <rect x="124" y="250" width="264" height="3" fill="#e2ebe8" />
+
+      <rect x="124" y="266" width="32" height="32" rx="8" fill="#ffc9ae" />
+      <rect x="172" y="275" width="76" height="14" rx="7" fill="#c3d2ce" />
+      <rect x="332" y="275" width="56" height="14" rx="7" fill="#1c2b30" />
+      <rect x="124" y="312" width="264" height="3" fill="#e2ebe8" />
+
+      <rect x="124" y="328" width="32" height="32" rx="8" fill="#a8e6c9" />
+      <rect x="172" y="337" width="88" height="14" rx="7" fill="#c3d2ce" />
+
+      <!-- Renewal badge over the corner, cut out of the card by a ring -->
+      <circle cx="380" cy="380" r="80" fill="#1c2b30" stroke="#93d6c7"
+        stroke-width="14" />
+      <g transform="translate(323.2 323.2) scale(4.733)" fill="none"
+        stroke="#9fded0" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+        <path d="M21 3v5h-5" />
+        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+        <path d="M8 16H3v5" />
+      </g>
+      <g transform="translate(359 359) scale(1.75)" fill="none" stroke="#ffffff"
+        stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 10h12M4 14h9" />
+        <path
+          d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2" />
+      </g>
     </g>
+  </svg>
 
-    <text x="76" y="290" font-size="76" font-weight="800"
-      letter-spacing="-1">Subscriptions</text>
-    <text x="76" y="372" font-size="76" font-weight="800"
-      letter-spacing="-1">Tracker</text>
+  <g font-family="Inter" fill="#1c2b30">
+    <text x="76" y="320" font-size="68" font-weight="600"
+      letter-spacing="-2">Subscriptions</text>
+    <text x="76" y="396" font-size="68" font-weight="600"
+      letter-spacing="-2">Tracker</text>
 
-    <text x="80" y="440" font-size="30" font-weight="600"
+    <text x="80" y="458" font-size="26"
       fill="#4f6268">Keep track of your subscription fees</text>
-    <text x="80" y="480" font-size="30" font-weight="600"
+    <text x="80" y="494" font-size="26"
       fill="#4f6268">and have some math done for you.</text>
   </g>
 
-  <!-- partials/empty-illustration.vto, scaled up, at rest -->
-  <g transform="translate(610 90) scale(2.2)">
-    <ellipse cx="130" cy="100" rx="104" ry="86" fill="#e0f4ef" />
-    <ellipse cx="132" cy="178" rx="64" ry="7" fill="#1c2b30"
-      fill-opacity="0.1" />
+  <!-- The dashboard: totals strip and the cards, as on the home page -->
+  <g font-family="Inter" fill="#1c2b30">
+    <rect x="615.5" y="111.5" width="505" height="129" rx="8" fill="#d9e4e1" />
+    <path d="M616 120a8 8 0 0 1 8-8h243.5v128h-243.5a8 8 0 0 1-8-8z"
+      fill="#ffffff" />
+    <path d="M1120 120a8 8 0 0 0-8-8h-243.5v128h243.5a8 8 0 0 0 8-8z"
+      fill="#ffffff" />
 
-    <g stroke="#1c2b30" stroke-width="2">
-      <rect x="74" y="66" width="120" height="78" rx="14" fill="#ffc9ae"
-        transform="rotate(-12 134 105)" />
-      <rect x="72" y="70" width="122" height="80" rx="14" fill="#a8e6c9"
-        transform="rotate(-5 133 110)" />
-      <rect x="70" y="74" width="124" height="80" rx="14" fill="#ffffff" />
+    <rect x="640" y="136" width="28" height="28" rx="6" fill="#dcf3e8" />
+    <g transform="translate(646 142) scale(0.667)" fill="none" stroke="#1c2b30"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect width="18" height="18" x="3" y="4" rx="2" />
+      <path d="M16 2v4M8 2v4M3 10h18" />
     </g>
-    <circle cx="95" cy="99" r="11" fill="#cbbcff" />
-    <rect x="113" y="92" width="58" height="7" rx="3.5" fill="#dbe6e3" />
-    <rect x="113" y="104" width="36" height="6" rx="3" fill="#dbe6e3"
-      opacity="0.7" />
-    <rect x="84" y="128" width="42" height="14" rx="7" fill="#a8e6c9" />
-    <rect x="146" y="128" width="34" height="14" rx="7" fill="#ffe08a" />
+    <text x="678" y="155" font-size="14" font-weight="500"
+      fill="#4f6268">Monthly cost</text>
+    <text x="640" y="200" font-size="32" font-weight="600"
+      letter-spacing="-0.6">24.98€</text>
+    <text x="640" y="224" font-size="13"
+      fill="#4f6268">Active subscriptions only</text>
 
-    <g font-family="Nunito" font-weight="800" fill="#1c2b30"
-      text-anchor="middle">
-      <g transform="rotate(8 208 56)">
-        <circle cx="208" cy="56" r="18" fill="#ffe08a" stroke="#1c2b30"
-          stroke-width="2" />
-        <text x="208" y="62.5" font-size="19">€</text>
-      </g>
-      <g transform="rotate(-8 52 70)">
-        <circle cx="52" cy="70" r="11" fill="#f9bcd3" stroke="#1c2b30"
-          stroke-width="2" />
-        <text x="52" y="74.5" font-size="13">$</text>
-      </g>
+    <rect x="884.0" y="136" width="28" height="28" rx="6" fill="#ffe3d3" />
+    <g transform="translate(890.0 142) scale(0.667)" fill="none"
+      stroke="#1c2b30"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect width="18" height="18" x="3" y="4" rx="2" />
+      <path d="M16 2v4M3 10h18M8 2v4M17 14h-6M13 18H7M7 14h.01M17 18h.01" />
     </g>
+    <text x="922.0" y="155" font-size="14" font-weight="500"
+      fill="#4f6268">Yearly cost</text>
+    <text x="884.0" y="200" font-size="32" font-weight="600"
+      letter-spacing="-0.6">399.75€</text>
+    <text x="884.0" y="224" font-size="13"
+      fill="#4f6268">Active subscriptions only</text>
 
-    <path transform="translate(46 132)" fill="#cbbcff"
-      d="M0-9C1-3 3-1 9 0C3 1 1 3 0 9C-1 3-3 1-9 0C-3-1-1-3 0-9Z" />
-    <path transform="translate(222 118)" fill="#ffc9ae"
-      d="M0-7C1-2 2-1 7 0C2 1 1 2 0 7C-1 2-2 1-7 0C-2-1-1-2 0-7Z" />
-    <path transform="translate(156 30)" fill="#a8e6c9"
-      d="M0-6C1-2 2-1 6 0C2 1 1 2 0 6C-1 2-2 1-6 0C-2-1-1-2 0-6Z" />
+    <rect x="616.5" y="264.5" width="243" height="137" rx="8" fill="#ffffff"
+      stroke="#d9e4e1" />
+    <path d="M616 272a8 8 0 0 1 3-6.2v134.4a8 8 0 0 1-3-6.2z" fill="#1d6b5f" />
+    <rect x="632" y="280" width="36" height="36" rx="6" fill="#ece6ff" />
+    <text x="650" y="303" font-size="15" font-weight="600"
+      text-anchor="middle">M</text>
+    <text x="680" y="295" font-size="16" font-weight="600"
+      fill="#1c2b30">Music</text>
+    <text x="680" y="313" font-size="13" fill="#4f6268">Monthly</text>
+    <text x="632" y="350" font-size="24" font-weight="600" letter-spacing="-0.5"
+      fill="#1c2b30">10.99€</text>
+    <rect x="632" y="364" width="212" height="1" fill="#d9e4e1" />
+    <text x="632" y="387.5" font-size="13" font-weight="500"
+      fill="#1d6b5f">Oct 21, 2026</text>
+    <rect x="782" y="371" width="62" height="24" rx="6" fill="#dcf3e8" />
+    <circle cx="794" cy="383" r="3.5" fill="#1d6644" />
+    <text x="803" y="387.5" font-size="12.5" font-weight="600"
+      fill="#1d6644">Active</text>
+    <rect x="876.5" y="264.5" width="243" height="137" rx="8" fill="#ffffff"
+      stroke="#d9e4e1" />
+    <rect x="892" y="280" width="36" height="36" rx="6" fill="#dcf3e8" />
+    <text x="910" y="303" font-size="15" font-weight="600"
+      text-anchor="middle">V</text>
+    <text x="940" y="295" font-size="16" font-weight="600"
+      fill="#1c2b30">Video streaming</text>
+    <text x="940" y="313" font-size="13" fill="#4f6268">Monthly</text>
+    <text x="892" y="350" font-size="24" font-weight="600" letter-spacing="-0.5"
+      fill="#1c2b30">13.99€</text>
+    <rect x="892" y="364" width="212" height="1" fill="#d9e4e1" />
+    <text x="892" y="387.5" font-size="13" font-weight="400"
+      fill="#4f6268">Nov 4, 2026</text>
+    <rect x="1042" y="371" width="62" height="24" rx="6" fill="#dcf3e8" />
+    <circle cx="1054" cy="383" r="3.5" fill="#1d6644" />
+    <text x="1063" y="387.5" font-size="12.5" font-weight="600"
+      fill="#1d6644">Active</text>
+    <rect x="616.5" y="418.5" width="243" height="137" rx="8" fill="#ffffff"
+      stroke="#d9e4e1" />
+    <rect x="632" y="434" width="36" height="36" rx="6" fill="#ffe3d3" />
+    <text x="650" y="457" font-size="15" font-weight="600"
+      text-anchor="middle">C</text>
+    <text x="680" y="449" font-size="16" font-weight="600"
+      fill="#1c2b30">Cloud storage</text>
+    <text x="680" y="467" font-size="13" fill="#4f6268">Yearly</text>
+    <text x="632" y="504" font-size="24" font-weight="600" letter-spacing="-0.5"
+      fill="#1c2b30">99.99€</text>
+    <rect x="632" y="518" width="212" height="1" fill="#d9e4e1" />
+    <text x="632" y="541.5" font-size="13" font-weight="400"
+      fill="#4f6268">Mar 12, 2027</text>
+    <rect x="782" y="525" width="62" height="24" rx="6" fill="#dcf3e8" />
+    <circle cx="794" cy="537" r="3.5" fill="#1d6644" />
+    <text x="803" y="541.5" font-size="12.5" font-weight="600"
+      fill="#1d6644">Active</text>
+    <rect x="876.5" y="418.5" width="243" height="137" rx="8" fill="#e9f0ee"
+      stroke="#d9e4e1" stroke-dasharray="4 3" />
+    <rect x="892" y="434" width="36" height="36" rx="6" fill="#dbeafb" />
+    <text x="910" y="457" font-size="15" font-weight="600"
+      text-anchor="middle">N</text>
+    <text x="940" y="449" font-size="16" font-weight="600"
+      fill="#4f6268">News</text>
+    <text x="940" y="467" font-size="13" fill="#4f6268">Monthly</text>
+    <text x="892" y="504" font-size="24" font-weight="600" letter-spacing="-0.5"
+      fill="#4f6268">6.99€</text>
+    <rect x="892" y="518" width="212" height="1" fill="#d9e4e1" />
+    <text x="892" y="541.5" font-size="13" font-weight="400"
+      fill="#4f6268">Jan 30, 2027</text>
+    <rect x="1030" y="525" width="74" height="24" rx="6" fill="#ffffff" />
+    <circle cx="1042" cy="537" r="3" fill="none" stroke="#4f6268"
+      stroke-width="1.5" />
+    <text x="1051" y="541.5" font-size="12.5" font-weight="600"
+      fill="#4f6268">Inactive</text>
   </g>
 </svg>

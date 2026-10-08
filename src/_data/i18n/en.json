@@ -4,7 +4,7 @@
     "title": "Subscriptions Tracker",
     "shareTitle": "Subscriptions Tracker: what your subscriptions really cost",
     "description": "Webapp to keep track of subscription fees and have some math done for you.",
-    "imageAlt": "Subscriptions Tracker: fanned subscription cards with euro and dollar coins"
+    "imageAlt": "Subscriptions Tracker: the app icon next to monthly and yearly totals and four subscription cards"
   },
   "header": {
     "skip": "Skip to content",
@@ -14,11 +14,11 @@
   },
   "main": {
     "title": "Your stats",
-    "total": "Total subscriptions:",
+    "total": "Total subscriptions",
     "inactives": "with {{value}} inactive subscriptions",
-    "monthly": "Total monthly cost:",
-    "yearly": "Total yearly cost:",
-    "detail": "(only active subscriptions)",
+    "monthly": "Monthly cost",
+    "yearly": "Yearly cost",
+    "detail": "Active subscriptions only",
     "list": "Your subscriptions",
     "cta": "Add a new subscription",
     "active": "Active",

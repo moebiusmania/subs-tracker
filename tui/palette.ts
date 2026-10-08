@@ -25,6 +25,8 @@ export type Palette = {
   tint: Record<Tint, string>;
   // Same tints as a list, to cycle through
   tints: string[];
+  // The empty-state illustration's colours: the web app dropped its
+  // illustration, so these only live here
   illo: {
     blob: string;
     stroke: string;

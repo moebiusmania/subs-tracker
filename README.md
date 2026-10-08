@@ -1,7 +1,7 @@
 # 💰 Subscriptions Tracker
 
 <p align="center">
-  <img src=".github/poster.svg" alt="Illustration of fanned subscription cards with bouncing euro and dollar coins" width="360">
+  <img src="src/icons/icon.svg" alt="Subscriptions Tracker icon: a list of subscriptions with a euro renewal badge" width="160">
 </p>
 
 Webapp to keep track on subscriptions fees and has some math done for you.
@@ -30,7 +30,7 @@ At the moment there is an _import/export_ functionality available in the app tha
 
 ### Languages
 
-The app is available in English and Italian: pick one with the flags at the top of the page. The choice is saved on your device, and on the first visit the app follows your browser's language.
+The app is available in English and Italian: pick one with the EN/IT switch at the top of the page. The choice is saved on your device, and on the first visit the app follows your browser's language.
 
 ### Install it & use it offline
 
@@ -149,7 +149,7 @@ Every push and pull request runs the format, lint, type-check and test steps on 
 - [Vento](https://vento.js.org/) - templating language used by Lume
 - [Alpine.js](https://alpinejs.dev/) - client side interactivity and state
 - [deno_tui](https://github.com/Im-Beast/deno_tui) - terminal rendering and keyboard/mouse input for the terminal version
-- [Nunito](https://fonts.bunny.net/family/nunito) - font, served by the privacy friendly [Bunny Fonts](https://fonts.bunny.net/)
+- [Inter](https://fonts.bunny.net/family/inter) - font, served by the privacy friendly [Bunny Fonts](https://fonts.bunny.net/)
 - [Lucide](https://lucide.dev/) - icons
 - [GitHub Actions](https://github.com/features/actions) & [GitHub Pages](https://pages.github.com/) - CI and hosting
 

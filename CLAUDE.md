@@ -94,7 +94,8 @@ their own browser (`deno task dev:host` serves it to the LAN).
     each test.
   - `index.ts`: cost calculations. Yearly cost counts monthly items ×12, and
     only active subscriptions are counted. `isExpiringThisMonth` drives the "due
-    this month" highlight on cards (web `.is-due`, TUI accent border and badge).
+    this month" highlight (web `.is-due` card with an accent bar and badge, TUI
+    accent border and badge).
   - `mocks.ts`: `mockSubs(now)` builds the example data with expirations
     relative to `now` (one this month, one next month, the rest later), so tests
     assert dates computed from it rather than fixed strings.
@@ -104,7 +105,7 @@ their own browser (`deno task dev:host` serves it to the LAN).
   - `i18n.ts`: the `translations` map and `detectLocale`. `store.locale` is a
     getter: the picked `language`, or else `systemLocale` from
     `navigator.languages`. `store.i18n` derives from it. Only `language` is
-    persisted, and it stays `null` until the user taps a flag.
+    persisted, and it stays `null` until the user picks one in the header.
 - **i18n**: the language switches at runtime. Every visible string is written as
   `<h1 x-text="$t.empty.title">{{ i18n.en.empty.title }}</h1>`, so the static
   HTML is English and Alpine swaps in the current locale (`$t` is an
@@ -116,7 +117,7 @@ their own browser (`deno task dev:host` serves it to the LAN).
   fallback. The inline script in `base.vto` repeats that lookup before first
   paint. For a non-English locale it sets `data-i18n-pending`, which hides the
   page until `main.ts` has run (with a one-second CSS fallback). Language names
-  in the flag switcher stay in their own language.
+  in the switcher (which shows the codes, EN/IT) stay in their own language.
 - **Styling**: one hand-written stylesheet, `src/styles.css`, with no framework
   or build step. It uses five cascade layers (reset, tokens, base, layout,
   components). The palette is misty sea-glass/slate-ink with pastel tints
@@ -127,14 +128,13 @@ their own browser (`deno task dev:host` serves it to the LAN).
   on proximity over unscoped ones with the same specificity, so theme overrides
   for scoped elements must live outside the `@scope` block (see
   `.theme-toggle__sun`). Icons are Lucide paths in `src/_data/icons.yml`,
-  rendered with `partials/icon.vto`. The empty-state scene is an inline SVG
-  (`partials/empty-illustration.vto`), coloured by `--illo-*` tokens and
-  animated by the `.illo` rules. `.github/poster.svg` is a standalone copy for
-  the README with the colours and animations embedded (GitHub renders SVGs as
-  images), so keep the two in sync. Don't use `--` in its XML comments. The
-  Nunito font comes from Bunny Fonts. Entry animations use `@starting-style` and
-  keyframes; navigations and the theme switch use view transitions; everything
-  respects `prefers-reduced-motion`.
+  rendered with `partials/icon.vto`. The look is functional rather than playful:
+  flat bordered panels, small radii, no decorative motion. The stats are one
+  strip of cells, and the subscriptions are a grid of cards (`.sub-card`). The
+  header, empty state and install banner show `favicon.svg` as the logo. The
+  Inter font (400/500/600 only) comes from Bunny Fonts. Sections fade in with
+  `@starting-style`; navigations and the theme switch use view transitions;
+  everything respects `prefers-reduced-motion`.
 - **PWA**: `src/sw.js` is a plain JS service worker (esbuild bundles it too).
   Same-origin GETs are network-first with `cache: "no-cache"` and a 4s timeout
   that falls back to the cache, so online users always get the latest deploy;
@@ -149,18 +149,20 @@ their own browser (`deno task dev:host` serves it to the LAN).
   `localStorage` key `subs-tracker:install-dismissed`. The PNG icons are
   rendered from `src/icons/icon.svg` and `icon-maskable.svg` (not published),
   `favicon.ico` (16/32/48 PNG entries) from `src/favicon.svg`, so re-render them
-  if the logo or the accent colour changes. They use the light `--color-accent`
-  and `--color-on-accent` values.
+  if the logo or the palette changes (`apple-touch-icon.png` comes from the
+  maskable one). The artwork is a statement card listing three subscriptions
+  with a renewal badge, in the light tokens; the favicon redraws it on a 32px
+  grid so it stays readable at 16px. The README shows `src/icons/icon.svg`.
 - **Social previews**: `base.vto` has Open Graph/Twitter tags and a canonical
   link, with absolute URLs from the `url(true)` filter. They're read by crawlers
   that don't run JS, so they stay in English. `og:title`/`twitter:title` use
   `meta.shareTitle`, longer than `meta.title` (30-60 characters is what the
   preview checkers want). `src/og-image.png` (1200×630, added in `_config.ts`
-  but not precached) is rendered from `src/og-image.svg`, a static variant of
-  the empty-state illustration with the light tokens hard-coded: keep it in sync
-  with the palette and the illustration. Its text needs static Nunito weights
-  (600/700/800) at render time, since resvg ignores the weight of the variable
-  font.
+  but not precached) is rendered from `src/og-image.svg`: the app icon (a copy
+  of `icons/icon.svg`) and name beside a static mock of the dashboard, with the
+  light tokens hard-coded. Keep it in sync with the palette, the icon and the
+  cards. Its text needs static Inter weights (400/500/600) at render time, since
+  resvg ignores the weight of the variable font.
 - Dates saved to `localStorage` come back as strings, so render them with
   `new Date(item.expiration)`.
 - **Terminal version** (`tui/`, entry `tui/main.ts`): feature parity with the
@@ -197,5 +199,6 @@ their own browser (`deno task dev:host` serves it to the LAN).
     SGR tracking (1003/1006) for hover. `tui/keys.ts` splits one stdin read into
     several keys (pastes, fast typing).
   - Colours are the CSS tokens copied into `tui/palette.ts` (keep them in sync
-    with `styles.css`), 24-bit when the terminal supports it, else the nearest
-    xterm-256 colour.
+    with `styles.css`; only the `illo` set, for the TUI's empty-state
+    illustration, has no CSS counterpart), 24-bit when the terminal supports it,
+    else the nearest xterm-256 colour.

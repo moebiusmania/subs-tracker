@@ -4,7 +4,7 @@
     "title": "Tracker abbonamenti",
     "shareTitle": "Tracker abbonamenti: quanto ti costano davvero gli abbonamenti",
     "description": "Webapp per tenere traccia dei costi degli abbonamenti e farsi fare un po' di conti.",
-    "imageAlt": "Tracker abbonamenti: carte di abbonamenti a ventaglio con monete in euro e dollari"
+    "imageAlt": "Tracker abbonamenti: l'icona dell'app accanto ai totali mensili e annuali e a quattro schede di abbonamenti"
   },
   "header": {
     "skip": "Vai al contenuto",
@@ -14,11 +14,11 @@
   },
   "main": {
     "title": "Le tue statistiche",
-    "total": "Abbonamenti totali:",
+    "total": "Abbonamenti totali",
     "inactives": "di cui {{value}} non attivi",
-    "monthly": "Costo mensile totale:",
-    "yearly": "Costo annuale totale:",
-    "detail": "(solo abbonamenti attivi)",
+    "monthly": "Costo mensile",
+    "yearly": "Costo annuale",
+    "detail": "Solo abbonamenti attivi",
     "list": "I tuoi abbonamenti",
     "cta": "Aggiungi un abbonamento",
     "active": "Attivo",

@@ -1,7 +1,10 @@
 {{# label is a key of i18n.main; value and description are Alpine
    expressions, evaluated client side #}}
 <div class="stat stat--{{ tint }}">
-  <p class="stat__label" x-text="$t.main.{{ label }}">{{ i18n.en.main[label] }}</p>
+  <p class="stat__label">
+    <span class="stat__icon">{{ include "partials/icon.vto" { name: icon } }}</span>
+    <span x-text="$t.main.{{ label }}">{{ i18n.en.main[label] }}</span>
+  </p>
   <p class="stat__value" x-text="{{ value }}"></p>
   <p class="stat__desc" x-text="{{ description }}"></p>
 </div>

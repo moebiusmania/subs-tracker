@@ -1,10 +1,12 @@
 <section class="panel add">
-  <a class="back-link" href="{{ '/' |> url }}">
-    {{ include "partials/icon.vto" { name: "arrow-left" } }} <span x-text="$t.add.back">{{ i18n.en.add.back }}</span>
-  </a>
-  <h1 x-text="$t.add.title">{{ i18n.en.add.title }}</h1>
-  {{# The intro carries its own markup: it only comes from _data/i18n #}}
-  <p class="add__intro" x-html="$t.add.intro">{{ i18n.en.add.intro }}</p>
+  <header class="add__header">
+    <a class="back-link" href="{{ '/' |> url }}">
+      {{ include "partials/icon.vto" { name: "arrow-left" } }} <span x-text="$t.add.back">{{ i18n.en.add.back }}</span>
+    </a>
+    <h1 x-text="$t.add.title">{{ i18n.en.add.title }}</h1>
+    {{# The intro carries its own markup: it only comes from _data/i18n #}}
+    <p class="add__intro" x-html="$t.add.intro">{{ i18n.en.add.intro }}</p>
+  </header>
 
   {{ set home = '/' |> url }}
   {{ include "partials/subscription-form.vto" {
