@@ -150,6 +150,7 @@ Every push and pull request runs the format, lint, type-check and test steps on 
 - [Alpine.js](https://alpinejs.dev/) - client side interactivity and state
 - [deno_tui](https://github.com/Im-Beast/deno_tui) - terminal rendering and keyboard/mouse input for the terminal version
 - [Inter](https://fonts.bunny.net/family/inter) - font, served by the privacy friendly [Bunny Fonts](https://fonts.bunny.net/)
+- [Fraunces](https://fonts.bunny.net/family/fraunces) - serif for headings and figures, also from Bunny Fonts
 - [Lucide](https://lucide.dev/) - icons
 - [GitHub Actions](https://github.com/features/actions) & [GitHub Pages](https://pages.github.com/) - CI and hosting
 

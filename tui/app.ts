@@ -76,9 +76,6 @@ export type AppDeps = {
 // "edit" is the add form filled with one card, like the web /edit/ page
 type Screen = "home" | "add" | "edit";
 
-// The web app's pages, as navigate() gets them
-const HOME = "/";
-
 type Modal =
   | { kind: "export" | "import"; path: Field; error?: string }
   | { kind: "delete" }
@@ -139,7 +136,7 @@ export class App {
       persist: () => this.#persist(),
       // The TUI asks with its own dialog before calling deleteAll()
       confirm: () => true,
-      navigate: (url) => this.#go(url === HOME ? "home" : "add"),
+      closeForm: () => this.#go("home"),
       // Every render already reads the theme from the store
       setThemeAttribute: () => {},
       transition: (update) => update(),
@@ -236,8 +233,8 @@ export class App {
     this.#modal = null;
     if (screen !== "home") {
       const { item } = screen === "edit"
-        ? this.#components.editForm(HOME, index!)
-        : this.#components.addForm(HOME);
+        ? this.#components.editForm(index!)
+        : this.#components.addForm();
       this.#form = {
         values: initialValues(item),
         errors: {},
@@ -375,8 +372,8 @@ export class App {
       return;
     }
     const target = form.index === null
-      ? this.#components.addForm(HOME)
-      : this.#components.editForm(HOME, form.index);
+      ? this.#components.addForm()
+      : this.#components.editForm(form.index);
     target.item = toSubscription(form.values, target.item.currency);
     target.submit();
   }

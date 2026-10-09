@@ -36,7 +36,9 @@ export type Deps = {
   app: () => Store;
   persist: () => void;
   confirm: (message: string) => boolean;
-  navigate: (url: string) => void;
+  // Leaves the add or edit form: the web closes its dialog, the TUI goes
+  // back to the home screen
+  closeForm: () => void;
   setThemeAttribute: (theme: Theme) => void;
   transition: (update: () => void) => void;
   download: (filename: string, content: string) => void;
@@ -192,19 +194,19 @@ export const createComponents = (deps: Deps) => {
       },
     }),
 
-    addForm: (homeUrl: string) => ({
+    addForm: () => ({
       item: newItem(),
       formatDate,
       submit(): void {
         app().addSubscription(this.item);
         persist();
-        deps.navigate(homeUrl);
+        deps.closeForm();
       },
     }),
 
     // Same fields as addForm, filled with the item at that index. An index
-    // with no item (a stale link, data deleted meanwhile) goes back home.
-    editForm: (homeUrl: string, index: number) => {
+    // with no item (a stale link, data deleted meanwhile) closes the form.
+    editForm: (index: number) => {
       const saved = Number.isInteger(index) ? app().data[index] : undefined;
       return {
         found: saved !== undefined,
@@ -215,13 +217,13 @@ export const createComponents = (deps: Deps) => {
           : newItem(),
         formatDate,
         init(): void {
-          if (!this.found) deps.navigate(homeUrl);
+          if (!this.found) deps.closeForm();
         },
         submit(): void {
-          if (!this.found) return deps.navigate(homeUrl);
+          if (!this.found) return deps.closeForm();
           app().updateSubscription(index, this.item);
           persist();
-          deps.navigate(homeUrl);
+          deps.closeForm();
         },
       };
     },

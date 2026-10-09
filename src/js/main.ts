@@ -5,6 +5,7 @@ import { createStore, type Store } from "./lib/store.ts";
 import { hasData, load, save } from "./lib/storage.ts";
 import { createComponents } from "./lib/components.ts";
 import { detectLocale } from "./lib/i18n.ts";
+import { parseRoute, type Route } from "./lib/route.ts";
 import { createInstaller, registerServiceWorker } from "./pwa.ts";
 
 registerServiceWorker();
@@ -27,13 +28,58 @@ const app = (): Store => Alpine.store("app") as Store;
 // Templates read the current strings as $t.section.key
 Alpine.magic("t", () => app().i18n);
 
+// The add and edit forms open in a dialog over home, but keep their own URLs:
+// links to them push a history entry, so back closes the dialog, and loading
+// one directly (every page renders home) opens it. main.js lives in /js/, so
+// the home path, with the GitHub Pages prefix, is one level up.
+const base = new URL("../", import.meta.url).pathname;
+const currentRoute = (): Route =>
+  parseRoute(location.pathname, location.search, base);
+
+Alpine.store("router", { route: currentRoute() });
+const router = Alpine.store("router") as { route: Route };
+
+const openForm = (url: string): void => {
+  history.pushState({ form: true }, "", url);
+  router.route = currentRoute();
+};
+
+const closeForm = (): void => {
+  // Opened from a link: step back to the home entry it came from
+  if ((history.state as { form?: boolean } | null)?.form) {
+    history.back();
+  } else {
+    history.replaceState(null, "", base);
+    router.route = currentRoute();
+  }
+};
+
+addEventListener("popstate", () => {
+  router.route = currentRoute();
+});
+
+// Plain clicks on links to /add/ or /edit/ open the dialog instead of loading
+// the page; modified clicks (new tab, …) still follow the link
+document.addEventListener("click", (event) => {
+  if (
+    event.defaultPrevented || event.button !== 0 || event.metaKey ||
+    event.ctrlKey || event.shiftKey || event.altKey
+  ) return;
+  const link = (event.target as Element | null)?.closest("a[href]");
+  if (
+    !(link instanceof HTMLAnchorElement) || link.target ||
+    link.origin !== location.origin
+  ) return;
+  if (parseRoute(link.pathname, link.search, base).name === "home") return;
+  event.preventDefault();
+  openForm(link.href);
+});
+
 const components = createComponents({
   app,
   persist: () => save(app().getState),
   confirm: (message) => confirm(message),
-  navigate: (url) => {
-    location.href = url;
-  },
+  closeForm,
   setThemeAttribute: (theme) => {
     document.documentElement.setAttribute("data-theme", theme);
   },
@@ -82,12 +128,37 @@ Alpine.data("dashboard", components.dashboard);
 Alpine.data("list", components.list);
 Alpine.data("backup", components.backup);
 Alpine.data("addForm", components.addForm);
-// The edit page gets the item's index as /edit/?item=<index>: a static site
-// has no /edit/<index> pages. A missing or bad one sends editForm home
-Alpine.data("editForm", (homeUrl: string) => {
-  const item = new URLSearchParams(location.search).get("item") ?? "";
-  return components.editForm(homeUrl, /^\d+$/.test(item) ? Number(item) : NaN);
-});
+// The index comes from /edit/?item=<index> (a static site has no
+// /edit/<index> pages). A missing or bad one closes the dialog right away
+Alpine.data("editForm", components.editForm);
+
+// The dialog follows the route. The form inside is keyed by it, so every
+// opening starts from a fresh copy of the item
+Alpine.data("formDialog", () => ({
+  // The pointer went down on the backdrop: a drag that started inside the
+  // dialog and ended outside doesn't close it
+  pressed: false,
+  get views(): (Route & { key: string })[] {
+    const { route } = router;
+    return route.name === "home"
+      ? []
+      : [{ ...route, key: JSON.stringify(route) }];
+  },
+  close: closeForm,
+  init(): void {
+    const dialog = this.$el as HTMLDialogElement;
+    Alpine.effect(() => {
+      void router.route;
+      // After x-for has rendered the form, so showModal() focuses its
+      // autofocus field
+      this.$nextTick(() => {
+        const open = router.route.name !== "home";
+        if (open && !dialog.open) dialog.showModal();
+        if (!open && dialog.open) dialog.close();
+      });
+    });
+  },
+}));
 Alpine.data("install", components.install);
 
 addEventListener("languagechange", () => {

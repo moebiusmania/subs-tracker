@@ -4,28 +4,24 @@
     Source of og-image.png, the social share preview (not published): the
     app icon (a copy of icons/icon.svg) and name beside a static mock of the
     dashboard, with the light theme tokens from styles.css. Render it with
-    Inter installed (static 400, 500 and 600 weights), since the text is not
-    converted to paths.
+    static Inter (400, 500 and 600) and Fraunces (400) installed, since the
+    text is not converted to paths.
   -->
-  <rect width="1200" height="630" fill="#f3f7f6" />
+  <rect width="1200" height="630" fill="#efecea" />
 
   <svg x="80" y="112" width="120" height="120" viewBox="0 0 512 512">
     <defs>
-      <linearGradient id="icon-bg" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#aee4d8" />
-        <stop offset="1" stop-color="#86cfbf" />
-      </linearGradient>
       <linearGradient id="icon-paper" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#ffffff" />
-        <stop offset="1" stop-color="#f3f7f6" />
+        <stop offset="1" stop-color="#f7f5f3" />
       </linearGradient>
       <filter id="icon-shadow" x="-20%" y="-20%" width="140%" height="150%">
-        <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#1c2b30"
+        <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#22201d"
           flood-opacity="0.22" />
       </filter>
     </defs>
 
-    <rect width="512" height="512" rx="112" fill="url(#icon-bg)" />
+    <rect width="512" height="512" rx="112" fill="#ff692d" />
 
     <g>
       <!-- The card behind, the previous statement -->
@@ -38,29 +34,29 @@
           fill="url(#icon-paper)" />
       </g>
       <path d="M96 146a30 30 0 0 1 30-30h260a30 30 0 0 1 30 30v34H96z"
-        fill="#1c2b30" />
-      <rect x="124" y="140" width="104" height="16" rx="8" fill="#9fded0" />
-      <rect x="336" y="140" width="52" height="16" rx="8" fill="#ffe08a" />
+        fill="#22201d" />
+      <rect x="124" y="140" width="104" height="16" rx="8" fill="#ff692d" />
+      <rect x="336" y="140" width="52" height="16" rx="8" fill="#fbe5da" />
 
       <!-- Three subscriptions: avatar, name and price -->
-      <rect x="124" y="204" width="32" height="32" rx="8" fill="#cbbcff" />
-      <rect x="172" y="213" width="100" height="14" rx="7" fill="#c3d2ce" />
-      <rect x="332" y="213" width="56" height="14" rx="7" fill="#1c2b30" />
-      <rect x="124" y="250" width="264" height="3" fill="#e2ebe8" />
+      <rect x="124" y="204" width="32" height="32" rx="16" fill="#ff9a6e" />
+      <rect x="172" y="213" width="100" height="14" rx="7" fill="#dcd9d6" />
+      <rect x="332" y="213" width="56" height="14" rx="7" fill="#22201d" />
+      <rect x="124" y="250" width="264" height="3" fill="#efecea" />
 
-      <rect x="124" y="266" width="32" height="32" rx="8" fill="#ffc9ae" />
-      <rect x="172" y="275" width="76" height="14" rx="7" fill="#c3d2ce" />
-      <rect x="332" y="275" width="56" height="14" rx="7" fill="#1c2b30" />
-      <rect x="124" y="312" width="264" height="3" fill="#e2ebe8" />
+      <rect x="124" y="266" width="32" height="32" rx="16" fill="#ffc4a8" />
+      <rect x="172" y="275" width="76" height="14" rx="7" fill="#dcd9d6" />
+      <rect x="332" y="275" width="56" height="14" rx="7" fill="#22201d" />
+      <rect x="124" y="312" width="264" height="3" fill="#efecea" />
 
-      <rect x="124" y="328" width="32" height="32" rx="8" fill="#a8e6c9" />
-      <rect x="172" y="337" width="88" height="14" rx="7" fill="#c3d2ce" />
+      <rect x="124" y="328" width="32" height="32" rx="16" fill="#c9c4bf" />
+      <rect x="172" y="337" width="88" height="14" rx="7" fill="#dcd9d6" />
 
       <!-- Renewal badge over the corner, cut out of the card by a ring -->
-      <circle cx="380" cy="380" r="80" fill="#1c2b30" stroke="#93d6c7"
+      <circle cx="380" cy="380" r="80" fill="#22201d" stroke="#ff692d"
         stroke-width="14" />
       <g transform="translate(323.2 323.2) scale(4.733)" fill="none"
-        stroke="#9fded0" stroke-width="2" stroke-linecap="round"
+        stroke="#ff692d" stroke-width="2" stroke-linecap="round"
         stroke-linejoin="round">
         <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
         <path d="M21 3v5h-5" />
@@ -76,122 +72,119 @@
     </g>
   </svg>
 
-  <g font-family="Inter" fill="#1c2b30">
-    <text x="76" y="320" font-size="68" font-weight="600"
-      letter-spacing="-2">Subscriptions</text>
-    <text x="76" y="396" font-size="68" font-weight="600"
-      letter-spacing="-2">Tracker</text>
+  <g font-family="Inter" fill="#22201d">
+    <text x="76" y="326" font-family="Fraunces" font-size="76"
+      letter-spacing="-4">Subscriptions</text>
+    <text x="76" y="404" font-family="Fraunces" font-size="76"
+      letter-spacing="-4">Tracker</text>
 
-    <text x="80" y="458" font-size="26"
-      fill="#4f6268">Keep track of your subscription fees</text>
-    <text x="80" y="494" font-size="26"
-      fill="#4f6268">and have some math done for you.</text>
+    <text x="80" y="462" font-size="26" letter-spacing="-0.3"
+      fill="#666461">Keep track of your subscription fees</text>
+    <text x="80" y="498" font-size="26" letter-spacing="-0.3"
+      fill="#666461">and have some math done for you.</text>
   </g>
 
   <!-- The dashboard: totals strip and the cards, as on the home page -->
-  <g font-family="Inter" fill="#1c2b30">
-    <rect x="615.5" y="111.5" width="505" height="129" rx="8" fill="#d9e4e1" />
-    <path d="M616 120a8 8 0 0 1 8-8h243.5v128h-243.5a8 8 0 0 1-8-8z"
-      fill="#ffffff" />
-    <path d="M1120 120a8 8 0 0 0-8-8h-243.5v128h243.5a8 8 0 0 0 8-8z"
-      fill="#ffffff" />
-
-    <rect x="640" y="136" width="28" height="28" rx="6" fill="#dcf3e8" />
-    <g transform="translate(646 142) scale(0.667)" fill="none" stroke="#1c2b30"
+  <g font-family="Inter" fill="#22201d">
+    <rect x="615.5" y="96.5" width="505" height="143" rx="12" fill="#ffffff"
+      stroke="#dcd9d6" />
+    <rect x="868" y="97" width="1" height="142" fill="#dcd9d6" />
+    <circle cx="654" cy="134" r="14" fill="#fbe5da" />
+    <g transform="translate(646 126) scale(0.667)" fill="none" stroke="#22201d"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <rect width="18" height="18" x="3" y="4" rx="2" />
       <path d="M16 2v4M8 2v4M3 10h18" />
     </g>
-    <text x="678" y="155" font-size="14" font-weight="500"
-      fill="#4f6268">Monthly cost</text>
-    <text x="640" y="200" font-size="32" font-weight="600"
-      letter-spacing="-0.6">24.98€</text>
-    <text x="640" y="224" font-size="13"
-      fill="#4f6268">Active subscriptions only</text>
-
-    <rect x="884.0" y="136" width="28" height="28" rx="6" fill="#ffe3d3" />
-    <g transform="translate(890.0 142) scale(0.667)" fill="none"
-      stroke="#1c2b30"
+    <text x="678" y="138.5" font-size="12" font-weight="500"
+      letter-spacing="0.8" fill="#666461">MONTHLY COST</text>
+    <text x="640" y="188" font-family="Fraunces" font-size="40"
+      letter-spacing="-1.6" fill="#22201d">24.98€</text>
+    <text x="640" y="213" font-size="13"
+      fill="#666461">Active subscriptions only</text>
+    <circle cx="906" cy="134" r="14" fill="#fbe5da" />
+    <g transform="translate(898 126) scale(0.667)" fill="none" stroke="#22201d"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <rect width="18" height="18" x="3" y="4" rx="2" />
       <path d="M16 2v4M3 10h18M8 2v4M17 14h-6M13 18H7M7 14h.01M17 18h.01" />
     </g>
-    <text x="922.0" y="155" font-size="14" font-weight="500"
-      fill="#4f6268">Yearly cost</text>
-    <text x="884.0" y="200" font-size="32" font-weight="600"
-      letter-spacing="-0.6">399.75€</text>
-    <text x="884.0" y="224" font-size="13"
-      fill="#4f6268">Active subscriptions only</text>
+    <text x="930" y="138.5" font-size="12" font-weight="500"
+      letter-spacing="0.8" fill="#666461">YEARLY COST</text>
+    <text x="892" y="188" font-family="Fraunces" font-size="40"
+      letter-spacing="-1.6" fill="#22201d">399.75€</text>
+    <text x="892" y="213" font-size="13"
+      fill="#666461">Active subscriptions only</text>
 
-    <rect x="616.5" y="264.5" width="243" height="137" rx="8" fill="#ffffff"
-      stroke="#d9e4e1" />
-    <path d="M616 272a8 8 0 0 1 3-6.2v134.4a8 8 0 0 1-3-6.2z" fill="#1d6b5f" />
-    <rect x="632" y="280" width="36" height="36" rx="6" fill="#ece6ff" />
-    <text x="650" y="303" font-size="15" font-weight="600"
-      text-anchor="middle">M</text>
-    <text x="680" y="295" font-size="16" font-weight="600"
-      fill="#1c2b30">Music</text>
-    <text x="680" y="313" font-size="13" fill="#4f6268">Monthly</text>
-    <text x="632" y="350" font-size="24" font-weight="600" letter-spacing="-0.5"
-      fill="#1c2b30">10.99€</text>
-    <rect x="632" y="364" width="212" height="1" fill="#d9e4e1" />
-    <text x="632" y="387.5" font-size="13" font-weight="500"
-      fill="#1d6b5f">Oct 21, 2026</text>
-    <rect x="782" y="371" width="62" height="24" rx="6" fill="#dcf3e8" />
-    <circle cx="794" cy="383" r="3.5" fill="#1d6644" />
-    <text x="803" y="387.5" font-size="12.5" font-weight="600"
-      fill="#1d6644">Active</text>
-    <rect x="876.5" y="264.5" width="243" height="137" rx="8" fill="#ffffff"
-      stroke="#d9e4e1" />
-    <rect x="892" y="280" width="36" height="36" rx="6" fill="#dcf3e8" />
-    <text x="910" y="303" font-size="15" font-weight="600"
-      text-anchor="middle">V</text>
-    <text x="940" y="295" font-size="16" font-weight="600"
-      fill="#1c2b30">Video streaming</text>
-    <text x="940" y="313" font-size="13" fill="#4f6268">Monthly</text>
-    <text x="892" y="350" font-size="24" font-weight="600" letter-spacing="-0.5"
-      fill="#1c2b30">13.99€</text>
-    <rect x="892" y="364" width="212" height="1" fill="#d9e4e1" />
-    <text x="892" y="387.5" font-size="13" font-weight="400"
-      fill="#4f6268">Nov 4, 2026</text>
-    <rect x="1042" y="371" width="62" height="24" rx="6" fill="#dcf3e8" />
-    <circle cx="1054" cy="383" r="3.5" fill="#1d6644" />
-    <text x="1063" y="387.5" font-size="12.5" font-weight="600"
-      fill="#1d6644">Active</text>
-    <rect x="616.5" y="418.5" width="243" height="137" rx="8" fill="#ffffff"
-      stroke="#d9e4e1" />
-    <rect x="632" y="434" width="36" height="36" rx="6" fill="#ffe3d3" />
-    <text x="650" y="457" font-size="15" font-weight="600"
-      text-anchor="middle">C</text>
-    <text x="680" y="449" font-size="16" font-weight="600"
-      fill="#1c2b30">Cloud storage</text>
-    <text x="680" y="467" font-size="13" fill="#4f6268">Yearly</text>
-    <text x="632" y="504" font-size="24" font-weight="600" letter-spacing="-0.5"
-      fill="#1c2b30">99.99€</text>
-    <rect x="632" y="518" width="212" height="1" fill="#d9e4e1" />
-    <text x="632" y="541.5" font-size="13" font-weight="400"
-      fill="#4f6268">Mar 12, 2027</text>
-    <rect x="782" y="525" width="62" height="24" rx="6" fill="#dcf3e8" />
-    <circle cx="794" cy="537" r="3.5" fill="#1d6644" />
-    <text x="803" y="541.5" font-size="12.5" font-weight="600"
-      fill="#1d6644">Active</text>
-    <rect x="876.5" y="418.5" width="243" height="137" rx="8" fill="#e9f0ee"
-      stroke="#d9e4e1" stroke-dasharray="4 3" />
-    <rect x="892" y="434" width="36" height="36" rx="6" fill="#dbeafb" />
-    <text x="910" y="457" font-size="15" font-weight="600"
-      text-anchor="middle">N</text>
-    <text x="940" y="449" font-size="16" font-weight="600"
-      fill="#4f6268">News</text>
-    <text x="940" y="467" font-size="13" fill="#4f6268">Monthly</text>
-    <text x="892" y="504" font-size="24" font-weight="600" letter-spacing="-0.5"
-      fill="#4f6268">6.99€</text>
-    <rect x="892" y="518" width="212" height="1" fill="#d9e4e1" />
-    <text x="892" y="541.5" font-size="13" font-weight="400"
-      fill="#4f6268">Jan 30, 2027</text>
-    <rect x="1030" y="525" width="74" height="24" rx="6" fill="#ffffff" />
-    <circle cx="1042" cy="537" r="3" fill="none" stroke="#4f6268"
+    <rect x="612.5" y="260.5" width="250" height="158" rx="15"
+      fill="#ff692d" fill-opacity="0.18" />
+    <rect x="616.5" y="264.5" width="243" height="151" rx="12" fill="#ffffff"
+      stroke="#ff692d" />
+    <circle cx="652" cy="300" r="20" fill="#fbe5da" />
+    <text x="652" y="307" font-family="Fraunces" font-size="20"
+      text-anchor="middle" fill="#22201d">M</text>
+    <text x="684" y="295" font-size="16" font-weight="500"
+      fill="#22201d">Music</text>
+    <text x="684" y="314" font-size="13" fill="#666461">Monthly</text>
+    <text x="632" y="360" font-family="Fraunces" font-size="30"
+      letter-spacing="-1.2" fill="#22201d">10.99€</text>
+    <rect x="632" y="375" width="212" height="1" fill="#dcd9d6" />
+    <text x="632" y="399.5" font-size="13" font-weight="500"
+      fill="#a83c0e">Oct 21, 2026</text>
+    <rect x="778" y="382" width="66" height="26" rx="13" fill="#e3efe2" />
+    <circle cx="792" cy="395" r="3.5" fill="#2c6b3f" />
+    <text x="801" y="399.5" font-size="12.5" font-weight="500"
+      fill="#2c6b3f">Active</text>
+    <rect x="876.5" y="264.5" width="243" height="151" rx="12" fill="#ffffff"
+      stroke="#dcd9d6" />
+    <circle cx="912" cy="300" r="20" fill="#efecea" />
+    <text x="912" y="307" font-family="Fraunces" font-size="20"
+      text-anchor="middle" fill="#22201d">V</text>
+    <text x="944" y="295" font-size="16" font-weight="500"
+      fill="#22201d">Video streaming</text>
+    <text x="944" y="314" font-size="13" fill="#666461">Monthly</text>
+    <text x="892" y="360" font-family="Fraunces" font-size="30"
+      letter-spacing="-1.2" fill="#22201d">13.99€</text>
+    <rect x="892" y="375" width="212" height="1" fill="#dcd9d6" />
+    <text x="892" y="399.5" font-size="13"
+      fill="#666461">Nov 4, 2026</text>
+    <rect x="1038" y="382" width="66" height="26" rx="13" fill="#e3efe2" />
+    <circle cx="1052" cy="395" r="3.5" fill="#2c6b3f" />
+    <text x="1061" y="399.5" font-size="12.5" font-weight="500"
+      fill="#2c6b3f">Active</text>
+    <rect x="616.5" y="432.5" width="243" height="151" rx="12" fill="#ffffff"
+      stroke="#dcd9d6" />
+    <circle cx="652" cy="468" r="20" fill="#f6dccd" />
+    <text x="652" y="475" font-family="Fraunces" font-size="20"
+      text-anchor="middle" fill="#22201d">C</text>
+    <text x="684" y="463" font-size="16" font-weight="500"
+      fill="#22201d">Cloud storage</text>
+    <text x="684" y="482" font-size="13" fill="#666461">Yearly</text>
+    <text x="632" y="528" font-family="Fraunces" font-size="30"
+      letter-spacing="-1.2" fill="#22201d">99.99€</text>
+    <rect x="632" y="543" width="212" height="1" fill="#dcd9d6" />
+    <text x="632" y="567.5" font-size="13"
+      fill="#666461">Mar 12, 2027</text>
+    <rect x="778" y="550" width="66" height="26" rx="13" fill="#e3efe2" />
+    <circle cx="792" cy="563" r="3.5" fill="#2c6b3f" />
+    <text x="801" y="567.5" font-size="12.5" font-weight="500"
+      fill="#2c6b3f">Active</text>
+    <rect x="876.5" y="432.5" width="243" height="151" rx="12" fill="#f7f5f3"
+      stroke="#dcd9d6" stroke-dasharray="4 3" />
+    <circle cx="912" cy="468" r="20" fill="#e6e1dc" />
+    <text x="912" y="475" font-family="Fraunces" font-size="20"
+      text-anchor="middle" fill="#666461">N</text>
+    <text x="944" y="463" font-size="16" font-weight="500"
+      fill="#666461">News</text>
+    <text x="944" y="482" font-size="13" fill="#666461">Monthly</text>
+    <text x="892" y="528" font-family="Fraunces" font-size="30"
+      letter-spacing="-1.2" fill="#666461">6.99€</text>
+    <rect x="892" y="543" width="212" height="1" fill="#dcd9d6" />
+    <text x="892" y="567.5" font-size="13"
+      fill="#666461">Jan 30, 2027</text>
+    <rect x="1026.5" y="550.5" width="77" height="25" rx="12.5"
+      fill="#ffffff" stroke="#dcd9d6" />
+    <circle cx="1040" cy="563" r="3" fill="none" stroke="#666461"
       stroke-width="1.5" />
-    <text x="1051" y="541.5" font-size="12.5" font-weight="600"
-      fill="#4f6268">Inactive</text>
+    <text x="1049" y="567.5" font-size="12.5" font-weight="500"
+      fill="#666461">Inactive</text>
   </g>
 </svg>

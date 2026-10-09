@@ -52,15 +52,18 @@ their own browser (`deno task dev:host` serves it to the LAN).
 
 - **Build side (Lume)**: `_config.ts` sets `src: "./src"`. Pages are Vento
   templates: `src/index.vto` → `/`, `src/add.vto` → `/add/`, `src/edit.vto` →
-  `/edit/` (both forms share `partials/subscription-form.vto`). `src/_data.yml`
-  gives every page the `layouts/base.vto` layout. `src/_data/i18n/*.json` (one
-  file per locale, `en` and `it`) is exposed to templates as `i18n.en`,
-  `i18n.it`. Lume 3 only copies non-page files that are registered with
-  `site.add()` in `_config.ts`, so new assets must be added there.
+  `/edit/`. All three only include `partials/home.vto` (the home page plus
+  `partials/form-dialog.vto`, where both forms share
+  `partials/subscription-form.vto`): see **Add and edit dialog**.
+  `src/_data.yml` gives every page the `layouts/base.vto` layout.
+  `src/_data/i18n/*.json` (one file per locale, `en` and `it`) is exposed to
+  templates as `i18n.en`, `i18n.it`. Lume 3 only copies non-page files that are
+  registered with `site.add()` in `_config.ts`, so new assets must be added
+  there.
 - **URLs**: always write internal links with the Vento `url` filter
   (`{{ '/add/' |> url }}`) so the GitHub Pages `/subs-tracker/` prefix is
-  applied. JS gets the home URL from the template
-  (`addForm('{{ '/' |> url }}')`) for the same reason.
+  applied. JS works out the home path from `import.meta.url` (`main.js` lives in
+  `/js/`) for the same reason.
 - **Client side**: `src/js/main.ts` is the only entry point. Lume's esbuild
   plugin bundles it, including Alpine from `npm:`, into `/js/main.js`. On every
   page load it builds the store, hydrates it from `localStorage`, applies
@@ -68,18 +71,28 @@ their own browser (`deno task dev:host` serves it to the LAN).
   `Alpine.data` components, then calls `Alpine.start()`. The component logic
   (`header`, `empty`, `dashboard`, `list`, `backup`, `addForm`, `editForm`,
   `install`) lives in `src/js/lib/components.ts` as plain factories. Browser
-  side effects (confirm, navigation, theme attribute, view transition, file
-  download/pick) are passed in as `Deps`, so `main.ts` only wires real DOM
+  side effects (confirm, closing the form, theme attribute, view transition,
+  file download/pick) are passed in as `Deps`, so `main.ts` only wires real DOM
   implementations and the tests pass fakes.
-- **Editing**: a card's pencil links to `/edit/?item=<index>` (a static site
-  can't have `/edit/<index>` pages; the service worker matches the cached page
-  with `ignoreSearch`). `main.ts` parses the index and hands it to `editForm`,
-  which edits a copy of the item, saves with `store.updateSubscription` and goes
-  home; an index with no item goes home right away.
+- **Add and edit dialog**: the forms open in a modal `<dialog class="sheet">`
+  over the home page, with a blurred backdrop, full screen below 40rem. They
+  keep their URLs: `/add/` and `/edit/?item=<index>` (a static site can't have
+  `/edit/<index>` pages; the service worker matches the cached page with
+  `ignoreSearch`). `route.ts` (`parseRoute`/`routeUrl`, tested) maps a URL to a
+  route. `main.ts` keeps it in `Alpine.store("router")`, intercepts plain clicks
+  on links to those URLs with `history.pushState` (so back closes the dialog)
+  and follows `popstate`. Loading `/add/` or `/edit/` directly renders home too
+  and opens the dialog. The `formDialog` component in `main.ts` calls
+  `showModal()`/`close()` from the route and renders the form keyed by it, so
+  each opening starts fresh. Everything that closes it (the close button,
+  cancel, Escape, a backdrop click, a submit through `deps.closeForm`) goes
+  through `closeForm`: `history.back()` when the dialog was opened from a link,
+  else `replaceState` to home. `editForm` edits a copy of the item and saves
+  with `store.updateSubscription`; an index with no item closes right away.
 - **Alpine gotcha**: directives only run inside an `x-data` root. That's why
-  `index.vto` is wrapped in `<div x-data>`: its top-level `<template x-if>`
-  switches between the empty state and dashboard+list at runtime, since the HTML
-  is static.
+  `partials/home.vto` is wrapped in `<div x-data>`: its top-level
+  `<template x-if>` switches between the empty state and dashboard+list at
+  runtime, since the HTML is static.
 - **Business logic** (`src/js/lib/`, framework-free and unit tested):
   - `store.ts`: `createStore()` returns a plain object (state + actions, ported
     from the old Pinia store) that `Alpine.store()` makes reactive.
@@ -120,21 +133,31 @@ their own browser (`deno task dev:host` serves it to the LAN).
   in the switcher (which shows the codes, EN/IT) stay in their own language.
 - **Styling**: one hand-written stylesheet, `src/styles.css`, with no framework
   or build step. It uses five cascade layers (reset, tokens, base, layout,
-  components). The palette is misty sea-glass/slate-ink with pastel tints
-  (`--tint-*`) and a seafoam accent. Every colour is a `light-dark()` token on
-  `:root`, switched by `color-scheme` via `html[data-theme]`. All text colours
-  were checked against WCAG 2.1 AA on bg, surfaces and every tint, so recheck
-  the ratios when changing a colour. Components use `@scope`. Scoped rules win
+  components). The look follows the Monarch design system on Refero
+  (https://styles.refero.design/style/a9dd8050-c03a-4901-b7fa-a9cc0ca54812): a
+  warm linen canvas, white paper cards with 1px stone hairlines, ink text and
+  ember orange (`#ff692d`) as the only chromatic colour. The `--tint-*` tokens
+  (their names are historical) are ember and linen shades, no other hues. Every
+  colour is a `light-dark()` token on `:root`, switched by `color-scheme` via
+  `html[data-theme]`; Monarch only has a light theme, the dark one is a warm ink
+  derivation. All text colours were checked against WCAG 2.1 AA on bg, surfaces
+  and every tint, so recheck the ratios when changing a colour. White on ember
+  fails AA (2.9:1), so filled ember buttons carry ink text, and ember text uses
+  the darker `--color-accent-strong`. Components use `@scope`. Scoped rules win
   on proximity over unscoped ones with the same specificity, so theme overrides
   for scoped elements must live outside the `@scope` block (see
   `.theme-toggle__sun`). Icons are Lucide paths in `src/_data/icons.yml`,
-  rendered with `partials/icon.vto`. The look is functional rather than playful:
-  flat bordered panels, small radii, no decorative motion (the due-card glow is
-  the one exception). The stats are one strip of cells, and the subscriptions
-  are a grid of cards (`.sub-card`). The header, empty state and install banner
-  show `favicon.svg` as the logo. The Inter font (400/500/600 only) comes from
-  Bunny Fonts. Sections fade in with `@starting-style`; navigations and the
-  theme switch use view transitions; everything respects
+  rendered with `partials/icon.vto`. The look is warm and editorial: pill
+  buttons, badges and avatars (`--radius-full`), 12px cards, 8px inputs, light
+  shadows only, no decorative motion (the due-card glow is the one exception).
+  Headings, stat values and prices use the Fraunces serif at weight 400 with
+  tight negative tracking (standing in for Monarch's Copernicus); everything
+  else is Inter. Uppercase tracked text is only for eyebrow labels (stat labels,
+  the "this month" badge). The stats are one strip of cells, and the
+  subscriptions are a grid of cards (`.sub-card`). The header, empty state and
+  install banner show `favicon.svg` as the logo. Fraunces (400) and Inter
+  (400/500/600) come from Bunny Fonts. Sections fade in with `@starting-style`;
+  navigations and the theme switch use view transitions; everything respects
   `prefers-reduced-motion`.
 - **PWA**: `src/sw.js` is a plain JS service worker (esbuild bundles it too).
   Same-origin GETs are network-first with `cache: "no-cache"` and a 4s timeout
@@ -152,8 +175,9 @@ their own browser (`deno task dev:host` serves it to the LAN).
   `favicon.ico` (16/32/48 PNG entries) from `src/favicon.svg`, so re-render them
   if the logo or the palette changes (`apple-touch-icon.png` comes from the
   maskable one). The artwork is a statement card listing three subscriptions
-  with a renewal badge, in the light tokens; the favicon redraws it on a 32px
-  grid so it stays readable at 16px. The README shows `src/icons/icon.svg`.
+  with a renewal badge on a flat ember background (no gradient), in the light
+  tokens; the favicon redraws it on a 32px grid so it stays readable at 16px.
+  The README shows `src/icons/icon.svg`.
 - **Social previews**: `base.vto` has Open Graph/Twitter tags and a canonical
   link, with absolute URLs from the `url(true)` filter. They're read by crawlers
   that don't run JS, so they stay in English. `og:title`/`twitter:title` use
@@ -162,14 +186,19 @@ their own browser (`deno task dev:host` serves it to the LAN).
   but not precached) is rendered from `src/og-image.svg`: the app icon (a copy
   of `icons/icon.svg`) and name beside a static mock of the dashboard, with the
   light tokens hard-coded. Keep it in sync with the palette, the icon and the
-  cards. Its text needs static Inter weights (400/500/600) at render time, since
-  resvg ignores the weight of the variable font.
+  cards. Its text needs static Inter weights (400/500/600) and static Fraunces
+  400 at render time, since resvg ignores the weight of a variable font (the
+  Fontsource CDN serves static TTFs, e.g.
+  `cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-500-normal.ttf`).
+  Nothing renders SVGs on the Pi out of the box: run `npm:@resvg/resvg-js` from
+  a script outside the repo so the lockfile stays clean.
 - Dates saved to `localStorage` come back as strings, so render them with
   `new Date(item.expiration)`.
 - **Terminal version** (`tui/`, entry `tui/main.ts`): feature parity with the
   web app, driven by keyboard and mouse. It reuses `createStore()` and
   `createComponents()` from `src/js/lib/`: `App` (`tui/app.ts`) passes its own
-  `Deps` (writes/reads files for export/import, a no-op installer, and
+  `Deps` (writes/reads files for export/import, `closeForm` going back to the
+  home screen, where the form is a full-screen view, a no-op installer, and
   `confirm: () => true` because it shows its own dialog before calling
   `deleteAll()`), so business rules stay in one place. The state is the same
   `AppState` JSON, saved by `tui/system.ts` to

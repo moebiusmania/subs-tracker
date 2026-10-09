@@ -2,25 +2,19 @@
   <!-- The PWA icon (icons/icon.svg) redrawn on a 32px grid: two rows instead
        of three, thicker bars and a bigger badge, so it stays readable at
        16px. Also the logo in the header and the install banner. -->
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#aee4d8" />
-      <stop offset="1" stop-color="#86cfbf" />
-    </linearGradient>
-  </defs>
-  <rect width="32" height="32" rx="7" fill="url(#bg)" />
+  <rect width="32" height="32" rx="7" fill="#ff692d" />
   <rect x="3.5" y="5" width="21" height="19.5" rx="2.5" fill="#ffffff" />
   <path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h16a2.5 2.5 0 0 1 2.5 2.5V10h-21z"
-    fill="#1c2b30" />
-  <rect x="6" y="6.75" width="7" height="1.5" rx="0.75" fill="#9fded0" />
-  <rect x="6" y="12" width="3.5" height="3.5" rx="1" fill="#cbbcff" />
-  <rect x="11" y="13" width="6" height="1.5" rx="0.75" fill="#b5c7c3" />
-  <rect x="6" y="18" width="3.5" height="3.5" rx="1" fill="#ffc9ae" />
-  <rect x="11" y="19" width="4" height="1.5" rx="0.75" fill="#b5c7c3" />
-  <rect x="18.5" y="13" width="3.5" height="1.5" rx="0.75" fill="#1c2b30" />
-  <circle cx="23.5" cy="23.5" r="7" fill="#1c2b30" stroke="#91d4c5"
+    fill="#22201d" />
+  <rect x="6" y="6.75" width="7" height="1.5" rx="0.75" fill="#ff692d" />
+  <rect x="6" y="12" width="3.5" height="3.5" rx="1.75" fill="#ff9a6e" />
+  <rect x="11" y="13" width="6" height="1.5" rx="0.75" fill="#cfcbc7" />
+  <rect x="6" y="18" width="3.5" height="3.5" rx="1.75" fill="#ffc4a8" />
+  <rect x="11" y="19" width="4" height="1.5" rx="0.75" fill="#cfcbc7" />
+  <rect x="18.5" y="13" width="3.5" height="1.5" rx="0.75" fill="#22201d" />
+  <circle cx="23.5" cy="23.5" r="7" fill="#22201d" stroke="#ff692d"
     stroke-width="1.5" />
-  <g transform="translate(18.7 18.7) scale(0.4)" fill="none" stroke="#9fded0"
+  <g transform="translate(18.7 18.7) scale(0.4)" fill="none" stroke="#ff692d"
     stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
     <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
     <path d="M21 3v5h-5" />

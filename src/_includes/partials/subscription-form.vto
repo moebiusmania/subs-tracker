@@ -1,4 +1,5 @@
-{{# The add and edit pages' form. component: the Alpine component (x-data),
+{{# The add and edit form, inside form-dialog.vto (close() comes from its
+   formDialog). component: the Alpine component (x-data),
    strings: the i18n section with the submit label, icon: the submit icon #}}
 <form class="form" x-data="{{ component }}" @submit.prevent="submit">
   <div class="field field--full">
@@ -59,6 +60,6 @@
     <button type="submit" class="btn btn--primary">
       {{ include "partials/icon.vto" { name: icon } }} <span x-text="$t.{{ strings }}.submit">{{ i18n.en[strings].submit }}</span>
     </button>
-    <a class="btn btn--ghost" href="{{ '/' |> url }}" x-text="$t.add.cancel">{{ i18n.en.add.cancel }}</a>
+    <button type="button" class="btn btn--ghost" @click="close()" x-text="$t.add.cancel">{{ i18n.en.add.cancel }}</button>
   </div>
 </form>

@@ -53,7 +53,7 @@ const setup = (
   const calls = {
     persist: 0,
     confirm: [] as string[],
-    navigate: [] as string[],
+    closed: 0,
     theme: [] as string[],
     transitions: 0,
     downloads: [] as { filename: string; content: string }[],
@@ -66,7 +66,7 @@ const setup = (
       calls.confirm.push(message);
       return options.confirm ?? true;
     },
-    navigate: (url) => calls.navigate.push(url),
+    closeForm: () => calls.closed++,
     setThemeAttribute: (theme) => calls.theme.push(theme),
     transition: (update) => {
       calls.transitions++;
@@ -322,7 +322,7 @@ Deno.test("backup - export then import round-trips the data", async () => {
 
 Deno.test("addForm - starts with the default subscription", () => {
   const { components } = setup();
-  const form = components.addForm("/");
+  const form = components.addForm();
 
   assertEquals(form.item.name, "");
   assertEquals(form.item.price, 1);
@@ -332,16 +332,16 @@ Deno.test("addForm - starts with the default subscription", () => {
   assertMatch(form.formatDate(form.item.expiration), /^\d{4}-\d{2}-\d{2}$/);
 });
 
-Deno.test("addForm - submit adds the item, persists and goes home", () => {
+Deno.test("addForm - submit adds the item, persists and closes", () => {
   const { store, calls, components } = setup();
-  const form = components.addForm("/subs-tracker/");
+  const form = components.addForm();
   form.item = { ...form.item, name: "Netflix", price: 12.5 };
 
   form.submit();
   assertEquals(store.data.length, 1);
   assertEquals(store.data[0].name, "Netflix");
   assertEquals(calls.persist, 1);
-  assertEquals(calls.navigate, ["/subs-tracker/"]);
+  assertEquals(calls.closed, 1);
 });
 
 Deno.test("editForm - starts with a copy of the item", () => {
@@ -355,7 +355,7 @@ Deno.test("editForm - starts with a copy of the item", () => {
       expiration: "2027-02-01" as unknown as Date,
     },
   ]);
-  const form = components.editForm("/", 1);
+  const form = components.editForm(1);
 
   assertEquals(form.found, true);
   assertEquals(form.item.name, "Spotify");
@@ -364,10 +364,10 @@ Deno.test("editForm - starts with a copy of the item", () => {
   assertEquals(store.data[1].name, "Spotify");
 });
 
-Deno.test("editForm - submit updates the item, persists and goes home", () => {
+Deno.test("editForm - submit updates the item, persists and closes", () => {
   const { store, calls, components } = setup();
   store.importSubs([netflix, { ...netflix, name: "Spotify" }]);
-  const form = components.editForm("/subs-tracker/", 0);
+  const form = components.editForm(0);
   form.item = { ...form.item, price: 15, recurrence: "yearly" };
 
   form.submit();
@@ -377,19 +377,19 @@ Deno.test("editForm - submit updates the item, persists and goes home", () => {
   assertEquals(store.data[0].recurrence, "yearly");
   assertEquals(store.data[1].name, "Spotify");
   assertEquals(calls.persist, 1);
-  assertEquals(calls.navigate, ["/subs-tracker/"]);
+  assertEquals(calls.closed, 1);
 });
 
-Deno.test("editForm - a missing item goes home without saving", () => {
+Deno.test("editForm - a missing item closes without saving", () => {
   for (const index of [2, -1, NaN, 0.5]) {
     const { store, calls, components } = setup();
     store.importSubs([netflix, { ...netflix, name: "Spotify" }]);
-    const form = components.editForm("/", index);
+    const form = components.editForm(index);
     assertEquals(form.found, false);
 
     form.init();
     form.submit();
-    assertEquals(calls.navigate, ["/", "/"]);
+    assertEquals(calls.closed, 2);
     assertEquals(calls.persist, 0);
     assertEquals(store.data.length, 2);
   }

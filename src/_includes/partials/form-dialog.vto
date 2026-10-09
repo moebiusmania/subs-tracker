@@ -1,0 +1,50 @@
+{{# The add and edit forms, in a dialog over the home page (full screen on
+   phones). main.ts opens it from the URL: /add/ or /edit/?item=<index>.
+   Escape, the backdrop, the close button and cancel all go through close(),
+   which also puts the URL back #}}
+<dialog
+  class="sheet"
+  x-data="formDialog"
+  aria-labelledby="sheet-title"
+  @close="if ($store.router.route.name !== 'home') close()"
+  @pointerdown="pressed = $event.target === $el"
+  @click.self="pressed && close()"
+>
+  <template x-for="view in views" :key="view.key">
+    <section class="add">
+      <header class="add__header">
+        <h1 id="sheet-title" x-text="view.name === 'edit' ? $t.edit.title : $t.add.title">{{ i18n.en.add.title }}</h1>
+        {{# A cross in the corner, a back arrow on phones where the dialog
+           looks like a page #}}
+        <button
+          type="button"
+          class="icon-btn add__close"
+          aria-label="{{ i18n.en.add.back }}"
+          :aria-label="$t.add.back"
+          :title="$t.add.back"
+          @click="close()"
+        >
+          <span class="add__close-x">{{ include "partials/icon.vto" { name: "x" } }}</span>
+          <span class="add__close-back">{{ include "partials/icon.vto" { name: "arrow-left" } }}</span>
+        </button>
+        {{# The intro carries its own markup: it only comes from _data/i18n #}}
+        <p class="add__intro" x-show="view.name === 'add'" x-html="$t.add.intro">{{ i18n.en.add.intro }}</p>
+      </header>
+
+      <template x-if="view.name === 'add'">
+        {{ include "partials/subscription-form.vto" {
+          component: "addForm",
+          strings: "add",
+          icon: "plus",
+        } }}
+      </template>
+      <template x-if="view.name === 'edit'">
+        {{ include "partials/subscription-form.vto" {
+          component: "editForm(view.index)",
+          strings: "edit",
+          icon: "check",
+        } }}
+      </template>
+    </section>
+  </template>
+</dialog>

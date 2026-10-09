@@ -1,16 +1,1 @@
-<section class="panel add">
-  <header class="add__header">
-    <a class="back-link" href="{{ '/' |> url }}">
-      {{ include "partials/icon.vto" { name: "arrow-left" } }} <span x-text="$t.add.back">{{ i18n.en.add.back }}</span>
-    </a>
-    <h1 x-text="$t.edit.title">{{ i18n.en.edit.title }}</h1>
-  </header>
-
-  {{# Which item comes from ?item=<index>: main.ts reads it #}}
-  {{ set home = '/' |> url }}
-  {{ include "partials/subscription-form.vto" {
-    component: `editForm('${home}')`,
-    strings: "edit",
-    icon: "check",
-  } }}
-</section>
+{{ include "partials/home.vto" }}

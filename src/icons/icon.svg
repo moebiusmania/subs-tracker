@@ -1,25 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <!-- Source of icon-192.png and icon-512.png (not published): a statement
        card listing three subscriptions with their prices, and a renewal
-       badge. Light theme tokens from styles.css: seafoam accent, slate ink,
-       the illustration pastels for the avatars. icon-maskable.svg and
+       badge. Light theme tokens from styles.css: a flat ember background (no
+       gradient), ink header and badge, ember and stone avatars. icon-maskable.svg and
        favicon.svg redraw the same artwork. -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#aee4d8" />
-      <stop offset="1" stop-color="#86cfbf" />
-    </linearGradient>
     <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#ffffff" />
-      <stop offset="1" stop-color="#f3f7f6" />
+      <stop offset="1" stop-color="#f7f5f3" />
     </linearGradient>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
-      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#1c2b30"
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#22201d"
         flood-opacity="0.22" />
     </filter>
   </defs>
 
-  <rect width="512" height="512" rx="112" fill="url(#bg)" />
+  <rect width="512" height="512" rx="112" fill="#ff692d" />
 
   <g>
     <!-- The card behind, the previous statement -->
@@ -32,29 +28,29 @@
         fill="url(#paper)" />
     </g>
     <path d="M96 146a30 30 0 0 1 30-30h260a30 30 0 0 1 30 30v34H96z"
-      fill="#1c2b30" />
-    <rect x="124" y="140" width="104" height="16" rx="8" fill="#9fded0" />
-    <rect x="336" y="140" width="52" height="16" rx="8" fill="#ffe08a" />
+      fill="#22201d" />
+    <rect x="124" y="140" width="104" height="16" rx="8" fill="#ff692d" />
+    <rect x="336" y="140" width="52" height="16" rx="8" fill="#fbe5da" />
 
     <!-- Three subscriptions: avatar, name and price -->
-    <rect x="124" y="204" width="32" height="32" rx="8" fill="#cbbcff" />
-    <rect x="172" y="213" width="100" height="14" rx="7" fill="#c3d2ce" />
-    <rect x="332" y="213" width="56" height="14" rx="7" fill="#1c2b30" />
-    <rect x="124" y="250" width="264" height="3" fill="#e2ebe8" />
+    <rect x="124" y="204" width="32" height="32" rx="16" fill="#ff9a6e" />
+    <rect x="172" y="213" width="100" height="14" rx="7" fill="#dcd9d6" />
+    <rect x="332" y="213" width="56" height="14" rx="7" fill="#22201d" />
+    <rect x="124" y="250" width="264" height="3" fill="#efecea" />
 
-    <rect x="124" y="266" width="32" height="32" rx="8" fill="#ffc9ae" />
-    <rect x="172" y="275" width="76" height="14" rx="7" fill="#c3d2ce" />
-    <rect x="332" y="275" width="56" height="14" rx="7" fill="#1c2b30" />
-    <rect x="124" y="312" width="264" height="3" fill="#e2ebe8" />
+    <rect x="124" y="266" width="32" height="32" rx="16" fill="#ffc4a8" />
+    <rect x="172" y="275" width="76" height="14" rx="7" fill="#dcd9d6" />
+    <rect x="332" y="275" width="56" height="14" rx="7" fill="#22201d" />
+    <rect x="124" y="312" width="264" height="3" fill="#efecea" />
 
-    <rect x="124" y="328" width="32" height="32" rx="8" fill="#a8e6c9" />
-    <rect x="172" y="337" width="88" height="14" rx="7" fill="#c3d2ce" />
+    <rect x="124" y="328" width="32" height="32" rx="16" fill="#c9c4bf" />
+    <rect x="172" y="337" width="88" height="14" rx="7" fill="#dcd9d6" />
 
     <!-- Renewal badge over the corner, cut out of the card by a ring -->
-    <circle cx="380" cy="380" r="80" fill="#1c2b30" stroke="#93d6c7"
+    <circle cx="380" cy="380" r="80" fill="#22201d" stroke="#ff692d"
       stroke-width="14" />
     <g transform="translate(323.2 323.2) scale(4.733)" fill="none"
-      stroke="#9fded0" stroke-width="2" stroke-linecap="round"
+      stroke="#ff692d" stroke-width="2" stroke-linecap="round"
       stroke-linejoin="round">
       <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
       <path d="M21 3v5h-5" />
