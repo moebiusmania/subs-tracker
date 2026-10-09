@@ -95,9 +95,11 @@ their own browser (`deno task dev:host` serves it to the LAN).
   its copyright notice, don't publish it as a standalone component). It
   snapshots a stripped clone of the panel with the experimental html-in-canvas
   API (`drawElementImage` in a `layoutsubtree` canvas, Chrome behind a flag or
-  origin trial), so `supportsPeel()` is false almost everywhere and the panel
-  fades instead (`.sheet--peel` switches the CSS fade off); reduced motion skips
-  the peel too. The backdrop always just fades (`.is-closing` on exit).
+  origin trial), so `supportsPeel()` is false almost everywhere. There the panel
+  slides in fast with a small bounce (an overshooting easing, from the bottom
+  edge on phones) and slides out quicker (`.sheet--peel` switches the CSS slide
+  off; `SLIDE_OUT` in `main.ts` matches `--duration-slide-out`). Reduced motion
+  skips both. The backdrop always just fades (`.is-closing` on exit).
   `formDialog` keeps its own `view` and runs openings and closings one at a
   time, so the form stays rendered until the exit animation is over.
 - **Alpine gotcha**: directives only run inside an `x-data` root. That's why

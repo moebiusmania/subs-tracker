@@ -110,6 +110,13 @@
     --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     --duration-fast: 120ms;
     --duration: 200ms;
+    /* The form dialog's slide where the WebGL peel can't run: a quick
+       slide in that overshoots a little, a quicker slide out. main.ts
+       waits --duration-slide-out before closing the dialog */
+    --duration-slide-in: 340ms;
+    --duration-slide-out: 160ms;
+    --ease-bounce: cubic-bezier(0.34, 1.45, 0.64, 1);
+    --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
   }
 
   :root[data-theme="dark"] {
@@ -123,6 +130,8 @@
     :root {
       --duration-fast: 0ms;
       --duration: 0ms;
+      --duration-slide-in: 0ms;
+      --duration-slide-out: 0ms;
     }
   }
 }
@@ -992,21 +1001,32 @@
       }
     }
 
-    /* The CSS fallback: fade and rise in, fade and sink out */
+    /* The fallback without the peel: the panel slides up and settles
+       with a small bounce (the easing overshoots), then slides back down.
+       On phones it comes in from the bottom edge, like a page */
     :scope:not(.sheet--peel) .sheet__panel {
+      --slide-from: 3rem;
+
       transition:
-        opacity var(--duration) ease,
-        translate var(--duration) var(--ease-out);
+        opacity calc(var(--duration-slide-in) * 0.5) ease-out,
+        translate var(--duration-slide-in) var(--ease-bounce);
 
       @starting-style {
         opacity: 0;
-        translate: 0 1rem;
+        translate: 0 var(--slide-from);
+      }
+
+      @media (width < 40rem) {
+        --slide-from: 100%;
       }
     }
 
     :scope.is-closing:not(.sheet--peel) .sheet__panel {
       opacity: 0;
-      translate: 0 1rem;
+      translate: 0 var(--slide-from);
+      transition:
+        opacity var(--duration-slide-out) ease-in,
+        translate var(--duration-slide-out) var(--ease-in);
     }
 
     /* The snapshot (laid out but not painted) and the WebGL output, which

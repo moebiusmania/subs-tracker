@@ -13,7 +13,8 @@
 //
 // The snapshot needs the experimental html-in-canvas API (drawElementImage,
 // Chrome behind the canvas-draw-element flag or an origin trial). Where it
-// or WebGL2 is missing, supportsPeel() is false and the dialog just fades.
+// or WebGL2 is missing, supportsPeel() is false and the dialog slides in
+// with CSS instead.
 
 type PaintableCanvas = HTMLCanvasElement & {
   onpaint?: (() => void) | null;

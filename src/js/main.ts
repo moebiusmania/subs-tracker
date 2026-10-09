@@ -146,8 +146,8 @@ Alpine.data("editForm", components.editForm);
 const reduceMotion = () =>
   matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canPeel = supportsPeel();
-// The CSS fade's length (--duration in styles.css)
-const FADE = 200;
+// The CSS slide out's length (--duration-slide-out in styles.css)
+const SLIDE_OUT = 160;
 
 Alpine.data("formDialog", () => {
   // Openings and closings run one at a time, each for the route current
@@ -164,7 +164,7 @@ Alpine.data("formDialog", () => {
     close: closeForm,
     init(): void {
       const dialog = this.$el as HTMLDialogElement;
-      // With the WebGL peel the panel doesn't fade with CSS
+      // With the WebGL peel the panel doesn't slide in with CSS
       dialog.classList.toggle("sheet--peel", canPeel);
       Alpine.effect(() => {
         void router.route;
@@ -180,12 +180,12 @@ Alpine.data("formDialog", () => {
 
       if (route.name === "home") {
         if (dialog.open) {
-          // The backdrop fades while the panel peels (or fades) away
+          // The backdrop fades while the panel peels (or slides) away
           dialog.classList.add("is-closing");
           const panel = this.panel(dialog);
           const peeled = peeling && panel && await peel(panel, dialog, "out");
           if (!peeled && !reduceMotion()) {
-            await new Promise((resolve) => setTimeout(resolve, FADE));
+            await new Promise((resolve) => setTimeout(resolve, SLIDE_OUT));
           }
           dialog.close();
           dialog.classList.remove("is-closing");
