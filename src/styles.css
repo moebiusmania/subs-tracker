@@ -514,11 +514,6 @@
       font-size: 0.8125rem;
       text-align: center;
     }
-
-    .heart {
-      color: var(--color-danger);
-      font-weight: 600;
-    }
   }
 
   /* Empty state ------------------------------------------------------ */

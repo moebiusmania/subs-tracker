@@ -1539,9 +1539,7 @@ export class App {
         style: muted,
       },
       { text: t.footer.project, style: { ...muted, underline: true } },
-      { text: ` ${t.footer.madeWith} `, style: muted },
-      { text: "<3", style: { fg: p.danger, bg: p.bg, bold: true } },
-      { text: ` ${t.footer.by} Salvatore Laisa`, style: muted },
+      { text: ` ${t.footer.madeBy} Salvatore Laisa`, style: muted },
     ];
     const total = parts.reduce((sum, part) => sum + textWidth(part.text), 0);
     let y = row;

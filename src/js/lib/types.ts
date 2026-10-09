@@ -90,9 +90,7 @@ export type I18n = {
   footer: {
     license: string;
     project: string;
-    madeWith: string;
-    love: string;
-    by: string;
+    madeBy: string;
   };
   // Only used by the terminal version (tui/)
   tui: {

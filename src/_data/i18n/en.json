@@ -79,9 +79,7 @@
   "footer": {
     "license": "MIT license",
     "project": "an Open Source project",
-    "madeWith": "made with",
-    "love": "love",
-    "by": "by"
+    "madeBy": "made by"
   },
   "tui": {
     "hints": {

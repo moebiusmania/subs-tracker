@@ -79,9 +79,7 @@
   "footer": {
     "license": "Licenza MIT",
     "project": "un progetto Open Source",
-    "madeWith": "fatto con",
-    "love": "amore",
-    "by": "da"
+    "madeBy": "realizzato da"
   },
   "tui": {
     "hints": {
