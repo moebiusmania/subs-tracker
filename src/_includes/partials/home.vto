@@ -28,6 +28,12 @@
           {{ include "partials/icon.vto" { name: "play" } }} <span x-text="$t.tour.link">{{ i18n.en.tour.link }}</span>
         </button>
       </div>
+      {{# Bring the subscriptions from another device or a backup #}}
+      <div class="empty__import">
+        <button type="button" class="btn btn--sm" @click="$dispatch('transfer-import')">
+          {{ include "partials/icon.vto" { name: "upload" } }} <span x-text="$t.backup.import">{{ i18n.en.backup.import }}</span>
+        </button>
+      </div>
     </section>
   </template>
 
@@ -48,10 +54,23 @@
             <span x-text="$t.main.list">{{ i18n.en.main.list }}</span>
             <span class="subs__count" x-text="$store.app.data.length"></span>
           </h2>
-          <a class="btn btn--primary btn--sm" href="{{ '/add/' |> url }}">
+          {{# Disabled once the list is full (MAX_SUBSCRIPTIONS) #}}
+          <a class="btn btn--primary btn--sm" href="{{ '/add/' |> url }}" x-show="$store.app.canAdd">
             {{ include "partials/icon.vto" { name: "plus" } }} <span x-text="$t.main.cta">{{ i18n.en.main.cta }}</span>
           </a>
+          <button
+            type="button"
+            class="btn btn--primary btn--sm"
+            disabled
+            aria-describedby="subs-limit"
+            x-show="!$store.app.canAdd"
+          >
+            {{ include "partials/icon.vto" { name: "plus" } }} <span x-text="$t.main.cta">{{ i18n.en.main.cta }}</span>
+          </button>
         </header>
+        <p id="subs-limit" class="subs__limit" role="status" x-show="!$store.app.canAdd">
+          {{ include "partials/icon.vto" { name: "circle-alert" } }} <span x-text="limitText"></span>
+        </p>
 
         <ul class="subs__grid" role="list">
           <template x-for="(item, index) in $store.app.data" :key="index">
@@ -122,11 +141,11 @@
         </ul>
 
         <footer class="subs__actions">
-          <div class="subs__backup" x-data="backup">
-            <button type="button" class="btn btn--sm" @click="exportData">
+          <div class="subs__backup">
+            <button type="button" class="btn btn--sm" @click="$dispatch('transfer-export')">
               {{ include "partials/icon.vto" { name: "download" } }} <span x-text="$t.backup.export">{{ i18n.en.backup.export }}</span>
             </button>
-            <button type="button" class="btn btn--sm" @click="importData">
+            <button type="button" class="btn btn--sm" @click="$dispatch('transfer-import')">
               {{ include "partials/icon.vto" { name: "upload" } }} <span x-text="$t.backup.import">{{ i18n.en.backup.import }}</span>
             </button>
           </div>
@@ -141,3 +160,4 @@
 
 {{ include "partials/form-dialog.vto" }}
 {{ include "partials/tour.vto" }}
+{{ include "partials/transfer.vto" }}

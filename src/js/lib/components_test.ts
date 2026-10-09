@@ -1,7 +1,8 @@
 import { assertEquals, assertMatch } from "@std/assert";
 
 import type { Subscription } from "./types.ts";
-import { createStore, type Store } from "./store.ts";
+import { createStore, MAX_SUBSCRIPTIONS, type Store } from "./store.ts";
+import { encodeShare, shareLink } from "./transfer.ts";
 import { createComponents, type Deps, type Installer } from "./components.ts";
 
 type InstallerOptions = {
@@ -46,6 +47,8 @@ const setup = (
     confirm?: boolean;
     file?: string | null;
     installer?: InstallerOptions;
+    // qrSvg rejects, like a code too big or a bundle that can't load
+    qrFails?: boolean;
   } = {},
 ) => {
   const install = fakeInstaller(options.installer);
@@ -59,6 +62,8 @@ const setup = (
     downloads: [] as { filename: string; content: string }[],
     accept: [] as string[],
     reloads: 0,
+    qr: [] as string[],
+    copied: [] as string[],
   };
   // The service worker reporting a newer version
   const update = { ready: () => {} };
@@ -87,6 +92,17 @@ const setup = (
         update.ready = callback;
       },
       reload: () => calls.reloads++,
+    },
+    shareBase: () => "https://example.com/app/",
+    qrSvg: (text) => {
+      calls.qr.push(text);
+      return options.qrFails
+        ? Promise.reject(new Error("too big"))
+        : Promise.resolve("<svg></svg>");
+    },
+    copy: (text) => {
+      calls.copied.push(text);
+      return Promise.resolve(true);
     },
   };
   return {
@@ -333,6 +349,141 @@ Deno.test("backup - export then import round-trips the data", async () => {
   await importer.components.backup().importData();
   assertEquals(importer.store.data.length, 4);
   assertEquals(importer.store.data[2].name, "App hosting");
+});
+
+Deno.test("backup - importData reports a broken or too long file", async () => {
+  const broken = setup({ file: "{nope" });
+  broken.store.loadMock();
+  assertEquals(await broken.components.backup().importData(), "invalid");
+  assertEquals(broken.store.data.length, 4);
+
+  const many = Array.from({ length: MAX_SUBSCRIPTIONS + 1 }, () => netflix);
+  const long = setup({ file: JSON.stringify(many) });
+  assertEquals(await long.components.backup().importData(), "tooMany");
+  assertEquals(long.store.data.length, 0);
+  assertEquals(long.calls.persist, 0);
+});
+
+Deno.test("transfer - export to a file closes the dialog", () => {
+  const { store, calls, components } = setup();
+  store.addSubscription(netflix);
+  const transfer = components.transfer();
+  transfer.openExport();
+  assertEquals(transfer.mode, "export");
+  transfer.saveFile();
+  assertEquals(calls.downloads[0].content, JSON.stringify([netflix]));
+  assertEquals(transfer.mode, "");
+});
+
+Deno.test("transfer - showQr encodes a share link and shows its code", async () => {
+  const { store, calls, components } = setup();
+  store.loadMock();
+  const transfer = components.transfer();
+  transfer.openExport();
+  await transfer.showQr();
+  assertEquals(transfer.view, "qr");
+  assertEquals(transfer.qr, "<svg></svg>");
+  assertMatch(transfer.link, /^https:\/\/example\.com\/app\/#d=[\w-]+$/);
+  assertEquals(calls.qr, [transfer.link]);
+
+  await transfer.copyLink();
+  assertEquals(calls.copied, [transfer.link]);
+  assertEquals(transfer.copied, true);
+  transfer.back();
+  assertEquals(transfer.view, "choose");
+});
+
+Deno.test("transfer - showQr shows an error when the code fails", async () => {
+  const { store, components } = setup({ qrFails: true });
+  store.loadMock();
+  const transfer = components.transfer();
+  transfer.openExport();
+  await transfer.showQr();
+  assertEquals(transfer.view, "choose");
+  assertEquals(transfer.error, store.i18n.transfer.qrFailed);
+});
+
+Deno.test("transfer - a pasted link imports and closes", async () => {
+  const { store, calls, components } = setup();
+  const transfer = components.transfer();
+  transfer.openImport();
+  transfer.pasted = shareLink(
+    "https://example.com/",
+    await encodeShare([
+      netflix,
+    ]),
+  );
+  await transfer.importPasted();
+  assertEquals(store.data.map((item) => item.name), ["Netflix"]);
+  assertEquals(calls.persist, 1);
+  assertEquals(transfer.mode, "");
+});
+
+Deno.test("transfer - a bad pasted link shows an error", async () => {
+  const { store, calls, components } = setup();
+  const transfer = components.transfer();
+  transfer.openImport();
+  transfer.pasted = "https://example.com/#d=nope";
+  await transfer.importPasted();
+  assertEquals(transfer.error, store.i18n.transfer.invalidLink);
+  transfer.pasted = "hello";
+  await transfer.importPasted();
+  assertEquals(transfer.error, store.i18n.transfer.invalidLink);
+  assertEquals(calls.persist, 0);
+  assertEquals(transfer.mode, "import");
+});
+
+Deno.test("transfer - openFile imports or explains what's wrong", async () => {
+  const good = setup({ file: JSON.stringify([netflix]) });
+  const transfer = good.components.transfer();
+  transfer.openImport();
+  await transfer.openFile();
+  assertEquals(good.store.data.length, 1);
+  assertEquals(transfer.mode, "");
+
+  const bad = setup({ file: "[1]" });
+  const failing = bad.components.transfer();
+  failing.openImport();
+  await failing.openFile();
+  assertEquals(failing.error, bad.store.i18n.transfer.invalidFile);
+  assertEquals(failing.mode, "import");
+});
+
+Deno.test("transfer - a received link asks before replacing", async () => {
+  const { store, calls, components } = setup();
+  store.loadMock();
+  const transfer = components.transfer();
+  await transfer.receive(await encodeShare([netflix]));
+  assertEquals(transfer.mode, "link");
+  assertEquals(transfer.pending.length, 1);
+  assertMatch(transfer.confirmText, /1/);
+  assertEquals(store.data.length, 4);
+
+  transfer.acceptLink();
+  assertEquals(store.data.map((item) => item.name), ["Netflix"]);
+  assertEquals(calls.persist, 1);
+  assertEquals(transfer.mode, "");
+});
+
+Deno.test("transfer - a broken received link only shows an error", async () => {
+  const { store, components } = setup();
+  const transfer = components.transfer();
+  await transfer.receive("nope");
+  assertEquals(transfer.error, store.i18n.transfer.invalidLink);
+  assertEquals(transfer.pending, []);
+  transfer.acceptLink();
+  assertEquals(transfer.mode, "");
+  assertEquals(store.data.length, 0);
+});
+
+Deno.test("addForm - closes right away when the list is full", () => {
+  const { store, calls, components } = setup();
+  for (let i = 0; i < MAX_SUBSCRIPTIONS; i++) store.addSubscription(netflix);
+  const form = components.addForm();
+  form.init();
+  assertEquals(calls.closed, 1);
+  form.submit();
+  assertEquals(store.data.length, MAX_SUBSCRIPTIONS);
 });
 
 Deno.test("addForm - starts with the default subscription", () => {

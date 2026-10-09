@@ -2,6 +2,10 @@ import type { AppState, I18n, Locale, Subscription } from "./types.ts";
 import { mockSubs } from "./mocks.ts";
 import { DEFAULT_LOCALE, isLocale, translations } from "./i18n.ts";
 
+// The most subscriptions the app keeps: they all have to fit in one QR code
+// (see transfer.ts)
+export const MAX_SUBSCRIPTIONS = 40;
+
 export type Store = AppState & {
   readonly getState: AppState;
   // Browser language, used until a language is picked. Not persisted
@@ -9,6 +13,8 @@ export type Store = AppState & {
   // The language in use and its strings, derived so they're never persisted
   readonly locale: Locale;
   readonly i18n: I18n;
+  // Below MAX_SUBSCRIPTIONS
+  readonly canAdd: boolean;
   loadMock(): void;
   addSubscription(item: Subscription): void;
   updateSubscription(index: number, item: Subscription): void;
@@ -38,6 +44,10 @@ export const createStore = (): Store => ({
     return translations[this.locale];
   },
 
+  get canAdd(): boolean {
+    return this.data.length < MAX_SUBSCRIPTIONS;
+  },
+
   get getState(): AppState {
     return {
       language: this.language,
@@ -51,7 +61,7 @@ export const createStore = (): Store => ({
     this.data = mockSubs();
   },
   addSubscription(item: Subscription): void {
-    this.data.push(item);
+    if (this.canAdd) this.data.push(item);
   },
   updateSubscription(index: number, item: Subscription): void {
     this.data = this.data.map((current, i) => i === index ? item : current);

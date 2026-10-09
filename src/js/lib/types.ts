@@ -42,6 +42,7 @@ export type I18n = {
     deleteItem: string;
     confirmDeleteItem: string;
     editItem: string;
+    limit: string;
   };
   recurrence: {
     monthly: string;
@@ -57,6 +58,37 @@ export type I18n = {
   backup: {
     export: string;
     import: string;
+  };
+  // The export and import dialog (partials/transfer.vto)
+  transfer: {
+    close: string;
+    exportIntro: string;
+    importIntro: string;
+    file: string;
+    fileExport: string;
+    fileImport: string;
+    qr: string;
+    qrExport: string;
+    qrImport: string;
+    replaces: string;
+    qrHint: string;
+    qrAlt: string;
+    copy: string;
+    copied: string;
+    back: string;
+    scanHow: string;
+    link: string;
+    importLink: string;
+    confirmTitle: string;
+    confirmNew: string;
+    confirmReplace: string;
+    accept: string;
+    cancel: string;
+    loading: string;
+    invalidFile: string;
+    invalidLink: string;
+    tooMany: string;
+    qrFailed: string;
   };
   add: {
     back: string;
@@ -149,11 +181,15 @@ export type I18n = {
     imported: string;
     readError: string;
     writeError: string;
-    invalidFile: string;
     required: string;
     invalidPrice: string;
     invalidDate: string;
     storage: string;
+    linkTitle: string;
+    linkMessage: string;
+    show: string;
+    qrTooSmall: string;
+    linkImported: string;
   };
 };
 

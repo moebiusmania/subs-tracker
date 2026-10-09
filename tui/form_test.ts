@@ -7,7 +7,6 @@ import {
   type FormValues,
   initialValues,
   insert,
-  isSubscriptionList,
   moveCursor,
   parseDate,
   parsePrice,
@@ -128,20 +127,4 @@ Deno.test("stepDate - days, months and month ends", () => {
   assertEquals(stepDate("2026-01-31", 0, 1), "2026-02-28");
   assertEquals(stepDate("2026-05-15", 0, -1), "2026-04-15");
   assertEquals(stepDate("nope", 1, 0, new Date(2026, 8, 25)), "2026-09-25");
-});
-
-Deno.test("isSubscriptionList - what the web app exports", () => {
-  const exported = JSON.parse(JSON.stringify(subs));
-  assertEquals(isSubscriptionList(exported), true);
-  assertEquals(isSubscriptionList([]), true);
-  assertEquals(isSubscriptionList({ data: exported }), false);
-  assertEquals(isSubscriptionList([{ ...exported[0], price: "9" }]), false);
-  assertEquals(
-    isSubscriptionList([{ ...exported[0], recurrence: "weekly" }]),
-    false,
-  );
-  assertEquals(
-    isSubscriptionList([{ ...exported[0], expiration: "someday" }]),
-    false,
-  );
 });

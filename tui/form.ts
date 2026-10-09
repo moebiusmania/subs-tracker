@@ -167,21 +167,3 @@ export const stepDate = (
   date.setDate(Math.min(day, lastDay) + days);
   return formatDate(date);
 };
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
-
-// What the web app exports: an array of subscriptions with string dates
-export const isSubscriptionList = (value: unknown): value is Subscription[] =>
-  Array.isArray(value) &&
-  value.every((item) =>
-    isRecord(item) &&
-    typeof item.name === "string" &&
-    typeof item.price === "number" &&
-    typeof item.currency === "string" &&
-    typeof item.isActive === "boolean" &&
-    (item.recurrence === "monthly" || item.recurrence === "yearly") &&
-    (typeof item.expiration === "string" ||
-      typeof item.expiration === "number") &&
-    !isNaN(new Date(item.expiration).getTime())
-  );

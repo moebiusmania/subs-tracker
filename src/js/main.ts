@@ -7,6 +7,7 @@ import { createComponents } from "./lib/components.ts";
 import { detectLocale } from "./lib/i18n.ts";
 import { getTranslation } from "./lib/index.ts";
 import { parseRoute, type Route } from "./lib/route.ts";
+import { readShareLink } from "./lib/transfer.ts";
 import {
   createInstaller,
   createUpdater,
@@ -89,6 +90,19 @@ document.addEventListener("click", (event) => {
   openForm(link.href);
 });
 
+// The QR encoder is its own bundle, fetched the first time a code is shown
+type QrModule = typeof import("./qr.ts");
+let qrModule: Promise<QrModule> | null = null;
+const loadQr = (): Promise<QrModule> => {
+  qrModule ??= import(new URL("./qr.js", import.meta.url).href)
+    .catch((error) => {
+      // Let a later attempt try again
+      qrModule = null;
+      throw error;
+    });
+  return qrModule;
+};
+
 const components = createComponents({
   app,
   persist: () => save(app().getState),
@@ -135,13 +149,24 @@ const components = createComponents({
     }),
   installer: createInstaller(),
   updater: createUpdater(),
+  // Share links open the home page of this same deploy
+  shareBase: () => new URL(base, location.origin).href,
+  qrSvg: async (text) => (await loadQr()).qrSvg(text),
+  copy: async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      return false;
+    }
+  },
 });
 
 Alpine.data("header", components.header);
 Alpine.data("empty", components.empty);
 Alpine.data("dashboard", components.dashboard);
 Alpine.data("list", components.list);
-Alpine.data("backup", components.backup);
+Alpine.data("transfer", components.transfer);
 Alpine.data("addForm", components.addForm);
 // The index comes from /edit/?item=<index> (a static site has no
 // /edit/<index> pages). A missing or bad one closes the dialog right away
@@ -330,6 +355,19 @@ Alpine.effect(() => {
 });
 
 Alpine.start();
+
+// A share link (#d=…, from a QR code) opened the app: drop the data from the
+// address, so a reload doesn't ask again, and let the transfer dialog ask
+// before importing it
+const receiveShareLink = (): void => {
+  const payload = readShareLink(location.hash);
+  if (!payload) return;
+  history.replaceState(history.state, "", location.pathname + location.search);
+  dispatchEvent(new CustomEvent("transfer-receive", { detail: payload }));
+};
+// After Alpine has set up the dialog listening for it
+Alpine.nextTick(receiveShareLink);
+addEventListener("hashchange", receiveShareLink);
 
 // Set by the inline script in layouts/base.vto to hide the English markup
 // until Alpine has translated it

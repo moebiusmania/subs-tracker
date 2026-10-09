@@ -1,5 +1,5 @@
 import type { Locale, Subscription } from "./types.ts";
-import type { Store } from "./store.ts";
+import { MAX_SUBSCRIPTIONS, type Store } from "./store.ts";
 import {
   formatDate,
   getInactives,
@@ -8,6 +8,14 @@ import {
   getYearlyCost,
   isExpiringThisMonth,
 } from "./index.ts";
+import {
+  decodeShare,
+  encodeShare,
+  type ImportError,
+  parseBackup,
+  readShareLink,
+  shareLink,
+} from "./transfer.ts";
 
 type Theme = "light" | "dark";
 
@@ -54,7 +62,19 @@ export type Deps = {
   pickFile: (accept: string) => Promise<string | null>;
   installer: Installer;
   updater: Updater;
+  // The app's address, the base of share links
+  shareBase: () => string;
+  // A QR code for the text as SVG markup; rejects when it doesn't fit or
+  // the code can't load
+  qrSvg: (text: string) => Promise<string>;
+  // Copies to the clipboard, resolves to false when that's not allowed
+  copy: (text: string) => Promise<boolean>;
 };
+
+// The export and import dialog: "export" and "import" let the user pick a
+// file or a QR code, "link" asks before importing a share link that opened
+// the app
+export type TransferMode = "" | "export" | "import" | "link";
 
 // What the add form starts with
 const newItem = (): Subscription => ({
@@ -68,6 +88,23 @@ const newItem = (): Subscription => ({
 
 export const createComponents = (deps: Deps) => {
   const { app, persist } = deps;
+
+  const downloadBackup = (): void =>
+    deps.download("subscriptions.json", JSON.stringify(app().getState.data));
+
+  // Picks a JSON file and imports it: says whether that happened, or why
+  // the file can't be imported
+  const importBackup = async (): Promise<
+    "imported" | "cancelled" | ImportError
+  > => {
+    const content = await deps.pickFile(".json");
+    if (typeof content !== "string") return "cancelled";
+    const result = parseBackup(content);
+    if (!result.ok) return result.error;
+    app().importSubs(result.data);
+    persist();
+    return "imported";
+  };
 
   return {
     header: () => ({
@@ -114,6 +151,9 @@ export const createComponents = (deps: Deps) => {
     }),
 
     list: () => ({
+      get limitText(): string {
+        return getTranslation(app().i18n.main.limit, MAX_SUBSCRIPTIONS);
+      },
       status(item: Subscription): string {
         const { main } = app().i18n;
         return item.isActive ? main.active : main.inactive;
@@ -165,18 +205,133 @@ export const createComponents = (deps: Deps) => {
     }),
 
     backup: () => ({
-      exportData(): void {
-        deps.download(
-          "subscriptions.json",
-          JSON.stringify(app().getState.data),
+      exportData: downloadBackup,
+      importData: importBackup,
+    }),
+
+    // The dialog behind the export and import buttons, and the one asking
+    // before a share link's subscriptions replace the current ones
+    transfer: () => ({
+      mode: "" as TransferMode,
+      // "choose" between file and QR code, or "qr" once the code is shown
+      view: "choose" as "choose" | "qr",
+      busy: false,
+      error: "",
+      link: "",
+      qr: "",
+      copied: false,
+      pasted: "",
+      // The subscriptions from the link that opened the app
+      pending: [] as Subscription[],
+      // The pointer went down on the dialog's backdrop
+      pressed: false,
+
+      get title(): string {
+        const t = app().i18n;
+        return this.mode === "link"
+          ? t.transfer.confirmTitle
+          : this.mode === "import"
+          ? t.backup.import
+          : t.backup.export;
+      },
+
+      reset(mode: TransferMode): void {
+        this.mode = mode;
+        this.view = "choose";
+        this.busy = false;
+        this.error = "";
+        this.link = "";
+        this.qr = "";
+        this.copied = false;
+        this.pasted = "";
+        this.pending = [];
+      },
+      openExport(): void {
+        this.reset("export");
+      },
+      openImport(): void {
+        this.reset("import");
+      },
+      close(): void {
+        this.reset("");
+      },
+      importError(error: ImportError, source: "file" | "link"): string {
+        const t = app().i18n.transfer;
+        return error === "tooMany"
+          ? getTranslation(t.tooMany, MAX_SUBSCRIPTIONS)
+          : source === "file"
+          ? t.invalidFile
+          : t.invalidLink;
+      },
+      // A share link opened the app: decode it, then ask
+      async receive(payload: string): Promise<void> {
+        this.reset("link");
+        this.busy = true;
+        const result = await decodeShare(payload);
+        this.busy = false;
+        if (result.ok) this.pending = result.data;
+        else this.error = this.importError(result.error, "link");
+      },
+      get confirmText(): string {
+        const t = app().i18n.transfer;
+        const count = this.pending.length;
+        return getTranslation(
+          app().data.length ? t.confirmReplace : t.confirmNew,
+          count,
         );
       },
-      async importData(): Promise<void> {
-        const content = await deps.pickFile(".json");
-        if (typeof content === "string") {
-          app().importSubs(JSON.parse(content));
-          persist();
+      acceptLink(): void {
+        if (!this.pending.length) return this.close();
+        app().importSubs(this.pending);
+        persist();
+        this.close();
+      },
+      saveFile(): void {
+        downloadBackup();
+        this.close();
+      },
+      async showQr(): Promise<void> {
+        this.error = "";
+        this.busy = true;
+        try {
+          const payload = await encodeShare(app().getState.data);
+          this.link = shareLink(deps.shareBase(), payload);
+          this.qr = await deps.qrSvg(this.link);
+          this.view = "qr";
+        } catch {
+          this.error = app().i18n.transfer.qrFailed;
+        } finally {
+          this.busy = false;
         }
+      },
+      async copyLink(): Promise<void> {
+        this.copied = await deps.copy(this.link);
+      },
+      back(): void {
+        this.view = "choose";
+        this.copied = false;
+      },
+      async openFile(): Promise<void> {
+        this.error = "";
+        const outcome = await importBackup();
+        if (outcome === "imported") this.close();
+        else if (outcome !== "cancelled") {
+          this.error = this.importError(outcome, "file");
+        }
+      },
+      async importPasted(): Promise<void> {
+        this.error = "";
+        const payload = readShareLink(this.pasted);
+        const result = payload
+          ? await decodeShare(payload)
+          : { ok: false as const, error: "invalid" as const };
+        if (!result.ok) {
+          this.error = this.importError(result.error, "link");
+          return;
+        }
+        app().importSubs(result.data);
+        persist();
+        this.close();
       },
     }),
 
@@ -221,9 +376,13 @@ export const createComponents = (deps: Deps) => {
       },
     }),
 
+    // Full (MAX_SUBSCRIPTIONS): /add/ opened directly closes right away
     addForm: () => ({
       item: newItem(),
       formatDate,
+      init(): void {
+        if (!app().canAdd) deps.closeForm();
+      },
       submit(): void {
         app().addSubscription(this.item);
         persist();

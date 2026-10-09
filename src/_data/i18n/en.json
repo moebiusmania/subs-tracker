@@ -30,7 +30,8 @@
     "confirmDelete": "Sure you want to delete all subscriptions data?",
     "deleteItem": "Delete {{value}}",
     "confirmDeleteItem": "Sure you want to delete {{value}}? This can't be undone.",
-    "editItem": "Edit {{value}}"
+    "editItem": "Edit {{value}}",
+    "limit": "You've reached the limit of {{value}} subscriptions: delete one to add another."
   },
   "recurrence": {
     "monthly": "Monthly",
@@ -46,6 +47,36 @@
   "backup": {
     "export": "Export the data",
     "import": "Import data"
+  },
+  "transfer": {
+    "close": "Close",
+    "exportIntro": "How do you want to take your subscriptions with you?",
+    "importIntro": "Where are your subscriptions coming from?",
+    "file": "A file",
+    "fileExport": "Save them as a JSON file: a backup, or a copy to open on another device.",
+    "fileImport": "Open a JSON file exported from the app.",
+    "qr": "A QR code",
+    "qrExport": "Show a code to scan with another phone's camera: the link it opens copies them there.",
+    "qrImport": "Scan the code shown by another device, or paste its link.",
+    "replaces": "Importing replaces the subscriptions you have now.",
+    "qrHint": "Scan it with the other device's camera and open the link. Your subscriptions travel inside the link itself: no server ever sees them.",
+    "qrAlt": "QR code with a link to your subscriptions",
+    "copy": "Copy the link",
+    "copied": "Link copied",
+    "back": "Back",
+    "scanHow": "On the other device, open “Export the data” and pick the QR code, then scan it with this device's camera and open the link.",
+    "link": "Or paste the link",
+    "importLink": "Import",
+    "confirmTitle": "Import from the link?",
+    "confirmNew": "The link brings {{value}} subscriptions to this device.",
+    "confirmReplace": "The link brings {{value}} subscriptions. They replace the ones on this device now.",
+    "accept": "Import",
+    "cancel": "Cancel",
+    "loading": "Loading…",
+    "invalidFile": "This file doesn't contain subscriptions data.",
+    "invalidLink": "This link doesn't contain subscriptions data.",
+    "tooMany": "It has more than {{value}} subscriptions, the most the app can keep.",
+    "qrFailed": "The QR code couldn't be made. Check your connection, or export a file instead."
   },
   "add": {
     "back": "Go back to the main screen",
@@ -135,10 +166,14 @@
     "imported": "Data imported from {{value}}",
     "readError": "Can't read {{value}}",
     "writeError": "Can't write {{value}}",
-    "invalidFile": "This file doesn't contain subscriptions data",
     "required": "Please fill in this field",
     "invalidPrice": "Enter a price of at least 0.1",
     "invalidDate": "Enter a valid date as YYYY-MM-DD",
-    "storage": "Saved in {{value}}"
+    "storage": "Saved in {{value}}",
+    "linkTitle": "Link",
+    "linkMessage": "Paste a link made by the app's QR code. It replaces your subscriptions with the ones it carries.",
+    "show": "Show the code",
+    "qrTooSmall": "Make the terminal at least {{value}} to show the code.",
+    "linkImported": "Subscriptions imported from the link"
   }
 }

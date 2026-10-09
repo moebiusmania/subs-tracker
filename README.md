@@ -26,7 +26,12 @@ Everything you type and "save" in the application **is stored locally on your de
 
 This **may** change in the future if I will consider the idea of adding a backend to make the app work across multiple device, but eventually this will be an opt-in feature with the local device data being always the default method.
 
-At the moment there is an _import/export_ functionality available in the app that will create a `.json` file with your subscriptions data that you can use to eventually move the data on another instance of the app (_on another device_). It isn't the most convenient way to _"sync"_ the data, but it easy to implement and keeps the complete ownership of personal data to the users.
+At the moment there is an _import/export_ functionality available in the app to move the data on another instance of the app (_on another device_), in two ways:
+
+- a `.json` file with your subscriptions data;
+- a **QR code**: scan it with the camera of the other device and open the link. The subscriptions travel compressed inside the link itself (after the `#`, the part browsers never send to a server), and the app asks before importing them. You can also copy the link and paste it in the import dialog.
+
+It isn't the most convenient way to _"sync"_ the data, but it easy to implement and keeps the complete ownership of personal data to the users. To keep every list small enough for one QR code, the app holds up to 40 subscriptions.
 
 ### Languages
 
@@ -152,6 +157,7 @@ Every push and pull request runs the format, lint, type-check and test steps on 
 - [Inter](https://fonts.bunny.net/family/inter) - font, served by the privacy friendly [Bunny Fonts](https://fonts.bunny.net/)
 - [Fraunces](https://fonts.bunny.net/family/fraunces) - serif for headings and figures, also from Bunny Fonts
 - [Lucide](https://lucide.dev/) - icons
+- [uqr](https://github.com/unjs/uqr) - QR code encoder for the share links
 - [Canvas UI Peel](https://canvasui.dev/docs/components/peel) by David Haz - WebGL peel effect behind the add/edit dialog animation (MIT + Commons Clause)
 - [GitHub Actions](https://github.com/features/actions) & [GitHub Pages](https://pages.github.com/) - CI and hosting
 

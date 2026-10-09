@@ -2,8 +2,9 @@ import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 
 import { App } from "./app.ts";
 import type { Key } from "./painter.ts";
-import { createStore } from "../src/js/lib/store.ts";
+import { createStore, MAX_SUBSCRIPTIONS } from "../src/js/lib/store.ts";
 import { mockSubs } from "../src/js/lib/mocks.ts";
+import { encodeShare, shareLink, SITE_URL } from "../src/js/lib/transfer.ts";
 
 const subs = mockSubs();
 
@@ -335,6 +336,8 @@ Deno.test("app - Tab stays inside a dialog", () => {
   press("tab");
   assertEquals(app.focus, "modal.confirm");
   press("tab");
+  assertEquals(app.focus, "modal.via");
+  press("tab");
   assertEquals(app.focus, "modal.path");
 });
 
@@ -410,6 +413,80 @@ Deno.test("app - import checks the file", async () => {
   assertEquals(store.data.length, 2);
   assertEquals(calls.persist, 1);
   assertEquals(app.toast?.text, "Data imported from ~/good.json");
+});
+
+// Encoding and reading are asynchronous
+const settle = () => new Promise((resolve) => setTimeout(resolve, 10));
+
+Deno.test("app - export shows the share link's QR code", async () => {
+  const { app, texts, click } = setup({ mock: true });
+  click("backup.export");
+  click("modal.via.qr");
+  assertStringIncludes(texts(), "Show a code to scan");
+  click("modal.confirm");
+  await settle();
+  app.render();
+  assertEquals(app.modal, "qr");
+  assertStringIncludes(texts(), "▀");
+  assertStringIncludes(texts(), "no server ever sees them");
+  click("modal.cancel");
+  assertEquals(app.modal, null);
+  assertEquals(app.focus, "backup.export");
+});
+
+Deno.test("app - the QR code asks for a bigger terminal", async () => {
+  const { app, texts, click, press } = setup({ mock: true, size: [60, 20] });
+  press("e");
+  click("modal.via.qr");
+  click("modal.confirm");
+  await settle();
+  assertEquals(app.modal, "qr");
+  assertStringIncludes(texts(), "Make the terminal at least");
+});
+
+Deno.test("app - import from a pasted link", async () => {
+  const { app, store, calls, texts, click, press, type } = setup({
+    mock: true,
+  });
+  click("backup.import");
+  click("modal.via.link");
+  click("modal.path");
+  type("https://example.com/#d=broken");
+  press("return");
+  await settle();
+  app.render();
+  assertStringIncludes(texts(), "This link doesn't contain subscriptions data");
+  assertEquals(store.data.length, 4);
+
+  for (let i = 0; i < 40; i++) press("backspace");
+  type(shareLink(SITE_URL, await encodeShare(subs.slice(0, 1))));
+  press("return");
+  await settle();
+  assertEquals(app.modal, null);
+  assertEquals(store.data.map((item) => item.name), [subs[0].name]);
+  assertEquals(calls.persist, 1);
+  assertEquals(app.toast?.text, "Subscriptions imported from the link");
+});
+
+Deno.test("app - the empty state imports too", () => {
+  const { app, click, press } = setup();
+  click("empty.import");
+  assertEquals(app.modal, "import");
+  press("escape");
+  assertEquals(app.focus, "empty.import");
+  press("i");
+  assertEquals(app.modal, "import");
+});
+
+Deno.test("app - a full list disables adding", () => {
+  const { app, store, hit, texts, press } = setup();
+  for (let i = 0; i < MAX_SUBSCRIPTIONS; i++) store.addSubscription(subs[0]);
+  app.render();
+  assertEquals(hit("list.add"), undefined);
+  assertStringIncludes(texts(), `limit of ${MAX_SUBSCRIPTIONS} subscriptions`);
+  press("a");
+  assertEquals(app.screen, "home");
+  assertEquals(app.toast?.kind, "error");
 });
 
 Deno.test("app - theme and language, from keys and the header", () => {

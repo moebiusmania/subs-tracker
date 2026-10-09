@@ -30,7 +30,8 @@
     "confirmDelete": "Vuoi davvero eliminare tutti i dati degli abbonamenti?",
     "deleteItem": "Elimina {{value}}",
     "confirmDeleteItem": "Vuoi davvero eliminare {{value}}? Non si potrà annullare.",
-    "editItem": "Modifica {{value}}"
+    "editItem": "Modifica {{value}}",
+    "limit": "Hai raggiunto il limite di {{value}} abbonamenti: eliminane uno per aggiungerne un altro."
   },
   "recurrence": {
     "monthly": "Mensile",
@@ -46,6 +47,36 @@
   "backup": {
     "export": "Esporta i dati",
     "import": "Importa i dati"
+  },
+  "transfer": {
+    "close": "Chiudi",
+    "exportIntro": "Come vuoi portare con te i tuoi abbonamenti?",
+    "importIntro": "Da dove arrivano i tuoi abbonamenti?",
+    "file": "Un file",
+    "fileExport": "Salvali in un file JSON: un backup, o una copia da aprire su un altro dispositivo.",
+    "fileImport": "Apri un file JSON esportato dall'app.",
+    "qr": "Un codice QR",
+    "qrExport": "Mostra un codice da inquadrare con la fotocamera di un altro telefono: il link che apre ce li copia.",
+    "qrImport": "Inquadra il codice mostrato da un altro dispositivo, oppure incolla il suo link.",
+    "replaces": "L'importazione sostituisce gli abbonamenti che hai ora.",
+    "qrHint": "Inquadralo con la fotocamera dell'altro dispositivo e apri il link. I tuoi abbonamenti viaggiano dentro il link stesso: nessun server li vede.",
+    "qrAlt": "Codice QR con un link ai tuoi abbonamenti",
+    "copy": "Copia il link",
+    "copied": "Link copiato",
+    "back": "Indietro",
+    "scanHow": "Sull'altro dispositivo apri “Esporta i dati” e scegli il codice QR, poi inquadralo con la fotocamera di questo dispositivo e apri il link.",
+    "link": "Oppure incolla il link",
+    "importLink": "Importa",
+    "confirmTitle": "Importare dal link?",
+    "confirmNew": "Il link porta {{value}} abbonamenti su questo dispositivo.",
+    "confirmReplace": "Il link porta {{value}} abbonamenti. Sostituiranno quelli che hai ora su questo dispositivo.",
+    "accept": "Importa",
+    "cancel": "Annulla",
+    "loading": "Caricamento…",
+    "invalidFile": "Questo file non contiene dati di abbonamenti.",
+    "invalidLink": "Questo link non contiene dati di abbonamenti.",
+    "tooMany": "Contiene più di {{value}} abbonamenti, il massimo che l'app può tenere.",
+    "qrFailed": "Impossibile creare il codice QR. Controlla la connessione, oppure esporta un file."
   },
   "add": {
     "back": "Torna alla schermata principale",
@@ -135,10 +166,14 @@
     "imported": "Dati importati da {{value}}",
     "readError": "Impossibile leggere {{value}}",
     "writeError": "Impossibile scrivere {{value}}",
-    "invalidFile": "Questo file non contiene dati di abbonamenti",
     "required": "Compila questo campo",
     "invalidPrice": "Inserisci un prezzo di almeno 0.1",
     "invalidDate": "Inserisci una data valida come AAAA-MM-GG",
-    "storage": "Salvati in {{value}}"
+    "storage": "Salvati in {{value}}",
+    "linkTitle": "Link",
+    "linkMessage": "Incolla un link creato dal codice QR dell'app. Sostituisce i tuoi abbonamenti con quelli che contiene.",
+    "show": "Mostra il codice",
+    "qrTooSmall": "Allarga il terminale ad almeno {{value}} per mostrare il codice.",
+    "linkImported": "Abbonamenti importati dal link"
   }
 }

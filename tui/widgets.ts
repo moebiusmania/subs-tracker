@@ -95,8 +95,11 @@ const buttonColours = (
   id: string,
   variant: ButtonVariant,
   bg: string,
+  disabled = false,
 ): { fg: string; bg: string } => {
   const { p } = ctx;
+  // Like .btn:disabled, whatever the variant
+  if (disabled) return { fg: p.muted, bg: p.surface2 };
   if (ctx.focus === id) return { fg: p.bg, bg: p.accentStrong };
   const hover = ctx.hover === id;
   switch (variant) {
@@ -135,14 +138,17 @@ export const button = (
     bg: string;
     onPress: () => void;
     focusable?: boolean;
+    // Shown, but can't be focused or pressed
+    disabled?: boolean;
   },
 ): number => {
-  const { id, column, row, label, icon } = options;
+  const { id, column, row, label, icon, disabled } = options;
   const colours = buttonColours(
     ctx,
     id,
     options.variant ?? "default",
     options.bg,
+    disabled,
   );
   const content = ` ${icon ? `${icon} ${label}` : label} `;
   const width = textWidth(content) + 2;
@@ -153,6 +159,7 @@ export const button = (
     { text: content, style: { ...colours, bold: true } },
     { text: "▌", style: cap },
   ]);
+  if (disabled) return width;
   painter.hit({
     id,
     rect: { column, row, width, height: 1 },

@@ -1,7 +1,7 @@
 import { assertEquals, assertNotEquals } from "@std/assert";
 
 import type { Subscription } from "./types.ts";
-import { createStore } from "./store.ts";
+import { createStore, MAX_SUBSCRIPTIONS } from "./store.ts";
 import type { AppState, Locale } from "./types.ts";
 import { translations } from "./i18n.ts";
 
@@ -208,4 +208,15 @@ Deno.test("getState - reflects later changes", () => {
   app.addSubscription(testSubscription);
   assertEquals(app.getState.theme, "dark");
   assertEquals(app.getState.data.length, 1);
+});
+
+Deno.test("addSubscription - stops at MAX_SUBSCRIPTIONS", () => {
+  const app = createStore();
+  for (let i = 0; i < MAX_SUBSCRIPTIONS; i++) {
+    assertEquals(app.canAdd, true);
+    app.addSubscription({ ...testSubscription });
+  }
+  assertEquals(app.canAdd, false);
+  app.addSubscription({ ...testSubscription });
+  assertEquals(app.data.length, MAX_SUBSCRIPTIONS);
 });

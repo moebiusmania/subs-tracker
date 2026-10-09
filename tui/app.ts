@@ -8,6 +8,8 @@ import type { I18n, Locale } from "../src/js/lib/types.ts";
 import { createComponents, type Deps } from "../src/js/lib/components.ts";
 import { getTranslation } from "../src/js/lib/index.ts";
 import { translations } from "../src/js/lib/i18n.ts";
+import { encodeShare, shareLink, SITE_URL } from "../src/js/lib/transfer.ts";
+import { qrMatrix } from "../src/js/lib/qr.ts";
 import {
   contains,
   encloses,
@@ -27,7 +29,6 @@ import {
   type FormValues,
   initialValues,
   insert,
-  isSubscriptionList,
   moveCursor,
   stepDate,
   stepPrice,
@@ -76,8 +77,19 @@ export type AppDeps = {
 // "edit" is the add form filled with one card, like the web /edit/ page
 type Screen = "home" | "add" | "edit";
 
+// Export and import pick a file or a QR code, like the web dialog: a share
+// link's QR code to show, or a link to paste (a terminal can't scan)
 type Modal =
-  | { kind: "export" | "import"; path: Field; error?: string }
+  | { kind: "export"; via: "file" | "qr"; path: Field; error?: string }
+  | {
+    kind: "import";
+    via: "file" | "link";
+    path: Field;
+    link: Field;
+    error?: string;
+  }
+  // The share link's QR code, drawn with half blocks
+  | { kind: "qr"; matrix: boolean[][] }
   | { kind: "delete" }
   // One card's ✕, or Delete on a focused card: focus goes back there
   | { kind: "deleteItem"; index: number; from: string };
@@ -145,6 +157,10 @@ export class App {
       pickFile: () => Promise.resolve(this.#importContent),
       // Updates come with a new binary, not while running
       updater: { onUpdate: () => {}, reload: () => {} },
+      // Links point to the web app; the QR code is drawn here (#showQr)
+      shareBase: () => SITE_URL,
+      qrSvg: () => Promise.reject(new Error("Not in a terminal")),
+      copy: () => Promise.resolve(false),
       // There's nothing to install in a terminal
       installer: {
         installed: () => true,
@@ -229,6 +245,11 @@ export class App {
   // Navigation ------------------------------------------------------------
 
   #go(screen: Screen, index: number | null = null): void {
+    // The list is full: say so instead, like the web app's notice
+    if (screen === "add" && !this.#store.canAdd) {
+      this.#notify("error", this.#components.list().limitText);
+      return;
+    }
     const edited = this.#form?.index ?? null;
     this.#screen = screen;
     this.#scroll = 0;
@@ -256,9 +277,26 @@ export class App {
 
   #openModal(modal: Modal): void {
     this.#modal = modal;
-    this.#focus = modal.kind === "delete" || modal.kind === "deleteItem"
-      ? "modal.cancel"
-      : "modal.path";
+    this.#focus = modal.kind === "export" || modal.kind === "import"
+      ? "modal.path"
+      : "modal.cancel";
+  }
+
+  #openExport(): void {
+    this.#openModal({
+      kind: "export",
+      via: "file",
+      path: field("subscriptions.json"),
+    });
+  }
+
+  #openImport(): void {
+    this.#openModal({
+      kind: "import",
+      via: "file",
+      path: field("subscriptions.json"),
+      link: field(),
+    });
   }
 
   #closeModal(): void {
@@ -268,10 +306,10 @@ export class App {
     // Back on the button that opened it
     this.#focus = modal?.kind === "deleteItem"
       ? modal.from
-      : kind === "export"
+      : kind === "export" || kind === "qr"
       ? "backup.export"
       : kind === "import"
-      ? "backup.import"
+      ? (this.#store.data.length ? "backup.import" : "empty.import")
       : kind === "delete"
       ? "list.delete"
       : null;
@@ -326,20 +364,51 @@ export class App {
       modal.error = getTranslation(this.#t.tui.readError, shown);
       return this.#deps.changed();
     }
-    try {
-      if (!isSubscriptionList(JSON.parse(content))) throw new Error();
-    } catch {
-      modal.error = this.#t.tui.invalidFile;
+    this.#importContent = content;
+    const outcome = await this.#components.backup().importData();
+    this.#importContent = null;
+    if (outcome !== "imported") {
+      modal.error = this.#components.transfer().importError(
+        outcome === "tooMany" ? outcome : "invalid",
+        "file",
+      );
       return this.#deps.changed();
     }
-
-    this.#importContent = content;
-    await this.#components.backup().importData();
-    this.#importContent = null;
     this.#closeModal();
     this.#focus = null;
     this.#scroll = 0;
     this.#notify("success", getTranslation(this.#t.tui.imported, shown));
+    this.#deps.changed();
+  }
+
+  // Same rules as the web dialog's pasted link
+  async #importLink(): Promise<void> {
+    const modal = this.#modal;
+    if (modal?.kind !== "import") return;
+    const transfer = this.#components.transfer();
+    transfer.pasted = modal.link.value;
+    await transfer.importPasted();
+    if (transfer.error) {
+      modal.error = transfer.error;
+      return this.#deps.changed();
+    }
+    this.#closeModal();
+    this.#focus = null;
+    this.#scroll = 0;
+    this.#notify("success", this.#t.tui.linkImported);
+    this.#deps.changed();
+  }
+
+  // The share link the web app's QR code holds, pointing to the web app
+  async #showQr(): Promise<void> {
+    const modal = this.#modal;
+    if (modal?.kind !== "export") return;
+    try {
+      const link = shareLink(SITE_URL, await encodeShare(this.#store.data));
+      this.#openModal({ kind: "qr", matrix: qrMatrix(link) });
+    } catch {
+      modal.error = this.#t.transfer.qrFailed;
+    }
     this.#deps.changed();
   }
 
@@ -441,19 +510,12 @@ export class App {
         return;
       case "e":
         if (this.#screen === "home" && this.#store.data.length) {
-          this.#openModal({
-            kind: "export",
-            path: field("subscriptions.json"),
-          });
+          this.#openExport();
         }
         return;
+      // The empty state has an import button too
       case "i":
-        if (this.#screen === "home" && this.#store.data.length) {
-          this.#openModal({
-            kind: "import",
-            path: field("subscriptions.json"),
-          });
-        }
+        if (this.#screen === "home") this.#openImport();
         return;
     }
   }
@@ -1077,6 +1139,29 @@ export class App {
     }
     y += inline ? 2 : 6;
 
+    // Import, as the panel's bottom row (the header's bar mirrors it)
+    painter.text(
+      "import.rule",
+      column,
+      y,
+      `├${"─".repeat(panelWidth - 2)}┤`,
+      { fg: this.#panelBorder(), bg: p.surface },
+      0,
+    );
+    y += 2;
+    const importLabel = t.backup.import;
+    button(painter, ctx, {
+      id: "empty.import",
+      column: column +
+        Math.floor((panelWidth - buttonWidth(importLabel, "↑")) / 2),
+      row: y,
+      label: importLabel,
+      icon: "↑",
+      bg: p.surface,
+      onPress: () => this.#openImport(),
+    });
+    y += 2;
+
     const height = y - row + 1;
     frame(painter, "panel", { column, row, width: panelWidth, height }, {
       border: this.#panelBorder(),
@@ -1230,6 +1315,7 @@ export class App {
       t.main.list,
       width - ctaWidth - 2,
     );
+    const full = !this.#store.canAdd;
     button(painter, ctx, {
       id: "list.add",
       column: left + width - ctaWidth,
@@ -1238,9 +1324,23 @@ export class App {
       icon: "+",
       variant: "primary",
       bg: p.bg,
+      disabled: full,
       onPress: () => this.#go("add"),
     });
     y += 2;
+
+    // Why the button is disabled, like the web app's .subs__limit
+    if (full) {
+      wrap(`▲ ${list.limitText}`, width).forEach((line, index) => {
+        painter.text(`list.limit.${index}`, left, y, line, {
+          fg: p.accentStrong,
+          bg: p.bg,
+          bold: true,
+        });
+        y += 1;
+      });
+      y += 1;
+    }
 
     const minCard = 30;
     const columns = Math.max(1, Math.floor((width + 2) / (minCard + 2)));
@@ -1447,8 +1547,7 @@ export class App {
       label: exportLabel,
       icon: "↓",
       bg: p.bg,
-      onPress: () =>
-        this.#openModal({ kind: "export", path: field("subscriptions.json") }),
+      onPress: () => this.#openExport(),
     }) + 1;
     button(painter, ctx, {
       id: "backup.import",
@@ -1457,8 +1556,7 @@ export class App {
       label: importLabel,
       icon: "↑",
       bg: p.bg,
-      onPress: () =>
-        this.#openModal({ kind: "import", path: field("subscriptions.json") }),
+      onPress: () => this.#openImport(),
     });
     button(painter, ctx, {
       id: "list.delete",
@@ -1870,6 +1968,7 @@ export class App {
 
   #drawModal(painter: Painter): void {
     const modal = this.#modal!;
+    if (modal.kind === "qr") return this.#drawQr(painter, modal.matrix);
     const p = this.#p;
     const t = this.#t;
     const ctx = this.#ctx;
@@ -1892,19 +1991,24 @@ export class App {
       : t.main.delete;
     const message = wrap(
       modal.kind === "export"
-        ? t.tui.exportMessage
+        ? modal.via === "file" ? t.tui.exportMessage : t.transfer.qrExport
         : modal.kind === "import"
-        ? t.tui.importMessage
+        ? modal.via === "file" ? t.tui.importMessage : t.tui.linkMessage
         : modal.kind === "deleteItem"
         ? getTranslation(t.main.confirmDeleteItem, name)
         : t.main.confirmDelete,
       inner,
     );
-    const error = modal.kind === "export" || modal.kind === "import"
-      ? modal.error
-      : undefined;
-    const height = 2 + 2 + message.length + 1 +
-      (isDelete ? 0 : (error ? 5 : 4) + 1) + 1 + 1;
+    const transfer = modal.kind === "export" || modal.kind === "import"
+      ? modal
+      : null;
+    const error = transfer?.error;
+    // The QR code needs no field; its errors get their own lines
+    const field = transfer && transfer.via !== "qr";
+    const errorLines = error && !field ? wrap(error, inner) : [];
+    const height = 2 + 2 + (transfer ? 5 : 0) + message.length + 1 +
+      (field ? (error ? 5 : 4) + 1 : 0) +
+      (errorLines.length ? errorLines.length + 1 : 0) + 1 + 1;
     const row = Math.max(1, Math.floor((rows - height) / 2));
 
     // Shadow
@@ -1934,6 +2038,39 @@ export class App {
       bold: true,
     }, 3);
     y += 2;
+    const controls = painter.sub({
+      layer: "modal",
+      z: Z.modal + 2,
+      clip: painter.clip,
+    });
+
+    // A file, or the QR code / a link, like the web dialog's two choices
+    if (transfer) {
+      const choose = (via: "file" | "qr" | "link") => {
+        if (transfer.kind === "export") transfer.via = via as "file" | "qr";
+        else transfer.via = via as "file" | "link";
+        transfer.error = undefined;
+      };
+      y += segmented(controls, ctx, {
+        id: "modal.via",
+        column: x,
+        row: y,
+        width: inner,
+        label: transfer.kind === "export"
+          ? t.transfer.exportIntro
+          : t.transfer.importIntro,
+        value: transfer.via as "file" | "qr" | "link",
+        choices: [
+          { value: "file", label: t.transfer.file },
+          transfer.kind === "export"
+            ? { value: "qr", label: t.transfer.qr }
+            : { value: "link", label: t.tui.linkTitle },
+        ],
+        bg,
+        onChange: choose,
+      }) + 1;
+    }
+
     message.forEach((line, index) => {
       painter.text(
         `message.${index}`,
@@ -1946,67 +2083,76 @@ export class App {
     });
     y += message.length + 1;
 
-    if (modal.kind === "export" || modal.kind === "import") {
-      const modalPath = modal;
-      y += input(
-        painter.sub({ layer: "modal", z: Z.modal + 2, clip: painter.clip }),
-        ctx,
-        {
-          id: "modal.path",
-          column: x,
-          row: y,
-          width: inner,
-          label: t.tui.fileTitle,
-          field: modalPath.path,
-          error,
-          bg,
-          onKey: (key) => {
-            const set = (update: (f: Field) => Field) => {
-              modalPath.path = update(modalPath.path);
-              modalPath.error = undefined;
+    if (transfer && field) {
+      const key = transfer.kind === "import" && transfer.via === "link"
+        ? "link"
+        : "path";
+      const current = () =>
+        key === "link" && transfer.kind === "import"
+          ? transfer.link
+          : transfer.path;
+      y += input(controls, ctx, {
+        id: "modal.path",
+        column: x,
+        row: y,
+        width: inner,
+        label: key === "link" ? t.tui.linkTitle : t.tui.fileTitle,
+        field: current(),
+        placeholder: key === "link" ? "https://…#d=…" : undefined,
+        error,
+        bg,
+        onKey: (pressed) => {
+          const set = (update: (f: Field) => Field) => {
+            const next = update(current());
+            if (key === "link" && transfer.kind === "import") {
+              transfer.link = next;
+            } else transfer.path = next;
+            transfer.error = undefined;
+            return true;
+          };
+          switch (pressed.key) {
+            case "backspace":
+              return set(backspace);
+            case "delete":
+              return set(deleteForward);
+            case "left":
+            case "right":
+            case "home":
+            case "end":
+              return set((f) => moveCursor(f, pressed.key as "left"));
+            case "return":
+              this.#confirmModal();
               return true;
-            };
-            switch (key.key) {
-              case "backspace":
-                return set(backspace);
-              case "delete":
-                return set(deleteForward);
-              case "left":
-              case "right":
-              case "home":
-              case "end":
-                return set((f) => moveCursor(f, key.key as "left"));
-              case "return":
-                this.#confirmModal();
-                return true;
-            }
-            if (key.typed && !key.ctrl && !key.meta) {
-              return set((f) => insert(f, key.typed));
-            }
-            return false;
-          },
+          }
+          if (pressed.typed && !pressed.ctrl && !pressed.meta) {
+            return set((f) => insert(f, pressed.typed));
+          }
+          return false;
         },
-      ) + 1;
+      }) + 1;
     }
+    errorLines.forEach((line, index) => {
+      painter.text(`error.${index}`, x, y + index, line, {
+        fg: p.danger,
+        bg,
+        bold: true,
+      }, 3);
+    });
+    if (errorLines.length) y += errorLines.length + 1;
 
     // Buttons at the bottom right: cancel, then the action
     const confirmLabel = modal.kind === "export"
-      ? t.tui.save
+      ? modal.via === "qr" ? t.tui.show : t.tui.save
       : modal.kind === "import"
       ? t.tui.open
       : modal.kind === "deleteItem"
       ? t.tui.delete
       : t.main.delete;
-    const buttons = painter.sub({
-      layer: "modal",
-      z: Z.modal + 2,
-      clip: painter.clip,
-    });
     const confirmWidth = buttonWidth(confirmLabel, isDelete ? "✕" : undefined);
     const cancelWidth = buttonWidth(t.add.cancel);
     const confirmColumn = x + inner - confirmWidth;
     // Cancel first, so Tab goes field → cancel → confirm
-    button(buttons, ctx, {
+    button(controls, ctx, {
       id: "modal.cancel",
       column: confirmColumn - cancelWidth - 1,
       row: y,
@@ -2015,7 +2161,7 @@ export class App {
       bg,
       onPress: () => this.#closeModal(),
     });
-    button(buttons, ctx, {
+    button(controls, ctx, {
       id: "modal.confirm",
       column: confirmColumn,
       row: y,
@@ -2027,17 +2173,147 @@ export class App {
     });
   }
 
+  // The share link's QR code over the whole screen, two modules per cell
+  // (▀ with the top one as foreground, the bottom one as background). Dark
+  // on white whatever the theme, for the scanners, with a 2 module quiet
+  // zone. The title, hint and close button only show if there's room.
+  #drawQr(painter: Painter, matrix: boolean[][]): void {
+    const p = this.#p;
+    const t = this.#t;
+    const ctx = this.#ctx;
+    const { columns, rows } = this.#size;
+    const quiet = 2;
+    const size = matrix.length + quiet * 2;
+    const qrRows = Math.ceil(size / 2);
+    const screen = { column: 0, row: 0, width: columns, height: rows };
+    painter.box("qr.bg", screen, { bg: p.bg });
+    painter.hit({
+      id: "modal.backdrop",
+      rect: screen,
+      onClick: () => this.#closeModal(),
+    });
+
+    const close = (row: number) => {
+      const label = t.transfer.close;
+      button(
+        painter.sub({ layer: "modal", z: Z.modal + 2, clip: screen }),
+        ctx,
+        {
+          id: "modal.cancel",
+          column: Math.floor((columns - buttonWidth(label)) / 2),
+          row,
+          label,
+          bg: p.bg,
+          onPress: () => this.#closeModal(),
+        },
+      );
+    };
+
+    if (size > columns || qrRows > rows) {
+      const lines = wrap(
+        getTranslation(t.tui.qrTooSmall, `${size}×${qrRows}`),
+        columns - 4,
+      );
+      const top = Math.max(0, Math.floor((rows - lines.length - 2) / 2));
+      lines.forEach((line, index) =>
+        painter.text(
+          `qr.small.${index}`,
+          2,
+          top + index,
+          center(line, columns - 4),
+          {
+            fg: p.text,
+            bg: p.bg,
+          },
+          1,
+        )
+      );
+      close(top + lines.length + 1);
+      return;
+    }
+
+    const hint = wrap(t.transfer.qrHint, Math.min(columns - 4, 72));
+    // Title and a blank line above, hint, close button and blank lines below
+    const full = qrRows + 2 + 1 + hint.length + 1 + 1 <= rows;
+    const titled = full || qrRows + 3 <= rows;
+    const block = full
+      ? qrRows + 2 + 1 + hint.length + 2
+      : titled
+      ? qrRows + 3
+      : qrRows;
+    let y = Math.floor((rows - block) / 2);
+    if (titled) {
+      painter.text(
+        "qr.title",
+        0,
+        y,
+        center(truncate(t.backup.export, columns), columns),
+        {
+          fg: p.text,
+          bg: p.bg,
+          bold: true,
+        },
+        1,
+      );
+      y += 2;
+    }
+
+    const dark = "#000000";
+    const light = "#ffffff";
+    const module = (x: number, y: number) =>
+      matrix[y - quiet]?.[x - quiet] ?? false;
+    const left = Math.floor((columns - size) / 2);
+    for (let line = 0; line < qrRows; line++) {
+      const spans: { text: string; style: StyleOptions }[] = [];
+      for (let x = 0; x < size; x++) {
+        const top = module(x, line * 2);
+        const bottom = line * 2 + 1 < size && module(x, line * 2 + 1);
+        const style = {
+          fg: top ? dark : light,
+          // Past the last module row, the cell's lower half is the page
+          bg: line * 2 + 1 < size ? (bottom ? dark : light) : p.bg,
+        };
+        const last = spans.at(-1);
+        if (last && last.style.fg === style.fg && last.style.bg === style.bg) {
+          last.text += "▀";
+        } else spans.push({ text: "▀", style });
+      }
+      painter.line(`qr.${line}`, left, y + line, spans, 1);
+    }
+    y += qrRows;
+
+    if (full) {
+      y += 1;
+      hint.forEach((line, index) =>
+        painter.text(`qr.hint.${index}`, 0, y + index, center(line, columns), {
+          fg: p.muted,
+          bg: p.bg,
+        }, 1)
+      );
+      y += hint.length;
+      close(y);
+    } else if (titled) close(y);
+  }
+
   #confirmModal(): void {
-    switch (this.#modal?.kind) {
+    const modal = this.#modal;
+    switch (modal?.kind) {
       case "export":
+        if (modal.via === "qr") {
+          this.#showQr();
+          return;
+        }
         return this.#exportData();
       case "import":
-        this.#importData();
+        if (modal.via === "link") this.#importLink();
+        else this.#importData();
         return;
+      case "qr":
+        return this.#closeModal();
       case "delete":
         return this.#deleteAll();
       case "deleteItem":
-        return this.#deleteItem(this.#modal.index);
+        return this.#deleteItem(modal.index);
     }
   }
 }

@@ -328,6 +328,17 @@
       --btn-bg: var(--color-surface-2);
       --btn-border: var(--color-field-border);
     }
+
+    /* After the variants, so it wins over their hover */
+    &:disabled,
+    &:disabled:hover {
+      --btn-bg: var(--color-surface-2);
+      --btn-fg: var(--color-text-muted);
+      --btn-border: var(--color-border);
+
+      box-shadow: none;
+      cursor: not-allowed;
+    }
   }
 
   .btn--primary {
@@ -635,6 +646,15 @@
       color: var(--color-text-muted);
       font-size: 0.875rem;
     }
+
+    /* Import, as the card's bottom row (the bar mirrors it on top) */
+    .empty__import {
+      display: flex;
+      justify-content: center;
+      padding: var(--space-4);
+      border-top: 1px solid var(--color-border);
+      background: var(--color-surface-2);
+    }
   }
 
   /* Stats ------------------------------------------------------------ */
@@ -761,6 +781,26 @@
       letter-spacing: 0;
       text-align: center;
       font-variant-numeric: tabular-nums;
+    }
+
+    /* The list is full: why the add button is disabled */
+    .subs__limit {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: calc(-1 * var(--space-2));
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      background: var(--color-accent-soft);
+      color: var(--color-accent-strong);
+      font-size: 0.9375rem;
+      font-weight: 500;
+
+      .icon {
+        flex: none;
+        width: 1.125rem;
+        height: 1.125rem;
+      }
     }
 
     .subs__grid {
@@ -1108,7 +1148,8 @@
   /* Outside @scope: the backdrop is a pseudo-element of the dialog. It
      fades in and out whichever way the panel moves */
   .sheet::backdrop,
-  .tour::backdrop {
+  .tour::backdrop,
+  .transfer::backdrop {
     background: color-mix(in oklab, #22201d, transparent 70%);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
@@ -1124,7 +1165,7 @@
   }
 
   /* The page behind doesn't scroll while a dialog is open */
-  :root:has(.sheet[open], .tour[open]) {
+  :root:has(.sheet[open], .tour[open], .transfer[open]) {
     overflow: hidden;
   }
 
@@ -1280,6 +1321,208 @@
     .tour__cta {
       @media (width < 40rem) {
         width: 100%;
+      }
+    }
+  }
+
+  /* Export and import ---------------------------------------------- */
+  /* A dialog to pick a file or a QR code (partials/transfer.vto).      */
+
+  @scope (.transfer) {
+    :scope {
+      width: min(100% - 2 * var(--gutter), 34rem);
+      max-width: none;
+      max-height: none;
+      margin: auto;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--color-text);
+      overflow: visible;
+    }
+
+    .transfer__panel {
+      display: grid;
+      gap: var(--space-4);
+      max-height: calc(100dvh - 2 * var(--gutter));
+      padding: var(--space-5);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface);
+      box-shadow: var(--shadow-md);
+      overflow: auto;
+      overscroll-behavior: contain;
+      transition:
+        opacity calc(var(--duration-slide-in) * 0.5) ease-out,
+        translate var(--duration-slide-in) var(--ease-bounce);
+
+      @starting-style {
+        opacity: 0;
+        translate: 0 3rem;
+      }
+
+      @media (width < 40rem) {
+        padding: var(--space-4);
+      }
+    }
+
+    .transfer__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+
+      h2 {
+        font-size: 1.75rem;
+      }
+    }
+
+    .transfer__body {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .transfer__intro,
+    .transfer__note {
+      color: var(--color-text-muted);
+      text-wrap: pretty;
+    }
+
+    .transfer__note {
+      font-size: 0.875rem;
+    }
+
+    .transfer__error {
+      color: var(--color-danger);
+      font-weight: 500;
+    }
+
+    .transfer__choices {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    /* An option card: icon on the left, title and description beside it */
+    .choice {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: var(--space-4);
+      row-gap: var(--space-1);
+      align-items: start;
+      padding: var(--space-4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface);
+      color: var(--color-text);
+      text-align: start;
+      font: inherit;
+      transition:
+        background-color var(--duration-fast) ease,
+        border-color var(--duration-fast) ease;
+    }
+
+    button.choice {
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        border-color: var(--color-field-border);
+        background: var(--color-surface-2);
+      }
+
+      &:disabled {
+        cursor: progress;
+      }
+    }
+
+    .choice__icon {
+      display: grid;
+      grid-row: span 2;
+      place-items: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--radius-full);
+      background: var(--tint-lav);
+
+      .icon {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+    }
+
+    .choice__title {
+      font-weight: 600;
+    }
+
+    .choice__text {
+      color: var(--color-text-muted);
+      font-size: 0.9375rem;
+    }
+
+    .transfer__paste {
+      display: grid;
+      grid-column: 1 / -1;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+
+      label {
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+    }
+
+    .transfer__paste-row {
+      display: flex;
+      gap: var(--space-2);
+
+      input {
+        flex: 1;
+        min-width: 0;
+        min-height: 2.375rem;
+        padding: var(--space-1) var(--space-3);
+        border: 1px solid var(--color-field-border);
+        border-radius: var(--radius-sm);
+        background: var(--color-surface);
+
+        &::placeholder {
+          color: var(--color-text-muted);
+          opacity: 1;
+        }
+
+        &:focus-visible {
+          outline: none;
+          border-color: var(--color-accent-strong);
+          box-shadow: 0 0 0 3px var(--color-accent-soft);
+        }
+      }
+    }
+
+    /* The SVG brings its own white quiet zone */
+    .transfer__qr {
+      justify-self: center;
+      width: min(100%, 20rem);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+
+      svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+    }
+
+    .transfer__actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: var(--space-2);
+
+      @media (width < 40rem) {
+        flex-direction: column-reverse;
+
+        .btn {
+          width: 100%;
+        }
       }
     }
   }

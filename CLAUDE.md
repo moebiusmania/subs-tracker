@@ -13,12 +13,12 @@ https://moebiusmania.github.io/subs-tracker/. A terminal version with the same
 features lives in `tui/` (see below).
 
 Dependencies are declared only in the `deno.json` import map: Lume is pinned to
-an exact version via jsDelivr (`lume/`), Alpine comes from `npm:alpinejs`,
-deno_tui is pinned the same way as Lume (`deno_tui/`), the TUI uses
-`jsr:@std/path`, and tests use `jsr:@std/assert`. To upgrade Lume, bump the
-version in the `lume/` URL. `deno.lock` is committed. Running one-off scripts
-from the repo root with extra `npm:`/`jsr:` imports adds them to the lockfile,
-so don't commit those entries.
+an exact version via jsDelivr (`lume/`), Alpine comes from `npm:alpinejs`, the
+QR encoder from `npm:uqr`, deno_tui is pinned the same way as Lume
+(`deno_tui/`), the TUI uses `jsr:@std/path`, and tests use `jsr:@std/assert`. To
+upgrade Lume, bump the version in the `lume/` URL. `deno.lock` is committed.
+Running one-off scripts from the repo root with extra `npm:`/`jsr:` imports adds
+them to the lockfile, so don't commit those entries.
 
 ## Commands
 
@@ -69,12 +69,13 @@ their own browser (`deno task dev:host` serves it to the LAN).
   page load it builds the store, hydrates it from `localStorage`, applies
   `data-theme` on `<html>`, registers `Alpine.store("app", …)` and the
   `Alpine.data` components, then calls `Alpine.start()`. The component logic
-  (`header`, `empty`, `dashboard`, `list`, `backup`, `addForm`, `editForm`,
-  `install`, `update`) lives in `src/js/lib/components.ts` as plain factories.
-  Browser side effects (confirm, closing the form, theme attribute, view
-  transition, file download/pick, install prompt, new-version notice) are passed
-  in as `Deps`, so `main.ts` only wires real DOM implementations and the tests
-  pass fakes.
+  (`header`, `empty`, `dashboard`, `list`, `backup` (TUI only), `transfer`,
+  `addForm`, `editForm`, `install`, `update`) lives in
+  `src/js/lib/components.ts` as plain factories. Browser side effects (confirm,
+  closing the form, theme attribute, view transition, file download/pick,
+  install prompt, new-version notice, QR code, clipboard) are passed in as
+  `Deps`, so `main.ts` only wires real DOM implementations and the tests pass
+  fakes.
 - **Add and edit dialog**: the forms open in a modal `<dialog class="sheet">`
   over the home page, with a blurred backdrop, full screen below 40rem. They
   keep their URLs: `/add/` and `/edit/?item=<index>` (a static site can't have
@@ -103,6 +104,30 @@ their own browser (`deno task dev:host` serves it to the LAN).
   skips both. The backdrop always just fades (`.is-closing` on exit).
   `formDialog` keeps its own `view` and runs openings and closings one at a
   time, so the form stays rendered until the exit animation is over.
+- **Export and import**: the Export and Import buttons (Import also sits at the
+  bottom of the empty state) send `transfer-export`/`transfer-import` events to
+  `partials/transfer.vto`, a dialog (the `transfer` component in
+  `components.ts`) offering a JSON file or a QR code. The QR code holds a share
+  link, the app's home URL with the data in the hash (`#d=…`): `lib/transfer.ts`
+  packs each subscription into a few bytes (flags, price in cents, the shown day
+  as days since 1970, length-prefixed UTF-8 strings), deflates them with
+  `CompressionStream` and writes base64url. Version byte first, so the format
+  can change. The camera app opens the link; `main.ts` reads the hash on load
+  (and on `hashchange`), removes it with `replaceState`, and the dialog asks
+  before replacing the data. Import also takes a pasted link (links sent by
+  message, installed apps that don't share storage with the browser). The
+  encoder (`uqr`, via `lib/qr.ts`) is its own bundle, `js/qr.ts`, imported the
+  first time a code is shown. The QR SVG is always black on white, whatever the
+  theme, for the scanners. File and link imports go through
+  `parseBackup`/`decodeShare`, which reject anything that isn't a subscription
+  list. The TUI picks file or QR/link with a segmented control in its dialogs,
+  draws the code full screen with `▀` half blocks (links point to `SITE_URL`)
+  and only takes pasted links.
+- **Subscription cap**: `MAX_SUBSCRIPTIONS` (40, in `store.ts`) keeps every list
+  within one easily scanned QR code (a full list of long names is a version 18
+  code). `store.canAdd` disables the add button and shows a notice (web
+  `.subs__limit`, TUI accent line), `addSubscription` refuses past it, `/add/`
+  opened directly closes, and imports with more are refused.
 - **Header and empty state**: the header's content (brand, language switch,
   theme toggle) is `partials/app-bar.vto`, a `header` component. With no
   subscriptions the header is hidden (`:root[data-empty]`, set before first
