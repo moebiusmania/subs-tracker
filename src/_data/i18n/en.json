@@ -82,6 +82,31 @@
     "reload": "Reload",
     "dismiss": "Later"
   },
+  "tour": {
+    "link": "See how it works",
+    "title": "How it works",
+    "close": "Close",
+    "play": "Play",
+    "pause": "Pause",
+    "replay": "Watch again",
+    "scene": "Scene {{value}}",
+    "loading": "Loading…",
+    "failed": "The animation couldn't load. Check your connection and try again.",
+    "cta": "Add your first subscription",
+    "music": "Music",
+    "video": "Video streaming",
+    "cloud": "Cloud storage",
+    "addButton": "Add",
+    "scenes": {
+      "nibble": "Subscriptions nibble at your wallet, a little every month.",
+      "add": "Add each one: what it is, how much, and how often it renews.",
+      "totals": "The totals add up by themselves: per month, and the honest yearly figure.",
+      "due": "Renewing this month? The card glows, so nothing catches you off guard.",
+      "inactive": "Not using one? Mark it inactive and it stops counting.",
+      "local": "Everything stays on your device. Export a backup whenever you like.",
+      "end": "Your turn!"
+    }
+  },
   "footer": {
     "license": "MIT license",
     "project": "an Open Source project",

@@ -82,6 +82,31 @@
     "reload": "Ricarica",
     "dismiss": "Più tardi"
   },
+  "tour": {
+    "link": "Guarda come funziona",
+    "title": "Come funziona",
+    "close": "Chiudi",
+    "play": "Riproduci",
+    "pause": "Pausa",
+    "replay": "Riguarda",
+    "scene": "Scena {{value}}",
+    "loading": "Caricamento…",
+    "failed": "Non è stato possibile caricare l'animazione. Controlla la connessione e riprova.",
+    "cta": "Aggiungi il primo abbonamento",
+    "music": "Musica",
+    "video": "Streaming video",
+    "cloud": "Spazio cloud",
+    "addButton": "Aggiungi",
+    "scenes": {
+      "nibble": "Gli abbonamenti rosicchiano il portafoglio, un pochino ogni mese.",
+      "add": "Aggiungili uno per uno: cos'è, quanto costa e ogni quanto si rinnova.",
+      "totals": "I totali si fanno da soli: al mese, e la sincera cifra annuale.",
+      "due": "Si rinnova questo mese? La scheda si illumina, così niente ti coglie di sorpresa.",
+      "inactive": "Non lo usi? Segnalalo come inattivo e smette di contare.",
+      "local": "Tutto resta sul tuo dispositivo. Esporta un backup quando vuoi.",
+      "end": "Tocca a te!"
+    }
+  },
   "footer": {
     "license": "Licenza MIT",
     "project": "un progetto Open Source",

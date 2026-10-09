@@ -110,6 +110,20 @@ their own browser (`deno task dev:host` serves it to the LAN).
   `main.ts`), and the empty state card shows the same app bar as its top row.
   The TUI does the same: no header row while empty, `#drawHeader` draws the
   controls inside the empty panel.
+- **"How it works" animation**: a link in the empty state opens
+  `partials/tour.vto`, a dialog with a ~43 s motion graphic (googly-eyed
+  subscription cards nibbling a wallet, the add form, totals, the due glow,
+  pausing one, local storage and export). `src/js/tour.ts` draws it as one SVG
+  coloured with the CSS tokens and drives it with Web Animations created up
+  front with absolute delays (`fill: "forwards"`; seeking sets `currentTime` on
+  all of them, and `resume()` only plays those not finished, since `play()`
+  rewinds a finished one). It's a separate esbuild entry (`site.add` in
+  `_config.ts`) that the `tour` component in `main.ts` imports on first open,
+  prefetching when the pointer or focus reaches the link, so it costs nothing on
+  page load (the service worker still precaches it for offline use). Captions
+  and the scene list come from `tour.scenes` in the locale files. With reduced
+  motion it opens on still frames (each scene's `still` time) that the scene
+  dots step through. Browser-only: the TUI has no counterpart.
 - **Alpine gotcha**: directives only run inside an `x-data` root. That's why
   `partials/home.vto` is wrapped in `<div x-data>`: its top-level
   `<template x-if>` switches between the empty state and dashboard+list at

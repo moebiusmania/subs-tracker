@@ -1107,7 +1107,8 @@
 
   /* Outside @scope: the backdrop is a pseudo-element of the dialog. It
      fades in and out whichever way the panel moves */
-  .sheet::backdrop {
+  .sheet::backdrop,
+  .tour::backdrop {
     background: color-mix(in oklab, #22201d, transparent 70%);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
@@ -1122,9 +1123,165 @@
     opacity: 0;
   }
 
-  /* The page behind doesn't scroll while the dialog is open */
-  :root:has(.sheet[open]) {
+  /* The page behind doesn't scroll while a dialog is open */
+  :root:has(.sheet[open], .tour[open]) {
     overflow: hidden;
+  }
+
+  /* "How it works" ------------------------------------------------- */
+  /* The link in the empty state, and the dialog playing the animation  */
+  /* (js/tour.ts draws the stage).                                      */
+
+  .tour-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding: var(--space-1) var(--space-2);
+    border: 0;
+    background: none;
+    color: var(--color-accent-strong);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, currentColor, transparent 50%);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration-color: currentColor;
+    }
+
+    .icon {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  @scope (.tour) {
+    :scope {
+      width: min(100% - 2 * var(--gutter), 46rem);
+      max-width: none;
+      max-height: none;
+      margin: auto;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--color-text);
+      overflow: visible;
+    }
+
+    .tour__panel {
+      display: grid;
+      gap: var(--space-4);
+      max-height: calc(100dvh - 2 * var(--gutter));
+      padding: var(--space-5);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface);
+      box-shadow: var(--shadow-md);
+      overflow: auto;
+      overscroll-behavior: contain;
+      transition:
+        opacity calc(var(--duration-slide-in) * 0.5) ease-out,
+        translate var(--duration-slide-in) var(--ease-bounce);
+
+      @starting-style {
+        opacity: 0;
+        translate: 0 3rem;
+      }
+
+      @media (width < 40rem) {
+        padding: var(--space-4);
+      }
+    }
+
+    .tour__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+
+      h2 {
+        font-size: 1.75rem;
+      }
+    }
+
+    /* 16:9, also while the animation is still loading */
+    .tour__stage {
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-md);
+      background: var(--color-bg);
+      overflow: hidden;
+    }
+
+    .tour__status,
+    .tour__caption {
+      color: var(--color-text-muted);
+      text-align: center;
+      text-wrap: balance;
+    }
+
+    .tour__caption {
+      min-height: 3em;
+      color: var(--color-text);
+      font-size: 1.0625rem;
+    }
+
+    .tour__controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .tour__play {
+      border-color: var(--color-border);
+    }
+
+    .tour__dots {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    /* A dot per scene, with a bigger hit area than it looks */
+    .tour__dot {
+      display: grid;
+      place-items: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: pointer;
+
+      &::before {
+        content: "";
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: var(--radius-full);
+        background: var(--color-border);
+        transition:
+          width var(--duration) var(--ease-out),
+          background-color var(--duration) ease;
+      }
+
+      &:hover::before {
+        background: var(--color-field-border);
+      }
+
+      &[aria-current="true"]::before {
+        width: 1.25rem;
+        background: var(--color-accent);
+      }
+    }
+
+    .tour__cta {
+      @media (width < 40rem) {
+        width: 100%;
+      }
+    }
   }
 
   @scope (.add) {

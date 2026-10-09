@@ -20,6 +20,8 @@ const assets = [
 ];
 
 site.add("js/main.ts");
+// "How it works" animation, a separate bundle main.js imports on demand
+site.add("js/tour.ts");
 site.add("sw.js");
 // Only fetched by social media crawlers, so it's not precached
 site.add("og-image.png");

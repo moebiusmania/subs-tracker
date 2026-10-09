@@ -5,6 +5,7 @@ import { createStore, type Store } from "./lib/store.ts";
 import { hasData, load, save } from "./lib/storage.ts";
 import { createComponents } from "./lib/components.ts";
 import { detectLocale } from "./lib/i18n.ts";
+import { getTranslation } from "./lib/index.ts";
 import { parseRoute, type Route } from "./lib/route.ts";
 import {
   createInstaller,
@@ -12,6 +13,7 @@ import {
   registerServiceWorker,
 } from "./pwa.ts";
 import { peel, supportsPeel } from "./peel.ts";
+import type { Tour } from "./tour.ts";
 
 registerServiceWorker();
 
@@ -213,6 +215,96 @@ Alpine.data("formDialog", () => {
       if (peeling && panel && !(await peel(panel, dialog, "in"))) {
         panel.style.opacity = "";
       }
+    },
+  };
+});
+// "How it works", opened from the empty state. The animation is its own
+// bundle, fetched the first time it's needed (or when the pointer gets near
+// the link), so it doesn't weigh on the page load
+type TourModule = typeof import("./tour.ts");
+let tourModule: Promise<TourModule> | null = null;
+const loadTour = (): Promise<TourModule> => {
+  tourModule ??= import(new URL("./tour.js", import.meta.url).href)
+    .catch((error) => {
+      // Let a later attempt try again
+      tourModule = null;
+      throw error;
+    });
+  return tourModule;
+};
+
+Alpine.data("tour", () => {
+  // Plain variables: Alpine's reactive proxies would wrap the animations
+  let tour: Tour | null = null;
+  let module: TourModule | null = null;
+  return {
+    // The pointer went down on the backdrop, see formDialog
+    pressed: false,
+    loading: false,
+    failed: false,
+    playing: false,
+    ended: false,
+    scene: 0,
+    scenes: [] as number[],
+    // Set once the module has loaded: module itself isn't reactive
+    ready: false,
+    // Reads every dependency first, so Alpine recomputes it when the scene,
+    // the language or the module changes
+    get caption(): string {
+      const { scene, ready } = this;
+      const strings = app().i18n;
+      return ready && module ? module.caption(strings, scene) : "";
+    },
+    sceneLabel(index: number): string {
+      return getTranslation(app().i18n.tour.scene, index + 1);
+    },
+    prefetch(): void {
+      loadTour().catch(() => {});
+    },
+    async open(): Promise<void> {
+      const dialog = this.$refs.dialog as HTMLDialogElement;
+      if (dialog.open) return;
+      this.failed = false;
+      this.loading = true;
+      dialog.showModal();
+      try {
+        module = await loadTour();
+      } catch {
+        this.failed = true;
+        return;
+      } finally {
+        this.loading = false;
+      }
+      if (!dialog.open) return;
+      this.ready = true;
+      this.scenes = Array.from({ length: module.sceneCount }, (_, i) => i);
+      tour = module.createTour(this.$refs.stage as HTMLElement, {
+        strings: () => app().i18n,
+        still: reduceMotion(),
+        onChange: (state) => {
+          this.playing = state.playing;
+          this.ended = state.ended;
+          this.scene = state.scene;
+        },
+      });
+    },
+    close(): void {
+      (this.$refs.dialog as HTMLDialogElement).close();
+    },
+    // On the dialog's close event, however it was closed
+    closed(): void {
+      tour?.destroy();
+      tour = null;
+      this.playing = false;
+      this.ended = false;
+      this.scene = 0;
+    },
+    toggle(): void {
+      if (this.playing) tour?.pause();
+      else tour?.play();
+    },
+    goTo(scene: number): void {
+      tour?.goTo(scene);
     },
   };
 });

@@ -87,6 +87,33 @@ export type I18n = {
     cta: string;
     dismiss: string;
   };
+  // The "how it works" animation (js/tour.ts), opened from the empty state
+  tour: {
+    link: string;
+    title: string;
+    close: string;
+    play: string;
+    pause: string;
+    replay: string;
+    scene: string;
+    loading: string;
+    failed: string;
+    cta: string;
+    music: string;
+    video: string;
+    cloud: string;
+    addButton: string;
+    // One caption per scene, in order
+    scenes: {
+      nibble: string;
+      add: string;
+      totals: string;
+      due: string;
+      inactive: string;
+      local: string;
+      end: string;
+    };
+  };
   update: {
     title: string;
     message: string;

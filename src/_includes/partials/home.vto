@@ -16,6 +16,17 @@
             {{ include "partials/icon.vto" { name: "list" } }} <span x-text="$t.empty.default">{{ i18n.en.empty.default }}</span>
           </button>
         </div>
+        {{# Opens partials/tour.vto; getting near it starts fetching the
+           animation #}}
+        <button
+          type="button"
+          class="tour-link"
+          @click="$dispatch('tour-open')"
+          @pointerenter.once="$dispatch('tour-prefetch')"
+          @focus.once="$dispatch('tour-prefetch')"
+        >
+          {{ include "partials/icon.vto" { name: "play" } }} <span x-text="$t.tour.link">{{ i18n.en.tour.link }}</span>
+        </button>
       </div>
     </section>
   </template>
@@ -129,3 +140,4 @@
 </div>
 
 {{ include "partials/form-dialog.vto" }}
+{{ include "partials/tour.vto" }}

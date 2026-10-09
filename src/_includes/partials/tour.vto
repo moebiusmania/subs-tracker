@@ -1,0 +1,67 @@
+{{# "How it works": a motion graphic in a dialog, opened from the empty
+   state with a tour-open event. js/tour.js draws it into the stage and is
+   only fetched when needed (the tour component in main.ts) #}}
+<div x-data="tour" @tour-open.window="open()" @tour-prefetch.window="prefetch()">
+  <dialog
+    class="tour"
+    x-ref="dialog"
+    aria-labelledby="tour-title"
+    @close="closed()"
+    @pointerdown="pressed = $event.target === $el"
+    @click.self="pressed && close()"
+  >
+    <div class="tour__panel">
+      <header class="tour__header">
+        <h2 id="tour-title" x-text="$t.tour.title">{{ i18n.en.tour.title }}</h2>
+        <button
+          type="button"
+          class="icon-btn"
+          aria-label="{{ i18n.en.tour.close }}"
+          :aria-label="$t.tour.close"
+          :title="$t.tour.close"
+          @click="close()"
+        >
+          {{ include "partials/icon.vto" { name: "x" } }}
+        </button>
+      </header>
+
+      <div class="tour__stage" x-ref="stage"></div>
+      <p class="tour__status" x-show="loading" x-text="$t.tour.loading">{{ i18n.en.tour.loading }}</p>
+      <p class="tour__status" x-show="failed" x-cloak x-text="$t.tour.failed">{{ i18n.en.tour.failed }}</p>
+      <p class="tour__caption" aria-live="polite" x-text="caption"></p>
+
+      <div class="tour__controls" x-show="scenes.length" x-cloak>
+        <button
+          type="button"
+          class="icon-btn tour__play"
+          :aria-label="playing ? $t.tour.pause : ended ? $t.tour.replay : $t.tour.play"
+          :title="playing ? $t.tour.pause : ended ? $t.tour.replay : $t.tour.play"
+          @click="toggle()"
+        >
+          <span x-show="playing">{{ include "partials/icon.vto" { name: "pause" } }}</span>
+          <span x-show="!playing && !ended">{{ include "partials/icon.vto" { name: "play" } }}</span>
+          <span x-show="!playing && ended">{{ include "partials/icon.vto" { name: "rotate-ccw" } }}</span>
+        </button>
+        <div class="tour__dots">
+          <template x-for="index in scenes" :key="index">
+            <button
+              type="button"
+              class="tour__dot"
+              :aria-label="sceneLabel(index)"
+              :title="sceneLabel(index)"
+              :aria-current="(scene === index).toString()"
+              @click="goTo(index)"
+            ></button>
+          </template>
+        </div>
+        <a
+          class="btn btn--primary btn--sm tour__cta"
+          href="{{ '/add/' |> url }}"
+          x-show="ended || scene === scenes.length - 1"
+          @click="close()"
+          x-text="$t.tour.cta"
+        >{{ i18n.en.tour.cta }}</a>
+      </div>
+    </div>
+  </dialog>
+</div>
