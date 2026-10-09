@@ -7,6 +7,7 @@ import { createComponents } from "./lib/components.ts";
 import { detectLocale } from "./lib/i18n.ts";
 import { parseRoute, type Route } from "./lib/route.ts";
 import { createInstaller, registerServiceWorker } from "./pwa.ts";
+import { peel, supportsPeel } from "./peel.ts";
 
 registerServiceWorker();
 
@@ -44,9 +45,15 @@ const openForm = (url: string): void => {
   router.route = currentRoute();
 };
 
+// Set while history.back() is on its way, so a second close (Escape fires
+// both cancel and close) doesn't step back twice
+let leaving = false;
+
 const closeForm = (): void => {
+  if (leaving || router.route.name === "home") return;
   // Opened from a link: step back to the home entry it came from
   if ((history.state as { form?: boolean } | null)?.form) {
+    leaving = true;
     history.back();
   } else {
     history.replaceState(null, "", base);
@@ -55,6 +62,7 @@ const closeForm = (): void => {
 };
 
 addEventListener("popstate", () => {
+  leaving = false;
   router.route = currentRoute();
 });
 
@@ -132,33 +140,77 @@ Alpine.data("addForm", components.addForm);
 // /edit/<index> pages). A missing or bad one closes the dialog right away
 Alpine.data("editForm", components.editForm);
 
-// The dialog follows the route. The form inside is keyed by it, so every
-// opening starts from a fresh copy of the item
-Alpine.data("formDialog", () => ({
-  // The pointer went down on the backdrop: a drag that started inside the
-  // dialog and ended outside doesn't close it
-  pressed: false,
-  get views(): (Route & { key: string })[] {
-    const { route } = router;
-    return route.name === "home"
-      ? []
-      : [{ ...route, key: JSON.stringify(route) }];
-  },
-  close: closeForm,
-  init(): void {
-    const dialog = this.$el as HTMLDialogElement;
-    Alpine.effect(() => {
-      void router.route;
+// The dialog follows the route. Its form is keyed by the route, so every
+// opening starts from a fresh copy of the item; the form stays rendered
+// until the exit animation is over.
+const reduceMotion = () =>
+  matchMedia("(prefers-reduced-motion: reduce)").matches;
+const canPeel = supportsPeel();
+// The CSS fade's length (--duration in styles.css)
+const FADE = 200;
+
+Alpine.data("formDialog", () => {
+  // Openings and closings run one at a time, each for the route current
+  // when it starts. Kept out of the reactive data: the effect below reads it
+  let queue = Promise.resolve();
+  return {
+    // The pointer went down on the backdrop: a drag that started inside the
+    // dialog and ended outside doesn't close it
+    pressed: false,
+    view: null as (Route & { key: string }) | null,
+    get views(): (Route & { key: string })[] {
+      return this.view ? [this.view] : [];
+    },
+    close: closeForm,
+    init(): void {
+      const dialog = this.$el as HTMLDialogElement;
+      // With the WebGL peel the panel doesn't fade with CSS
+      dialog.classList.toggle("sheet--peel", canPeel);
+      Alpine.effect(() => {
+        void router.route;
+        queue = queue.then(() => this.sync(dialog)).catch(console.error);
+      });
+    },
+    panel(dialog: HTMLDialogElement): HTMLElement | null {
+      return dialog.querySelector<HTMLElement>(":scope > .sheet__panel");
+    },
+    async sync(dialog: HTMLDialogElement): Promise<void> {
+      const route = router.route;
+      const peeling = canPeel && !reduceMotion();
+
+      if (route.name === "home") {
+        if (dialog.open) {
+          // The backdrop fades while the panel peels (or fades) away
+          dialog.classList.add("is-closing");
+          const panel = this.panel(dialog);
+          const peeled = peeling && panel && await peel(panel, dialog, "out");
+          if (!peeled && !reduceMotion()) {
+            await new Promise((resolve) => setTimeout(resolve, FADE));
+          }
+          dialog.close();
+          dialog.classList.remove("is-closing");
+        }
+        this.view = null;
+        return;
+      }
+
+      const key = JSON.stringify(route);
+      if (this.view?.key === key && dialog.open) return;
+      this.view = { ...route, key };
       // After x-for has rendered the form, so showModal() focuses its
       // autofocus field
-      this.$nextTick(() => {
-        const open = router.route.name !== "home";
-        if (open && !dialog.open) dialog.showModal();
-        if (!open && dialog.open) dialog.close();
-      });
-    });
-  },
-}));
+      await this.$nextTick();
+      // editForm may have closed it right away (no such item)
+      if (router.route.name === "home" || dialog.open) return;
+      const panel = this.panel(dialog);
+      if (peeling && panel) panel.style.opacity = "0";
+      dialog.showModal();
+      if (peeling && panel && !(await peel(panel, dialog, "in"))) {
+        panel.style.opacity = "";
+      }
+    },
+  };
+});
 Alpine.data("install", components.install);
 
 addEventListener("languagechange", () => {

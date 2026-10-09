@@ -152,6 +152,7 @@ Every push and pull request runs the format, lint, type-check and test steps on 
 - [Inter](https://fonts.bunny.net/family/inter) - font, served by the privacy friendly [Bunny Fonts](https://fonts.bunny.net/)
 - [Fraunces](https://fonts.bunny.net/family/fraunces) - serif for headings and figures, also from Bunny Fonts
 - [Lucide](https://lucide.dev/) - icons
+- [Canvas UI Peel](https://canvasui.dev/docs/components/peel) by David Haz - WebGL peel effect behind the add/edit dialog animation (MIT + Commons Clause)
 - [GitHub Actions](https://github.com/features/actions) & [GitHub Pages](https://pages.github.com/) - CI and hosting
 
 ### Support

@@ -88,7 +88,18 @@ their own browser (`deno task dev:host` serves it to the LAN).
   cancel, Escape, a backdrop click, a submit through `deps.closeForm`) goes
   through `closeForm`: `history.back()` when the dialog was opened from a link,
   else `replaceState` to home. `editForm` edits a copy of the item and saves
-  with `store.updateSubscription`; an index with no item closes right away.
+  with `store.updateSubscription`; an index with no item closes right away. The
+  panel (`.sheet__panel`, the visible card; the dialog only places it) enters
+  and leaves with a WebGL2 peel, like a sticker laid down and peeled off
+  (`src/js/peel.ts`, adapted from Canvas UI's Peel, MIT + Commons Clause: keep
+  its copyright notice, don't publish it as a standalone component). It
+  snapshots a stripped clone of the panel with the experimental html-in-canvas
+  API (`drawElementImage` in a `layoutsubtree` canvas, Chrome behind a flag or
+  origin trial), so `supportsPeel()` is false almost everywhere and the panel
+  fades instead (`.sheet--peel` switches the CSS fade off); reduced motion skips
+  the peel too. The backdrop always just fades (`.is-closing` on exit).
+  `formDialog` keeps its own `view` and runs openings and closings one at a
+  time, so the form stays rendered until the exit animation is over.
 - **Alpine gotcha**: directives only run inside an `x-data` root. That's why
   `partials/home.vto` is wrapped in `<div x-data>`: its top-level
   `<template x-if>` switches between the empty state and dashboard+list at
@@ -149,16 +160,16 @@ their own browser (`deno task dev:host` serves it to the LAN).
   `.theme-toggle__sun`). Icons are Lucide paths in `src/_data/icons.yml`,
   rendered with `partials/icon.vto`. The look is warm and editorial: pill
   buttons, badges and avatars (`--radius-full`), 12px cards, 8px inputs, light
-  shadows only, no decorative motion (the due-card glow is the one exception).
-  Headings, stat values and prices use the Fraunces serif at weight 400 with
-  tight negative tracking (standing in for Monarch's Copernicus); everything
-  else is Inter. Uppercase tracked text is only for eyebrow labels (stat labels,
-  the "this month" badge). The stats are one strip of cells, and the
-  subscriptions are a grid of cards (`.sub-card`). The header, empty state and
-  install banner show `favicon.svg` as the logo. Fraunces (400) and Inter
-  (400/500/600) come from Bunny Fonts. Sections fade in with `@starting-style`;
-  navigations and the theme switch use view transitions; everything respects
-  `prefers-reduced-motion`.
+  shadows only, no decorative motion (the due-card glow and the dialog peel are
+  the exceptions). Headings, stat values and prices use the Fraunces serif at
+  weight 400 with tight negative tracking (standing in for Monarch's
+  Copernicus); everything else is Inter. Uppercase tracked text is only for
+  eyebrow labels (stat labels, the "this month" badge). The stats are one strip
+  of cells, and the subscriptions are a grid of cards (`.sub-card`). The header,
+  empty state and install banner show `favicon.svg` as the logo. Fraunces (400)
+  and Inter (400/500/600) come from Bunny Fonts. Sections fade in with
+  `@starting-style`; navigations and the theme switch use view transitions;
+  everything respects `prefers-reduced-motion`.
 - **PWA**: `src/sw.js` is a plain JS service worker (esbuild bundles it too).
   Same-origin GETs are network-first with `cache: "no-cache"` and a 4s timeout
   that falls back to the cache, so online users always get the latest deploy;

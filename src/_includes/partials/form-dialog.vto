@@ -6,12 +6,13 @@
   class="sheet"
   x-data="formDialog"
   aria-labelledby="sheet-title"
-  @close="if ($store.router.route.name !== 'home') close()"
+  @cancel.prevent="close()"
+  @close="close()"
   @pointerdown="pressed = $event.target === $el"
   @click.self="pressed && close()"
 >
   <template x-for="view in views" :key="view.key">
-    <section class="add">
+    <section class="add sheet__panel">
       <header class="add__header">
         <h1 id="sheet-title" x-text="view.name === 'edit' ? $t.edit.title : $t.add.title">{{ i18n.en.add.title }}</h1>
         {{# A cross in the corner, a back arrow on phones where the dialog
