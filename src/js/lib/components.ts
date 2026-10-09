@@ -59,6 +59,9 @@ export type Deps = {
   closeForm: () => void;
   setThemeAttribute: (theme: Theme) => void;
   transition: (update: () => void) => void;
+  // Removes one card from the list, around `remove`: the web animates the
+  // card out, the TUI just calls it
+  removeItem: (index: number, remove: () => void) => Promise<void>;
   download: (filename: string, content: string) => void;
   pickFile: (accept: string) => Promise<string | null>;
   installer: Installer;
@@ -151,59 +154,70 @@ export const createComponents = (deps: Deps) => {
       },
     }),
 
-    list: () => ({
-      get limitText(): string {
-        return getTranslation(app().i18n.main.limit, MAX_SUBSCRIPTIONS);
-      },
-      status(item: Subscription): string {
-        const { main } = app().i18n;
-        return item.isActive ? main.active : main.inactive;
-      },
-      statusLabel(item: Subscription): string {
-        const toggle = getTranslation(app().i18n.main.toggle, item.name);
-        return `${this.status(item)}, ${toggle}`;
-      },
-      recurrence(item: Subscription): string {
-        return app().i18n.recurrence[item.recurrence];
-      },
-      // Dates come back from localStorage as strings
-      expiration(item: Subscription): string {
-        return new Date(item.expiration).toLocaleDateString(app().locale, {
-          dateStyle: "medium",
-        });
-      },
-      expiresThisMonth(item: Subscription): boolean {
-        return isExpiringThisMonth(item);
-      },
-      toggleActive(index: number): void {
-        app().toggleActive(index);
-        persist();
-      },
-      editLabel(item: Subscription): string {
-        return getTranslation(app().i18n.main.editItem, item.name);
-      },
-      deleteLabel(item: Subscription): string {
-        return getTranslation(app().i18n.main.deleteItem, item.name);
-      },
-      deleteItem(index: number): void {
-        const item = app().data[index];
-        if (!item) return;
-        const message = getTranslation(
-          app().i18n.main.confirmDeleteItem,
-          item.name,
-        );
-        if (deps.confirm(message)) {
-          app().deleteSubscription(index);
+    list: () => {
+      // A card is being animated out
+      let removing = false;
+      return {
+        get limitText(): string {
+          return getTranslation(app().i18n.main.limit, MAX_SUBSCRIPTIONS);
+        },
+        status(item: Subscription): string {
+          const { main } = app().i18n;
+          return item.isActive ? main.active : main.inactive;
+        },
+        statusLabel(item: Subscription): string {
+          const toggle = getTranslation(app().i18n.main.toggle, item.name);
+          return `${this.status(item)}, ${toggle}`;
+        },
+        recurrence(item: Subscription): string {
+          return app().i18n.recurrence[item.recurrence];
+        },
+        // Dates come back from localStorage as strings
+        expiration(item: Subscription): string {
+          return new Date(item.expiration).toLocaleDateString(app().locale, {
+            dateStyle: "medium",
+          });
+        },
+        expiresThisMonth(item: Subscription): boolean {
+          return isExpiringThisMonth(item);
+        },
+        toggleActive(index: number): void {
+          app().toggleActive(index);
           persist();
-        }
-      },
-      deleteAll(): void {
-        if (deps.confirm(app().i18n.main.confirmDelete)) {
-          app().deleteSubs();
-          persist();
-        }
-      },
-    }),
+        },
+        editLabel(item: Subscription): string {
+          return getTranslation(app().i18n.main.editItem, item.name);
+        },
+        deleteLabel(item: Subscription): string {
+          return getTranslation(app().i18n.main.deleteItem, item.name);
+        },
+        async deleteItem(index: number): Promise<void> {
+          const item = app().data[index];
+          // One at a time: the indexes change once the animated card is gone
+          if (!item || removing) return;
+          const message = getTranslation(
+            app().i18n.main.confirmDeleteItem,
+            item.name,
+          );
+          if (!deps.confirm(message)) return;
+          removing = true;
+          try {
+            await deps.removeItem(index, () => {
+              app().deleteSubscription(index);
+              persist();
+            });
+          } finally {
+            removing = false;
+          }
+        },
+        deleteAll(): void {
+          if (deps.confirm(app().i18n.main.confirmDelete)) {
+            app().deleteSubs();
+            persist();
+          }
+        },
+      };
+    },
 
     backup: () => ({
       exportData: downloadBackup,

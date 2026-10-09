@@ -73,9 +73,9 @@ their own browser (`deno task dev:host` serves it to the LAN).
   `addForm`, `editForm`, `install`, `update`) lives in
   `src/js/lib/components.ts` as plain factories. Browser side effects (confirm,
   closing the form, theme attribute, view transition, file download/pick,
-  install prompt, new-version notice, QR code, clipboard) are passed in as
-  `Deps`, so `main.ts` only wires real DOM implementations and the tests pass
-  fakes.
+  install prompt, new-version notice, QR code, clipboard, a deleted card's exit
+  animation) are passed in as `Deps`, so `main.ts` only wires real DOM
+  implementations and the tests pass fakes.
 - **Add and edit dialog**: the forms open in a modal `<dialog class="sheet">`
   over the home page, with a blurred backdrop, full screen below 40rem. They
   keep their URLs: `/add/` and `/edit/?item=<index>` (a static site can't have

@@ -103,6 +103,16 @@ const loadQr = (): Promise<QrModule> => {
   return qrModule;
 };
 
+const reduceMotion = () =>
+  matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// A deleted card's exit and the slide of the ones after it, with the
+// --ease-in and --ease-out curves in styles.css
+const REMOVE_OUT = 200;
+const REMOVE_SHIFT = 340;
+const EASE_IN = "cubic-bezier(0.55, 0, 1, 0.45)";
+const EASE_OUT = "cubic-bezier(0.22, 1, 0.36, 1)";
+
 const components = createComponents({
   app,
   persist: () => save(app().getState),
@@ -119,6 +129,44 @@ const components = createComponents({
     } else {
       update();
     }
+  },
+  // The card shrinks and fades out, then the cards after it slide into the
+  // gap. Cards are keyed by index, so after the removal each of them shows
+  // the item one place further on: it starts from that card's old box (FLIP)
+  removeItem: async (index, remove) => {
+    const cards = () => [
+      ...document.querySelectorAll<HTMLElement>(".subs__grid > .sub-card"),
+    ];
+    const before = cards();
+    const card = before[index];
+    if (!card || reduceMotion()) return remove();
+    const boxes = before.map((item) => item.getBoundingClientRect());
+
+    card.inert = true;
+    const exit = card.animate([
+      { opacity: 1, transform: "none" },
+      { opacity: 0, transform: "scale(0.9)" },
+    ], { duration: REMOVE_OUT, easing: EASE_IN, fill: "forwards" });
+    await exit.finished;
+    remove();
+    await Alpine.nextTick();
+    // The element now shows the next item (or is gone if it was the last)
+    exit.cancel();
+    card.inert = false;
+
+    cards().slice(index).forEach((item, offset) => {
+      const from = boxes[index + offset + 1];
+      if (!from) return;
+      const to = item.getBoundingClientRect();
+      item.animate([
+        {
+          transform: `translate(${from.left - to.left}px, ${
+            from.top - to.top
+          }px)`,
+        },
+        { transform: "none" },
+      ], { duration: REMOVE_SHIFT, easing: EASE_OUT });
+    });
   },
   download: (filename, content) => {
     const blob = new Blob([content], { type: "application/json" });
@@ -175,8 +223,6 @@ Alpine.data("editForm", components.editForm);
 // The dialog follows the route. Its form is keyed by the route, so every
 // opening starts from a fresh copy of the item; the form stays rendered
 // until the exit animation is over.
-const reduceMotion = () =>
-  matchMedia("(prefers-reduced-motion: reduce)").matches;
 const canPeel = supportsPeel();
 // The CSS slide out's length (--duration-slide-out in styles.css)
 const SLIDE_OUT = 160;

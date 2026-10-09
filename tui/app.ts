@@ -152,6 +152,11 @@ export class App {
       // Every render already reads the theme from the store
       setThemeAttribute: () => {},
       transition: (update) => update(),
+      // No exit animation in the terminal
+      removeItem: (_index, remove) => {
+        remove();
+        return Promise.resolve();
+      },
       download: (_filename, content) =>
         deps.writeFile(this.#exportTarget, content),
       pickFile: () => Promise.resolve(this.#importContent),

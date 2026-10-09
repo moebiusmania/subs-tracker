@@ -60,6 +60,7 @@ const setup = (
     closed: 0,
     theme: [] as string[],
     transitions: 0,
+    removed: [] as number[],
     downloads: [] as { filename: string; content: string }[],
     accept: [] as string[],
     reloads: 0,
@@ -80,6 +81,11 @@ const setup = (
     transition: (update) => {
       calls.transitions++;
       update();
+    },
+    removeItem: (index, remove) => {
+      calls.removed.push(index);
+      remove();
+      return Promise.resolve();
     },
     download: (filename, content) =>
       calls.downloads.push({ filename, content }),
@@ -111,6 +117,7 @@ const setup = (
     calls,
     install,
     update,
+    deps,
     components: createComponents(deps),
   };
 };
@@ -245,9 +252,35 @@ Deno.test("list - deleteItem removes one item after confirmation", () => {
   assertEquals(calls.confirm, [
     `Sure you want to delete ${first}? This can't be undone.`,
   ]);
+  assertEquals(calls.removed, [0]);
   assertEquals(store.data.length, 3);
   assertEquals(store.data[0].name, second);
   assertEquals(calls.persist, 1);
+});
+
+Deno.test("list - deleteItem ignores deletes while a card is leaving", async () => {
+  const { store, calls, components, deps } = setup();
+  store.loadMock();
+  const removeItem = deps.removeItem;
+  let finish = () => {};
+  deps.removeItem = (_index, remove) =>
+    new Promise((resolve) => {
+      finish = () => {
+        remove();
+        resolve();
+      };
+    });
+  const list = components.list();
+  const first = list.deleteItem(0);
+  await list.deleteItem(1);
+  assertEquals(store.data.length, 4);
+  finish();
+  await first;
+  assertEquals(store.data.length, 3);
+  assertEquals(calls.confirm.length, 1);
+  deps.removeItem = removeItem;
+  await list.deleteItem(0);
+  assertEquals(store.data.length, 2);
 });
 
 Deno.test("list - deleteItem keeps the item when not confirmed", () => {
@@ -259,6 +292,7 @@ Deno.test("list - deleteItem keeps the item when not confirmed", () => {
     `Vuoi davvero eliminare ${store.data[1].name}? Non si potrà annullare.`,
   ]);
   assertEquals(store.data.length, 4);
+  assertEquals(calls.removed, []);
   assertEquals(calls.persist, 0);
 });
 
