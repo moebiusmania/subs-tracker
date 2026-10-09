@@ -264,6 +264,10 @@
     flex: 1;
     padding-block: var(--space-7) var(--space-8);
     view-transition-name: content;
+
+    @media (width < 40rem) {
+      padding-block: var(--space-5) var(--space-7);
+    }
   }
 
   .stack {
@@ -408,12 +412,30 @@
       view-transition-name: site-header;
     }
 
-    .site-header__inner {
+    .app-bar {
+      min-height: 4rem;
+    }
+  }
+
+  /* While there are no subscriptions the empty state shows the brand and
+     the controls itself (main.ts and the script in base.vto set the
+     attribute) */
+  :root[data-empty] .site-header {
+    display: none;
+  }
+
+  /* Brand and controls (partials/app-bar.vto): the header's content, and
+     the top of the empty state */
+  @scope (.app-bar) {
+    :scope {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: var(--space-4);
-      min-height: 4rem;
+
+      @media (width < 40rem) {
+        gap: var(--space-3);
+      }
     }
 
     .brand {
@@ -438,9 +460,27 @@
         text-overflow: ellipsis;
         white-space: nowrap;
       }
+
+      /* Phones: a smaller name that wraps onto two lines rather than
+         getting cut off next to the buttons */
+      @media (width < 40rem) {
+        gap: var(--space-2);
+        font-size: 1.125rem;
+        line-height: 1.15;
+
+        img {
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+
+        span {
+          white-space: normal;
+          text-wrap: balance;
+        }
+      }
     }
 
-    .site-header__actions {
+    .app-bar__actions {
       display: flex;
       align-items: center;
       gap: var(--space-2);
@@ -459,6 +499,11 @@
 
     .lang-switch__option {
       min-width: 2.25rem;
+
+      @media (width < 40rem) {
+        min-width: 2rem;
+      }
+
       height: 1.875rem;
       padding: 0 var(--space-2);
       border: 0;
@@ -530,19 +575,36 @@
   @scope (.empty) {
     :scope {
       display: grid;
-      justify-items: center;
-      gap: var(--space-3);
       max-width: 40rem;
       margin: var(--space-6) auto 0;
-      padding: var(--space-8) var(--space-5);
       border: 0;
-      text-align: center;
+      overflow: clip;
+
+      @media (width < 40rem) {
+        margin-top: 0;
+      }
     }
 
-    .empty__logo {
-      width: 3rem;
-      height: 3rem;
-      margin-bottom: var(--space-3);
+    /* The header's controls, as the card's top row */
+    .empty__bar {
+      padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+
+      @media (width < 40rem) {
+        padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+      }
+    }
+
+    .empty__body {
+      display: grid;
+      justify-items: center;
+      gap: var(--space-3);
+      padding: var(--space-7) var(--space-5) var(--space-8);
+      text-align: center;
+
+      @media (width < 40rem) {
+        padding: var(--space-6) var(--space-4);
+      }
     }
 
     p {

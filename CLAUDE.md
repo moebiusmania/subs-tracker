@@ -102,6 +102,13 @@ their own browser (`deno task dev:host` serves it to the LAN).
   skips both. The backdrop always just fades (`.is-closing` on exit).
   `formDialog` keeps its own `view` and runs openings and closings one at a
   time, so the form stays rendered until the exit animation is over.
+- **Header and empty state**: the header's content (brand, language switch,
+  theme toggle) is `partials/app-bar.vto`, a `header` component. With no
+  subscriptions the header is hidden (`:root[data-empty]`, set before first
+  paint by the inline script in `base.vto`, then kept in sync by an effect in
+  `main.ts`), and the empty state card shows the same app bar as its top row.
+  The TUI does the same: no header row while empty, `#drawHeader` draws the
+  controls inside the empty panel.
 - **Alpine gotcha**: directives only run inside an `x-data` root. That's why
   `partials/home.vto` is wrapped in `<div x-data>`: its top-level
   `<template x-if>` switches between the empty state and dashboard+list at

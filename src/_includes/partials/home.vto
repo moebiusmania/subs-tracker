@@ -3,17 +3,19 @@
 <div x-data>
   <template x-if="$store.app.data.length === 0">
     <section class="empty panel" x-data="empty">
-      <img class="empty__logo" src="{{ '/favicon.svg' |> url }}" alt="" width="48" height="48">
-      <h1 x-text="$t.empty.title">{{ i18n.en.empty.title }}</h1>
-      <p x-text="$t.empty.message">{{ i18n.en.empty.message }}</p>
-      <div class="empty__actions">
-        <a class="btn btn--primary" href="{{ '/add/' |> url }}">
-          {{ include "partials/icon.vto" { name: "plus" } }} <span x-text="$t.empty.cta">{{ i18n.en.empty.cta }}</span>
-        </a>
-        <span class="empty__or" x-text="$t.empty.or">{{ i18n.en.empty.or }}</span>
-        <button type="button" class="btn" @click="useMock">
-          {{ include "partials/icon.vto" { name: "list" } }} <span x-text="$t.empty.default">{{ i18n.en.empty.default }}</span>
-        </button>
+      {{ include "partials/app-bar.vto" { extra: "empty__bar" } }}
+      <div class="empty__body">
+        <h1 x-text="$t.empty.title">{{ i18n.en.empty.title }}</h1>
+        <p x-text="$t.empty.message">{{ i18n.en.empty.message }}</p>
+        <div class="empty__actions">
+          <a class="btn btn--primary" href="{{ '/add/' |> url }}">
+            {{ include "partials/icon.vto" { name: "plus" } }} <span x-text="$t.empty.cta">{{ i18n.en.empty.cta }}</span>
+          </a>
+          <span class="empty__or" x-text="$t.empty.or">{{ i18n.en.empty.or }}</span>
+          <button type="button" class="btn" @click="useMock">
+            {{ include "partials/icon.vto" { name: "list" } }} <span x-text="$t.empty.default">{{ i18n.en.empty.default }}</span>
+          </button>
+        </div>
       </div>
     </section>
   </template>

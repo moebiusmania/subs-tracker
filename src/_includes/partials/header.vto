@@ -1,37 +1,5 @@
-<header class="site-header" x-data="header">
-  <div class="container site-header__inner">
-    <a class="brand" href="{{ '/' |> url }}">
-      <img src="{{ '/favicon.svg' |> url }}" alt="" width="28" height="28">
-      <span x-text="$t.header.brand">{{ i18n.en.header.brand }}</span>
-    </a>
-    <div class="site-header__actions">
-      {{# Shows the language codes; each language is named in its own
-         language for assistive tech, so that's never translated #}}
-      <div class="lang-switch" role="group" aria-label="{{ i18n.en.header.language }}" :aria-label="$t.header.language">
-        {{ for code, strings of i18n }}
-        <button
-          type="button"
-          class="lang-switch__option"
-          lang="{{ code }}"
-          aria-label="{{ strings.meta.language }}"
-          title="{{ strings.meta.language }}"
-          aria-pressed="{{ code === 'en' ? 'true' : 'false' }}"
-          :aria-pressed="($store.app.locale === '{{ code }}').toString()"
-          @click="setLocale('{{ code }}')"
-        >{{ code }}</button>
-        {{ /for }}
-      </div>
-      <button
-        type="button"
-        class="icon-btn theme-toggle"
-        aria-label="{{ i18n.en.header.darkMode }}"
-        :aria-label="$t.header.darkMode"
-        :aria-pressed="($store.app.theme === 'dark').toString()"
-        @click="toggleTheme"
-      >
-        <span class="theme-toggle__sun">{{ include "partials/icon.vto" { name: "sun" } }}</span>
-        <span class="theme-toggle__moon">{{ include "partials/icon.vto" { name: "moon" } }}</span>
-      </button>
-    </div>
-  </div>
+{{# Hidden while there are no subscriptions: the empty state shows the same
+   controls (see :root[data-empty] in styles.css) #}}
+<header class="site-header">
+  {{ include "partials/app-bar.vto" { extra: "container" } }}
 </header>

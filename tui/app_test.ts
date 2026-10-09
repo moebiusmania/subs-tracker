@@ -94,6 +94,25 @@ Deno.test("app - empty state loads the example data", () => {
   assertStringIncludes(texts(), "Movies streaming");
 });
 
+Deno.test("app - the empty state carries the header's controls", () => {
+  const { store, hit, click } = setup();
+  // No header row: brand and buttons sit in the panel, below the top
+  for (const id of ["brand", "lang.it", "theme"]) {
+    assertEquals(hit(id)?.layer, "page");
+    assert(hit(id)!.screen!.row > 0, `${id} is in the panel`);
+  }
+  click("theme");
+  assertEquals(store.theme, "dark");
+  click("lang.it");
+  assertEquals(store.locale, "it");
+
+  click("empty.mock");
+  for (const id of ["brand", "lang.it", "theme"]) {
+    assertEquals(hit(id)?.layer, "header");
+    assertEquals(hit(id)!.screen!.row, 0);
+  }
+});
+
 Deno.test("app - dashboard shows the web app's numbers", () => {
   const { texts } = setup({ mock: true });
   // 229.87€ in big digits

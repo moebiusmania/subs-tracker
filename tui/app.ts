@@ -703,12 +703,21 @@ export class App {
       return { nodes: root.nodes, hits: root.hits };
     }
 
-    const viewport = { column: 0, row: 1, width: columns, height: rows - 2 };
+    // The empty state carries the header's controls itself, like the web
+    // app: no header row then, the page starts at the top
+    const header = !this.#isEmpty();
+    const top = header ? 1 : 0;
+    const viewport = {
+      column: 0,
+      row: top,
+      width: columns,
+      height: rows - 1 - top,
+    };
     const page = root.sub({
       layer: "page",
       z: Z.page,
       clip: viewport,
-      dy: 1 - this.#scroll,
+      dy: top - this.#scroll,
     });
     this.#pageHeight = this.#screen !== "home"
       ? this.#drawAdd(page)
@@ -723,7 +732,13 @@ export class App {
     }
 
     this.#drawScrollbar(root, viewport);
-    this.#drawHeader(root.sub({ layer: "header", z: Z.chrome, clip: screen }));
+    if (header) {
+      const painter = root.sub({ layer: "header", z: Z.chrome, clip: screen });
+      painter.box("bar", { column: 0, row: 0, width: columns, height: 1 }, {
+        bg: p.surface,
+      });
+      this.#drawHeader(painter, { ...this.#container(), row: 0 });
+    }
     this.#drawStatus(root.sub({ layer: "status", z: Z.chrome, clip: screen }));
     if (this.#toast) {
       this.#drawToast(root.sub({ layer: "toast", z: Z.toast, clip: screen }));
@@ -740,14 +755,21 @@ export class App {
     return { left: Math.floor((this.#size.columns - width) / 2), width };
   }
 
-  #drawHeader(painter: Painter): void {
+  // The home page with no subscriptions yet
+  #isEmpty(): boolean {
+    return this.#screen === "home" && this.#store.data.length === 0;
+  }
+
+  // Brand on the left, language and theme buttons on the right, on one row
+  // on a surface background: the header bar, or the top of the empty state
+  #drawHeader(
+    painter: Painter,
+    { left, width, row }: { left: number; width: number; row: number },
+  ): void {
     const p = this.#p;
     const t = this.#t;
     const ctx = this.#ctx;
-    const { columns } = this.#size;
-    const { left, width } = this.#container();
     const bar = { bg: p.surface };
-    painter.box("bar", { column: 0, row: 0, width: columns, height: 1 }, bar);
 
     // Right side first, so the brand knows how much room it has
     let x = left + width;
@@ -756,7 +778,7 @@ export class App {
     button(painter, ctx, {
       id: "theme",
       column: x,
-      row: 0,
+      row,
       label: themeLabel,
       bg: p.surface,
       onPress: () => this.#toggleTheme(),
@@ -771,7 +793,7 @@ export class App {
       button(painter, ctx, {
         id: `lang.${code}`,
         column: x,
-        row: 0,
+        row,
         label,
         // The picked language looks pressed, like aria-pressed on the web
         variant: selected ? "primary" : "ghost",
@@ -783,7 +805,7 @@ export class App {
     const brandFocus = ctx.focus === "brand" || ctx.hover === "brand";
     const logo = " ◈ ";
     const name = truncate(t.header.brand, x - left - textWidth(logo) - 3);
-    const brandWidth = painter.line("brand", left, 0, [
+    const brandWidth = painter.line("brand", left, row, [
       { text: logo, style: { fg: p.onAccent, bg: p.accent, bold: true } },
       { text: " ", style: bar },
       {
@@ -798,7 +820,7 @@ export class App {
     ]);
     painter.hit({
       id: "brand",
-      rect: { column: left, row: 0, width: brandWidth, height: 1 },
+      rect: { column: left, row, width: brandWidth, height: 1 },
       focusable: true,
       onClick: () => this.#go("home"),
       onKey: (key) => {
@@ -958,13 +980,25 @@ export class App {
     const message = wrap(t.empty.message, inner);
     const row = 1;
 
+    // The header's controls, in a bar across the top of the panel
+    this.#drawHeader(painter, { left: column + 3, width: inner, row: row + 1 });
+    painter.text(
+      "bar.rule",
+      column,
+      row + 2,
+      `├${"─".repeat(panelWidth - 2)}┤`,
+      // Over the frame's sides, so its ends join them
+      { fg: this.#panelBorder(), bg: p.surface },
+      0,
+    );
+
     this.#drawIllustration(
       painter,
       column + Math.floor((panelWidth - 34) / 2),
-      row + 1,
+      row + 3,
     );
 
-    let y = row + 12;
+    let y = row + 14;
     painter.text(
       "title",
       column + 3,

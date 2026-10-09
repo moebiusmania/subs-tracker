@@ -217,6 +217,15 @@ addEventListener("languagechange", () => {
   app().setSystemLocale(detectLocale(navigator.languages));
 });
 
+// The header hides while there are no subscriptions, since the empty state
+// shows the same controls (base.vto sets it before first paint)
+Alpine.effect(() => {
+  document.documentElement.toggleAttribute(
+    "data-empty",
+    app().data.length === 0,
+  );
+});
+
 Alpine.effect(() => {
   document.documentElement.lang = app().locale;
   document.title = app().i18n.meta.title;
