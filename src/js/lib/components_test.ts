@@ -58,7 +58,10 @@ const setup = (
     transitions: 0,
     downloads: [] as { filename: string; content: string }[],
     accept: [] as string[],
+    reloads: 0,
   };
+  // The service worker reporting a newer version
+  const update = { ready: () => {} };
   const deps: Deps = {
     app: () => store,
     persist: () => calls.persist++,
@@ -79,8 +82,20 @@ const setup = (
       return Promise.resolve(options.file ?? null);
     },
     installer: install.installer,
+    updater: {
+      onUpdate: (callback) => {
+        update.ready = callback;
+      },
+      reload: () => calls.reloads++,
+    },
   };
-  return { store, calls, install, components: createComponents(deps) };
+  return {
+    store,
+    calls,
+    install,
+    update,
+    components: createComponents(deps),
+  };
 };
 
 const netflix: Subscription = {
@@ -473,4 +488,35 @@ Deno.test("install - hides once the app gets installed", () => {
   install.fire();
   install.install();
   assertEquals(banner.mode, "");
+});
+
+Deno.test("update - shows once a newer version is ready", () => {
+  const { components, update } = setup();
+  const banner = components.update();
+  banner.init();
+  assertEquals(banner.available, false);
+
+  update.ready();
+  assertEquals(banner.available, true);
+});
+
+Deno.test("update - reload loads the new version", () => {
+  const { components, update, calls } = setup();
+  const banner = components.update();
+  banner.init();
+  update.ready();
+
+  banner.reload();
+  assertEquals(calls.reloads, 1);
+});
+
+Deno.test("update - dismiss only hides the banner", () => {
+  const { components, update, calls } = setup();
+  const banner = components.update();
+  banner.init();
+  update.ready();
+
+  banner.dismiss();
+  assertEquals(banner.available, false);
+  assertEquals(calls.reloads, 0);
 });

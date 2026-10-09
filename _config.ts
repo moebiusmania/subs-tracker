@@ -26,7 +26,8 @@ site.add("og-image.png");
 assets.forEach((file) => site.add(file));
 
 // Fill in the service worker's precache list and a version hashed from every
-// built file, so any change to the site makes browsers install the new worker
+// built file, so any change to the site makes browsers install the new worker.
+// main.js gets the same version, to tell whether it's older than the worker
 site.process([".js"], async (_pages, allPages) => {
   const sw = allPages.find((page) => page.data.url === "/sw.js");
   if (!sw) return;
@@ -46,6 +47,12 @@ site.process([".js"], async (_pages, allPages) => {
   const version = Array.from(new Uint8Array(digest).slice(0, 6))
     .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
+
+  const main = allPages.find((page) => page.data.url === "/js/main.js");
+  if (main) {
+    main.content = (main.content as string)
+      .replaceAll(`"__BUILD_VERSION__"`, JSON.stringify(version));
+  }
 
   sw.content = (sw.content as string)
     .replace(`"__SW_VERSION__"`, JSON.stringify(version))

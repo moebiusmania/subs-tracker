@@ -87,6 +87,12 @@ export type I18n = {
     cta: string;
     dismiss: string;
   };
+  update: {
+    title: string;
+    message: string;
+    reload: string;
+    dismiss: string;
+  };
   footer: {
     license: string;
     project: string;

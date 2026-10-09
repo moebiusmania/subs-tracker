@@ -1,4 +1,4 @@
-import type { Installer } from "./lib/components.ts";
+import type { Installer, Updater } from "./lib/components.ts";
 
 // Chromium only, not in the DOM typings yet
 type BeforeInstallPromptEvent = Event & {
@@ -8,6 +8,14 @@ type BeforeInstallPromptEvent = Event & {
 
 const DISMISSED_KEY = "subs-tracker:install-dismissed";
 
+// This build's version, the same hash the service worker gets: both are
+// filled in at build time (see _config.ts)
+const BUILD_VERSION = "__BUILD_VERSION__";
+
+// How often an open app asks for a new service worker, besides every time
+// it comes back to the foreground
+const UPDATE_INTERVAL = 60 * 60 * 1000;
+
 // The worker sits at the site root (next to index.html) so it controls every
 // page; resolving it from this bundle keeps the GitHub Pages path prefix
 export const registerServiceWorker = (): void => {
@@ -15,6 +23,18 @@ export const registerServiceWorker = (): void => {
   addEventListener("load", () => {
     navigator.serviceWorker
       .register(new URL("../sw.js", import.meta.url))
+      .then((registration) => {
+        // Browsers only look for a new sw.js when a page loads, and an open
+        // app doesn't load pages: ask again when it's in front of the user
+        const check = () => {
+          if (document.visibilityState !== "visible") return;
+          registration.update().catch(() => {
+            // Offline: try again next time
+          });
+        };
+        document.addEventListener("visibilitychange", check);
+        setInterval(check, UPDATE_INTERVAL);
+      })
       .catch((error) => console.error("Service worker not registered", error));
   });
 };
@@ -73,5 +93,28 @@ export const createInstaller = (): Installer => {
       await event.prompt();
       return (await event.userChoice).outcome === "accepted";
     },
+  };
+};
+
+// A new service worker announces its version when it takes over. A page
+// loaded before that deploy runs older code: offer to reload. A page that
+// already got the new files (requests go to the network first) matches it
+export const createUpdater = (): Updater => {
+  let ready = false;
+  let readyCallback = (): void => {};
+
+  navigator.serviceWorker?.addEventListener("message", (event) => {
+    const data = event.data as { type?: string; version?: string } | null;
+    if (data?.type !== "activated" || data.version === BUILD_VERSION) return;
+    ready = true;
+    readyCallback();
+  });
+
+  return {
+    onUpdate: (callback) => {
+      readyCallback = callback;
+      if (ready) callback();
+    },
+    reload: () => location.reload(),
   };
 };

@@ -1,0 +1,19 @@
+{{# Shown when a newer deploy has taken over while the app was open
+   (createUpdater in js/pwa.ts) #}}
+<aside
+  class="banner update"
+  x-data="update"
+  x-show="available"
+  x-cloak
+  aria-labelledby="update-title"
+>
+  <img class="banner__logo" src="{{ '/favicon.svg' |> url }}" alt="" width="40" height="40">
+  <div class="banner__body">
+    <h2 id="update-title" class="banner__title" x-text="$t.update.title">{{ i18n.en.update.title }}</h2>
+    <p class="banner__text" x-text="$t.update.message">{{ i18n.en.update.message }}</p>
+  </div>
+  <div class="banner__actions">
+    <button type="button" class="btn btn--primary" @click="reload" x-text="$t.update.reload">{{ i18n.en.update.reload }}</button>
+    <button type="button" class="btn btn--ghost" @click="dismiss" x-text="$t.update.dismiss">{{ i18n.en.update.dismiss }}</button>
+  </div>
+</aside>

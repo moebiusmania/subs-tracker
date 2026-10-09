@@ -1343,26 +1343,35 @@
     }
   }
 
-  /* Install banner --------------------------------------------------- */
-  /* Floating card, bottom-right on wide screens and full width on phones. */
+  /* Banners: install and new version ------------------------------- */
+  /* Floating cards stacked bottom-right on wide screens, full width on   */
+  /* phones.                                                              */
 
-  @scope (.install) {
+  .banners {
+    position: fixed;
+    inset-inline: var(--gutter);
+    bottom: calc(var(--gutter) + env(safe-area-inset-bottom, 0px));
+    z-index: 20;
+    display: grid;
+    justify-items: end;
+    gap: var(--space-3);
+    view-transition-name: banners;
+    /* Only the cards take clicks, not the gaps around them */
+    pointer-events: none;
+  }
+
+  @scope (.banner) {
     :scope {
-      position: fixed;
-      inset-inline: var(--gutter);
-      bottom: calc(var(--gutter) + env(safe-area-inset-bottom, 0px));
-      z-index: 20;
       display: grid;
       grid-template-columns: auto 1fr;
       gap: var(--space-3) var(--space-3);
-      max-width: 26rem;
-      margin-inline-start: auto;
+      width: min(100%, 26rem);
       padding: var(--space-5);
+      pointer-events: auto;
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
       background: var(--color-surface);
       box-shadow: var(--shadow-md);
-      view-transition-name: install;
       transition:
         opacity var(--duration) ease,
         translate var(--duration) var(--ease-out);
@@ -1373,30 +1382,30 @@
       }
     }
 
-    .install__logo {
+    .banner__logo {
       width: 2.5rem;
       height: 2.5rem;
     }
 
-    .install__body {
+    .banner__body {
       display: grid;
       gap: var(--space-1);
     }
 
-    .install__title {
+    .banner__title {
       font-family: var(--font-serif);
       font-size: 1.375rem;
       font-weight: 400;
       letter-spacing: -0.03em;
     }
 
-    .install__text {
+    .banner__text {
       color: var(--color-text-muted);
       font-size: 0.875rem;
     }
 
     /* Mirrors the iOS Share button so it is easy to spot */
-    .install__share {
+    .banner__share {
       display: inline-grid;
       place-items: center;
       width: 1.5rem;
@@ -1413,7 +1422,7 @@
       }
     }
 
-    .install__actions {
+    .banner__actions {
       grid-column: 1 / -1;
       display: flex;
       flex-wrap: wrap;

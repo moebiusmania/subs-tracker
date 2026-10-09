@@ -70,10 +70,11 @@ their own browser (`deno task dev:host` serves it to the LAN).
   `data-theme` on `<html>`, registers `Alpine.store("app", …)` and the
   `Alpine.data` components, then calls `Alpine.start()`. The component logic
   (`header`, `empty`, `dashboard`, `list`, `backup`, `addForm`, `editForm`,
-  `install`) lives in `src/js/lib/components.ts` as plain factories. Browser
-  side effects (confirm, closing the form, theme attribute, view transition,
-  file download/pick) are passed in as `Deps`, so `main.ts` only wires real DOM
-  implementations and the tests pass fakes.
+  `install`, `update`) lives in `src/js/lib/components.ts` as plain factories.
+  Browser side effects (confirm, closing the form, theme attribute, view
+  transition, file download/pick, install prompt, new-version notice) are passed
+  in as `Deps`, so `main.ts` only wires real DOM implementations and the tests
+  pass fakes.
 - **Add and edit dialog**: the forms open in a modal `<dialog class="sheet">`
   over the home page, with a blurred backdrop, full screen below 40rem. They
   keep their URLs: `/add/` and `/edit/?item=<index>` (a static site can't have
@@ -190,14 +191,25 @@ their own browser (`deno task dev:host` serves it to the LAN).
   the path prefix) and implements the `Installer` dep behind the `install`
   banner component (`partials/install.vto`): Chromium's `beforeinstallprompt`,
   manual Share-menu steps on iOS, and a "not now" flag under the separate
-  `localStorage` key `subs-tracker:install-dismissed`. The PNG icons are
-  rendered from `src/icons/icon.svg` and `icon-maskable.svg` (not published),
-  `favicon.ico` (16/32/48 PNG entries) from `src/favicon.svg`, so re-render them
-  if the logo or the palette changes (`apple-touch-icon.png` comes from the
-  maskable one). The artwork is a statement card listing three subscriptions
-  with a renewal badge on a flat ember background (no gradient), in the light
-  tokens; the favicon redraws it on a 32px grid so it stays readable at 16px.
-  The README shows `src/icons/icon.svg`.
+  `localStorage` key `subs-tracker:install-dismissed`. Updates: the same
+  `site.process()` writes the version into `main.js` too (`"__BUILD_VERSION__"`
+  in `pwa.ts`). The page calls `registration.update()` whenever it becomes
+  visible and every hour, since browsers only check `sw.js` on page loads and
+  the app rarely loads pages. A new worker posts
+  `{ type: "activated",
+  version }` to open pages once it takes over;
+  `createUpdater` (the `Updater` dep, a no-op in the TUI) compares it with the
+  page's own version and, when they differ, the `update` banner
+  (`partials/update.vto`) offers a reload. It never reloads by itself, so a form
+  being filled in isn't lost. Both banners are `.banner` cards stacked in one
+  fixed `.banners` container in `base.vto`. The PNG icons are rendered from
+  `src/icons/icon.svg` and `icon-maskable.svg` (not published), `favicon.ico`
+  (16/32/48 PNG entries) from `src/favicon.svg`, so re-render them if the logo
+  or the palette changes (`apple-touch-icon.png` comes from the maskable one).
+  The artwork is a statement card listing three subscriptions with a renewal
+  badge on a flat ember background (no gradient), in the light tokens; the
+  favicon redraws it on a 32px grid so it stays readable at 16px. The README
+  shows `src/icons/icon.svg`.
 - **Social previews**: `base.vto` has Open Graph/Twitter tags and a canonical
   link, with absolute URLs from the `url(true)` filter. They're read by crawlers
   that don't run JS, so they stay in English. `og:title`/`twitter:title` use

@@ -143,6 +143,8 @@ export class App {
       download: (_filename, content) =>
         deps.writeFile(this.#exportTarget, content),
       pickFile: () => Promise.resolve(this.#importContent),
+      // Updates come with a new binary, not while running
+      updater: { onUpdate: () => {}, reload: () => {} },
       // There's nothing to install in a terminal
       installer: {
         installed: () => true,

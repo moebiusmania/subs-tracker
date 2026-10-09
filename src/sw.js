@@ -5,7 +5,9 @@
 //
 // Both placeholders below are filled in at build time (see _config.ts): the
 // version changes whenever any built file does, which makes the browser
-// install the new worker and precache the new shell in the background.
+// install the new worker and precache the new shell in the background. Once
+// it takes over it tells open pages its version, so one still running an
+// older build can offer to reload (js/pwa.ts, createUpdater).
 
 const VERSION = "__SW_VERSION__";
 const PRECACHE = "__SW_PRECACHE__";
@@ -41,7 +43,13 @@ self.addEventListener("activate", (event) => {
             .map((key) => caches.delete(key)),
         )
       )
-      .then(() => self.clients.claim()),
+      .then(() => self.clients.claim())
+      .then(() => self.clients.matchAll({ type: "window" }))
+      .then((clients) =>
+        clients.forEach((client) =>
+          client.postMessage({ type: "activated", version: VERSION })
+        )
+      ),
   );
 });
 

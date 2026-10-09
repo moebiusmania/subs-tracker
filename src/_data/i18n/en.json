@@ -76,6 +76,12 @@
     "cta": "Install",
     "dismiss": "Not now"
   },
+  "update": {
+    "title": "A new version is ready",
+    "message": "Reload to start using it. Your subscriptions stay where they are.",
+    "reload": "Reload",
+    "dismiss": "Later"
+  },
   "footer": {
     "license": "MIT license",
     "project": "an Open Source project",

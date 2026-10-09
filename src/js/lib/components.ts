@@ -30,6 +30,15 @@ export type Installer = {
   prompt: () => Promise<boolean>;
 };
 
+// A newer deploy taking over while the app is open (the service worker
+// tells the page); the TUI has nothing to update
+export type Updater = {
+  // Called once a newer version is ready
+  onUpdate: (callback: () => void) => void;
+  // Loads the new version
+  reload: () => void;
+};
+
 // Browser side effects are injected so the components stay plain objects
 // that can be unit tested; main.ts provides the real implementations.
 export type Deps = {
@@ -44,6 +53,7 @@ export type Deps = {
   download: (filename: string, content: string) => void;
   pickFile: (accept: string) => Promise<string | null>;
   installer: Installer;
+  updater: Updater;
 };
 
 // What the add form starts with
@@ -191,6 +201,23 @@ export const createComponents = (deps: Deps) => {
       dismiss(): void {
         this.mode = "";
         deps.installer.dismiss();
+      },
+    }),
+
+    // "New version" banner. It only offers the reload: reloading by itself
+    // could throw away a form being filled in
+    update: () => ({
+      available: false,
+      init(): void {
+        deps.updater.onUpdate(() => {
+          this.available = true;
+        });
+      },
+      reload(): void {
+        deps.updater.reload();
+      },
+      dismiss(): void {
+        this.available = false;
       },
     }),
 

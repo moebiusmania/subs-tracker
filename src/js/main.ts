@@ -6,7 +6,11 @@ import { hasData, load, save } from "./lib/storage.ts";
 import { createComponents } from "./lib/components.ts";
 import { detectLocale } from "./lib/i18n.ts";
 import { parseRoute, type Route } from "./lib/route.ts";
-import { createInstaller, registerServiceWorker } from "./pwa.ts";
+import {
+  createInstaller,
+  createUpdater,
+  registerServiceWorker,
+} from "./pwa.ts";
 import { peel, supportsPeel } from "./peel.ts";
 
 registerServiceWorker();
@@ -128,6 +132,7 @@ const components = createComponents({
       input.click();
     }),
   installer: createInstaller(),
+  updater: createUpdater(),
 });
 
 Alpine.data("header", components.header);
@@ -212,6 +217,7 @@ Alpine.data("formDialog", () => {
   };
 });
 Alpine.data("install", components.install);
+Alpine.data("update", components.update);
 
 addEventListener("languagechange", () => {
   app().setSystemLocale(detectLocale(navigator.languages));

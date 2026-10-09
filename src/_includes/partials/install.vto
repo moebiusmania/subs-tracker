@@ -1,21 +1,21 @@
 <aside
-  class="install"
+  class="banner install"
   x-data="install"
   x-show="mode"
   x-cloak
   aria-labelledby="install-title"
 >
-  <img class="install__logo" src="{{ '/favicon.svg' |> url }}" alt="" width="40" height="40">
-  <div class="install__body">
-    <h2 id="install-title" class="install__title" x-text="$t.install.title">{{ i18n.en.install.title }}</h2>
-    <p class="install__text" x-show="mode === 'prompt'" x-text="$t.install.message">{{ i18n.en.install.message }}</p>
-    <p class="install__text" x-show="mode === 'manual'">
+  <img class="banner__logo" src="{{ '/favicon.svg' |> url }}" alt="" width="40" height="40">
+  <div class="banner__body">
+    <h2 id="install-title" class="banner__title" x-text="$t.install.title">{{ i18n.en.install.title }}</h2>
+    <p class="banner__text" x-show="mode === 'prompt'" x-text="$t.install.message">{{ i18n.en.install.message }}</p>
+    <p class="banner__text" x-show="mode === 'manual'">
       <span x-text="$t.install.manualTap">{{ i18n.en.install.manualTap }}</span>
-      <span class="install__share">{{ include "partials/icon.vto" { name: "share" } }}<span class="visually-hidden" x-text="$t.install.share">{{ i18n.en.install.share }}</span></span>
+      <span class="banner__share">{{ include "partials/icon.vto" { name: "share" } }}<span class="visually-hidden" x-text="$t.install.share">{{ i18n.en.install.share }}</span></span>
       <span x-text="$t.install.manualAdd">{{ i18n.en.install.manualAdd }}</span>
     </p>
   </div>
-  <div class="install__actions">
+  <div class="banner__actions">
     <button type="button" class="btn btn--primary" x-show="mode === 'prompt'" @click="install">
       {{ include "partials/icon.vto" { name: "download" } }} <span x-text="$t.install.cta">{{ i18n.en.install.cta }}</span>
     </button>

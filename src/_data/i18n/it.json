@@ -76,6 +76,12 @@
     "cta": "Installa",
     "dismiss": "Non ora"
   },
+  "update": {
+    "title": "È pronta una nuova versione",
+    "message": "Ricarica per usarla. I tuoi abbonamenti restano dove sono.",
+    "reload": "Ricarica",
+    "dismiss": "Più tardi"
+  },
   "footer": {
     "license": "Licenza MIT",
     "project": "un progetto Open Source",
