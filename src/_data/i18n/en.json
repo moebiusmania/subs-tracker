@@ -167,7 +167,7 @@
     "readError": "Can't read {{value}}",
     "writeError": "Can't write {{value}}",
     "required": "Please fill in this field",
-    "invalidPrice": "Enter a price of at least 0.1",
+    "invalidPrice": "Enter a price of 0 or more, with up to two decimals",
     "invalidDate": "Enter a valid date as YYYY-MM-DD",
     "storage": "Saved in {{value}}",
     "linkTitle": "Link",

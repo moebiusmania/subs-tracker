@@ -41,11 +41,25 @@ const isExpiringThisMonth = (
     date.getMonth() === now.getMonth();
 };
 
+// The same day `months` later, on the last day of shorter months
+// (Jan 31 + 1 month = Feb 28)
+const addMonths = (value: Date, months: number): Date => {
+  const date = new Date(value);
+  const day = date.getDate();
+  date.setDate(1);
+  date.setMonth(date.getMonth() + months);
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+    .getDate();
+  date.setDate(Math.min(day, lastDay));
+  return date;
+};
+
 // deno-lint-ignore no-explicit-any
 const getTranslation = (key: string, value: any): string =>
   key.replace("{{value}}", value);
 
 export {
+  addMonths,
   formatDate,
   getInactives,
   getMonthlyCost,

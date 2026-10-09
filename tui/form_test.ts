@@ -86,7 +86,10 @@ Deno.test("validate - required fields, price and date", () => {
     price: "required",
     expiration: "required",
   });
-  assertEquals(validate(values({ price: "0.05" })), { price: "invalidPrice" });
+  assertEquals(validate(values({ price: "0.00" })), {});
+  assertEquals(validate(values({ price: "0,05" })), {});
+  assertEquals(validate(values({ price: "0.001" })), { price: "invalidPrice" });
+  assertEquals(validate(values({ price: "-1" })), { price: "invalidPrice" });
   assertEquals(validate(values({ price: "abc" })), { price: "invalidPrice" });
   assertEquals(validate(values({ expiration: "2027-13-01" })), {
     expiration: "invalidDate",
@@ -117,7 +120,8 @@ Deno.test("initialValues - starts from the web form defaults", () => {
 Deno.test("stepPrice - steps by 0.1, never under the minimum", () => {
   assertEquals(stepPrice("9.99", 1), "10.09");
   assertEquals(stepPrice("1", -1), "0.9");
-  assertEquals(stepPrice("0.1", -1), "0.1");
+  assertEquals(stepPrice("0.1", -1), "0");
+  assertEquals(stepPrice("0.05", -1), "0");
   assertEquals(stepPrice("", 1), "0.1");
 });
 

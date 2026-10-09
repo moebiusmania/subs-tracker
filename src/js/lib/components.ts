@@ -1,6 +1,7 @@
 import type { Locale, Subscription } from "./types.ts";
 import { MAX_SUBSCRIPTIONS, type Store } from "./store.ts";
 import {
+  addMonths,
   formatDate,
   getInactives,
   getMonthlyCost,
@@ -76,13 +77,13 @@ export type Deps = {
 // the app
 export type TransferMode = "" | "export" | "import" | "link";
 
-// What the add form starts with
-const newItem = (): Subscription => ({
+// What the add form starts with: renewing a month from today
+const newItem = (now = new Date()): Subscription => ({
   name: "",
   price: 1,
   currency: "€",
   isActive: true,
-  expiration: new Date(),
+  expiration: addMonths(now, 1),
   recurrence: "monthly",
 });
 

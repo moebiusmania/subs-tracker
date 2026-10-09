@@ -4,6 +4,7 @@ import { mockSubs } from "./mocks.ts";
 
 const subs = mockSubs();
 import {
+  addMonths,
   formatDate,
   getInactives,
   getMonthlyCost,
@@ -75,4 +76,11 @@ Deno.test("isExpiringThisMonth - same month and year only", () => {
   assertEquals(at(new Date(2025, 8, 25)), false);
   // Dates read back from localStorage are strings
   assertEquals(at(JSON.parse(JSON.stringify(new Date(2026, 8, 10, 12)))), true);
+});
+
+Deno.test("addMonths - same day, last day of shorter months", () => {
+  assertEquals(formatDate(addMonths(new Date(2026, 9, 10), 1)), "2026-11-10");
+  assertEquals(formatDate(addMonths(new Date(2026, 0, 31), 1)), "2026-02-28");
+  assertEquals(formatDate(addMonths(new Date(2026, 11, 15), 1)), "2027-01-15");
+  assertEquals(formatDate(addMonths(new Date(2026, 2, 31), -1)), "2026-02-28");
 });

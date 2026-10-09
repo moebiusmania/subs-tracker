@@ -1,7 +1,7 @@
 // Text editing and the add form's rules, kept free of any terminal code so
 // they can be unit tested.
 import type { I18n, Subscription } from "../src/js/lib/types.ts";
-import { formatDate } from "../src/js/lib/index.ts";
+import { addMonths, formatDate } from "../src/js/lib/index.ts";
 
 // A one-line text input: its value and the cursor position (in UTF-16 units,
 // always on a grapheme boundary)
@@ -104,15 +104,16 @@ export const parseDate = (value: string): Date | null => {
     : null;
 };
 
-// Accepts a comma as decimal separator too, as typed with an Italian keyboard
+// Accepts a comma as decimal separator too, as typed with an Italian keyboard.
+// Cents at most, like the web input's step="0.01"
 export const parsePrice = (value: string): number | null => {
   const clean = value.trim().replace(",", ".");
-  if (!/^\d+(\.\d+)?$|^\.\d+$/.test(clean)) return null;
+  if (!/^\d+(\.\d{1,2})?$|^\.\d{1,2}$/.test(clean)) return null;
   return parseFloat(clean);
 };
 
-// The web form's price input has min="0.1"
-export const MIN_PRICE = 0.1;
+// The web form's price input has min="0": free subscriptions are allowed
+export const MIN_PRICE = 0;
 
 export const validate = (values: FormValues): Errors => {
   const errors: Errors = {};
@@ -141,7 +142,8 @@ export const toSubscription = (
   recurrence: values.recurrence,
 });
 
-// Up/down on the price, by the web input's step="0.1"
+// Up/down on the price by 0.1 (the web input steps by its step="0.01",
+// too slow from the keyboard)
 export const stepPrice = (value: string, direction: 1 | -1): string => {
   const price = parsePrice(value) ?? 0;
   const next = Math.max(MIN_PRICE, price + direction * 0.1);
@@ -158,12 +160,7 @@ export const stepDate = (
 ): string => {
   const date = parseDate(value);
   if (!date) return formatDate(today);
-  const day = date.getDate();
-  date.setDate(1);
-  date.setMonth(date.getMonth() + months);
-  // Stay on the last day for shorter months (Jan 31 + 1 month = Feb 28)
-  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
-    .getDate();
-  date.setDate(Math.min(day, lastDay) + days);
-  return formatDate(date);
+  const moved = addMonths(date, months);
+  moved.setDate(moved.getDate() + days);
+  return formatDate(moved);
 };

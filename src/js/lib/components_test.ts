@@ -4,6 +4,7 @@ import type { Subscription } from "./types.ts";
 import { createStore, MAX_SUBSCRIPTIONS, type Store } from "./store.ts";
 import { encodeShare, shareLink } from "./transfer.ts";
 import { createComponents, type Deps, type Installer } from "./components.ts";
+import { addMonths, formatDate } from "./index.ts";
 
 type InstallerOptions = {
   installed?: boolean;
@@ -495,7 +496,10 @@ Deno.test("addForm - starts with the default subscription", () => {
   assertEquals(form.item.currency, "€");
   assertEquals(form.item.isActive, true);
   assertEquals(form.item.recurrence, "monthly");
-  assertMatch(form.formatDate(form.item.expiration), /^\d{4}-\d{2}-\d{2}$/);
+  assertEquals(
+    form.formatDate(form.item.expiration),
+    formatDate(addMonths(new Date(), 1)),
+  );
 });
 
 Deno.test("addForm - submit adds the item, persists and closes", () => {
