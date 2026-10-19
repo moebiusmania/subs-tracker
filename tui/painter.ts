@@ -2,7 +2,7 @@
 // scroll or focus (hit regions). A Painter draws in its own coordinates,
 // shifted by an offset and cut to a clip rectangle, so the scrolling page and
 // the fixed header, status bar and dialogs are all drawn the same way.
-import type { KeyPressEvent } from "deno_tui/src/input_reader/types.ts";
+import type { KeyPressEvent } from "./input.ts";
 import type { Node, Rect } from "./scene.ts";
 import type { StyleOptions } from "./palette.ts";
 import { textWidth } from "./text.ts";
@@ -49,12 +49,15 @@ const intersect = (a: Rect, b: Rect): Rect | null => {
 };
 
 export const contains = (rect: Rect, x: number, y: number): boolean =>
-  x >= rect.column && x < rect.column + rect.width && y >= rect.row &&
+  x >= rect.column &&
+  x < rect.column + rect.width &&
+  y >= rect.row &&
   y < rect.row + rect.height;
 
 // Whether inner lies entirely within outer
 export const encloses = (outer: Rect, inner: Rect): boolean =>
-  inner.column >= outer.column && inner.row >= outer.row &&
+  inner.column >= outer.column &&
+  inner.row >= outer.row &&
   inner.column + inner.width <= outer.column + outer.width &&
   inner.row + inner.height <= outer.row + outer.height;
 
@@ -165,7 +168,9 @@ export class Painter {
     const placed = this.#place({ column, row, width, height: 1 });
     const { clip } = this;
     if (
-      !text || placed.row < clip.row || placed.row >= clip.row + clip.height
+      !text ||
+      placed.row < clip.row ||
+      placed.row >= clip.row + clip.height
     ) {
       return width;
     }

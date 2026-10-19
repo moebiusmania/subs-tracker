@@ -214,19 +214,24 @@ export const input = (
   const border = options.disabled
     ? p.border
     : focused
-    ? p.accentStrong
-    : options.error
-    ? p.danger
-    : hover
-    ? p.text
-    : p.fieldBorder;
+      ? p.accentStrong
+      : options.error
+        ? p.danger
+        : hover
+          ? p.text
+          : p.fieldBorder;
   const fill = options.disabled ? p.surface2 : p.surface;
-  frame(painter, `${id}.frame`, { column, row: row + 1, width, height: 3 }, {
-    border,
-    fill,
-    outside: options.bg,
-    bold: focused,
-  });
+  frame(
+    painter,
+    `${id}.frame`,
+    { column, row: row + 1, width, height: 3 },
+    {
+      border,
+      fill,
+      outside: options.bg,
+      bold: focused,
+    },
+  );
 
   // Controls sit at the right end of the box
   const controls = options.controls ?? [];
@@ -234,8 +239,8 @@ export const input = (
   controls.forEach((control, index) => {
     controlsWidth += textWidth(control.label) + (index ? 1 : 0);
   });
-  const textWidthAvailable = width - 4 -
-    (controlsWidth ? controlsWidth + 1 : 0);
+  const textWidthAvailable =
+    width - 4 - (controlsWidth ? controlsWidth + 1 : 0);
   const textColumn = column + 2;
   const textRow = row + 2;
   const textStyle = {
@@ -283,7 +288,7 @@ export const input = (
     // On an empty field it sits on the placeholder's first letter
     const rest = field.value
       ? field.value.slice(field.cursor)
-      : options.placeholder ?? "";
+      : (options.placeholder ?? "");
     const under = [...new Intl.Segmenter().segment(rest)][0]?.segment ?? " ";
     painter.text(
       `${id}.cursor`,
@@ -312,11 +317,18 @@ export const input = (
   controls.forEach((control, index) => {
     const controlId = `${id}.control${index}`;
     const w = textWidth(control.label);
-    painter.text(controlId, controlColumn, textRow, control.label, {
-      fg: ctx.hover === controlId ? p.accentStrong : p.muted,
-      bg: ctx.hover === controlId ? p.accentSoft : fill,
-      bold: true,
-    }, 2);
+    painter.text(
+      controlId,
+      controlColumn,
+      textRow,
+      control.label,
+      {
+        fg: ctx.hover === controlId ? p.accentStrong : p.muted,
+        bg: ctx.hover === controlId ? p.accentSoft : fill,
+        bold: true,
+      },
+      2,
+    );
     painter.hit({
       id: controlId,
       rect: { column: controlColumn, row: textRow, width: w, height: 1 },
@@ -428,36 +440,47 @@ export const segmented = <T extends string>(
     bg: options.bg,
     bold: true,
   });
-  frame(painter, `${id}.frame`, { column, row: row + 1, width, height: 3 }, {
-    border: focused
-      ? p.accentStrong
-      : ctx.hover?.startsWith(id)
-      ? p.text
-      : p.fieldBorder,
-    fill: p.surface,
-    outside: options.bg,
-    bold: focused,
-  });
+  frame(
+    painter,
+    `${id}.frame`,
+    { column, row: row + 1, width, height: 3 },
+    {
+      border: focused
+        ? p.accentStrong
+        : ctx.hover?.startsWith(id)
+          ? p.text
+          : p.fieldBorder,
+      fill: p.surface,
+      outside: options.bg,
+      bold: focused,
+    },
+  );
 
   const cell = Math.floor((width - 2) / choices.length);
   choices.forEach((choice, index) => {
     const choiceId = `${id}.${choice.value}`;
     const selected = choice.value === value;
     const cellColumn = column + 1 + index * cell;
-    const cellWidth = index === choices.length - 1
-      ? width - 2 - cell * index
-      : cell;
+    const cellWidth =
+      index === choices.length - 1 ? width - 2 - cell * index : cell;
     const text = center(
       truncate(`${selected ? "●" : "○"} ${choice.label}`, cellWidth - 2),
       cellWidth - 2,
     );
     const hover = ctx.hover === choiceId;
     const bg = selected ? p.accentSoft : hover ? p.surface2 : p.surface;
-    painter.text(choiceId, cellColumn + 1, row + 2, text, {
-      fg: selected ? p.accentStrong : p.text,
-      bg,
-      bold: selected,
-    }, 2);
+    painter.text(
+      choiceId,
+      cellColumn + 1,
+      row + 2,
+      text,
+      {
+        fg: selected ? p.accentStrong : p.text,
+        bg,
+        bold: selected,
+      },
+      2,
+    );
     painter.box(
       `${choiceId}.pad`,
       {
@@ -514,7 +537,7 @@ const GLYPHS: Record<string, [string, string, string]> = {
   ",": [" ", " ", "▪"],
   "-": ["   ", "╺━╸", "   "],
   "€": ["┏━╸", "╋━╸", "┗━╸"],
-  "$": ["┏╋┓", "┗╋┓", "┗╋┛"],
+  $: ["┏╋┓", "┗╋┓", "┗╋┛"],
   " ": [" ", " ", " "],
 };
 

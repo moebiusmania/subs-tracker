@@ -5,7 +5,7 @@ export type Theme = "light" | "dark";
 
 // Avatar tints cycle in this order, like .sub-card:nth-of-type()
 const TINTS = ["lav", "mint", "peach", "sky", "butter", "pink"] as const;
-type Tint = typeof TINTS[number];
+type Tint = (typeof TINTS)[number];
 
 export type Palette = {
   bg: string;
@@ -160,8 +160,8 @@ export const to256 = (hex: string): number => {
   const [r, g, b] = rgb(hex);
   const [cr, cg, cb] = [nearestLevel(r), nearestLevel(g), nearestLevel(b)];
   const cube = 16 + 36 * cr + 6 * cg + cb;
-  const cubeDistance = (LEVELS[cr] - r) ** 2 + (LEVELS[cg] - g) ** 2 +
-    (LEVELS[cb] - b) ** 2;
+  const cubeDistance =
+    (LEVELS[cr] - r) ** 2 + (LEVELS[cg] - g) ** 2 + (LEVELS[cb] - b) ** 2;
 
   const grey = Math.max(
     0,
@@ -178,16 +178,17 @@ export const supportsTrueColor = (env: (name: string) => string | undefined) =>
   // Terminals that support it without saying so
   ["iTerm.app", "WezTerm", "vscode", "ghostty"].includes(
     env("TERM_PROGRAM") ?? "",
-  ) || /kitty|ghostty|alacritty|foot/.test(env("TERM") ?? "");
+  ) ||
+  /kitty|ghostty|alacritty|foot/.test(env("TERM") ?? "");
 
 // SGR parameters for a colour: 38/48;2;r;g;b or 38/48;5;n
 const colour = (layer: 38 | 48, hex: string, trueColor: boolean): string =>
   trueColor ? `${layer};2;${rgb(hex).join(";")}` : `${layer};5;${to256(hex)}`;
 
-// Builds the escape sequence for a style once, deno_tui calls it per frame
+// Builds the escape sequence for a style once, the scene calls it per frame
 export const createStyler = (trueColor: boolean) => {
   const cache = new Map<string, (text: string) => string>();
-  return (options: StyleOptions): (text: string) => string => {
+  return (options: StyleOptions): ((text: string) => string) => {
     const key = JSON.stringify(options);
     let style = cache.get(key);
     if (style) return style;
@@ -208,11 +209,14 @@ export const createStyler = (trueColor: boolean) => {
 // color-mix(in srgb, a, b amount): used for hover shades, like the web app
 export const mix = (a: string, b: string, amount: number): string => {
   const [from, to] = [rgb(a), rgb(b)];
-  return "#" + from
-    .map((value, index) =>
-      Math.round(value + (to[index] - value) * amount)
-        .toString(16)
-        .padStart(2, "0")
-    )
-    .join("");
+  return (
+    "#" +
+    from
+      .map((value, index) =>
+        Math.round(value + (to[index] - value) * amount)
+          .toString(16)
+          .padStart(2, "0"),
+      )
+      .join("")
+  );
 };

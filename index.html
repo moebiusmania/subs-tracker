@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ meta.title }}</title>
+    <meta name="title" content="{{ meta.title }}" />
+    <meta name="description" content="{{ meta.description }}" />
+    <meta
+      name="theme-color"
+      content="#ffffff"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#24211e"
+      media="(prefers-color-scheme: dark)"
+    />
+    <!-- Social previews: crawlers don't run JS, so these stay in English.
+         The URLs are absolute (the prerender points canonical and og:url at
+         each page); og-image.png is rendered from src/og-image.svg -->
+    <link rel="canonical" href="{{ site }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="{{ meta.title }}" />
+    <meta property="og:url" content="{{ site }}" />
+    <meta property="og:title" content="{{ meta.shareTitle }}" />
+    <meta property="og:description" content="{{ meta.description }}" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="it_IT" />
+    <meta property="og:image" content="{{ site }}og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="{{ meta.imageAlt }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ meta.shareTitle }}" />
+    <meta name="twitter:description" content="{{ meta.description }}" />
+    <meta name="twitter:image:alt" content="{{ meta.imageAlt }}" />
+    <meta name="twitter:image" content="{{ site }}og-image.png" />
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-title" content="Subs tracker" />
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.bunny.net/css?family=fraunces:400|inter:400,500,600&display=swap"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script>
+      // Apply the saved theme and language before first paint (the app's
+      // module script is deferred). The prerendered markup is in English: for
+      // any other language keep the page hidden until the app has rendered
+      // it (see detectLocale in src/lib/i18n.ts for the same browser
+      // language lookup).
+      try {
+        const root = document.documentElement;
+        const saved = JSON.parse(localStorage.getItem("subs-tracker"));
+        const locales = {{ locales }};
+        const locale = locales.includes(saved?.language)
+          ? saved.language
+          : navigator.languages
+              .map((language) => language.toLowerCase().split("-")[0])
+              .find((language) => locales.includes(language));
+        if (saved?.theme) root.dataset.theme = saved.theme;
+        // No subscriptions: the empty state replaces the header (main.ts
+        // keeps the attribute in sync from then on)
+        if (!saved?.data?.length) root.dataset.empty = "";
+        if (locales.includes(locale) && locale !== "en") {
+          root.lang = locale;
+          root.dataset.i18nPending = "";
+        }
+      } catch {}
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <!-- The app mounts on body: the skip link, header, main, footer and banners
+       are its direct children (body is a flex column in styles.css).
+       scripts/prerender.ts puts the server-rendered shell in place of the
+       comment below -->
+  <body>
+    <!--app-->
+  </body>
+</html>

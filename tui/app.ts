@@ -1,15 +1,15 @@
 // The terminal version of the app: screens, focus, scrolling and input. It
-// reuses the web app's store and component logic (src/js/lib), so both
+// reuses the web app's store and component logic (src/lib), so both
 // versions compute and change the data the same way. Nothing here touches the
 // terminal: main.ts feeds it keys, mouse events and the screen size, and
 // draws the nodes it returns.
-import type { Store } from "../src/js/lib/store.ts";
-import type { I18n, Locale } from "../src/js/lib/types.ts";
-import { createComponents, type Deps } from "../src/js/lib/components.ts";
-import { formatPrice, getTranslation } from "../src/js/lib/index.ts";
-import { translations } from "../src/js/lib/i18n.ts";
-import { encodeShare, shareLink, SITE_URL } from "../src/js/lib/transfer.ts";
-import { qrMatrix } from "../src/js/lib/qr.ts";
+import type { Store } from "../src/lib/store.ts";
+import type { I18n, Locale } from "../src/lib/types.ts";
+import { createComponents, type Deps } from "../src/lib/components.ts";
+import { formatPrice, getTranslation } from "../src/lib/index.ts";
+import { translations } from "../src/lib/i18n.ts";
+import { encodeShare, shareLink, SITE_URL } from "../src/lib/transfer.ts";
+import { qrMatrix } from "../src/lib/qr.ts";
 import {
   contains,
   encloses,
@@ -82,12 +82,12 @@ type Screen = "home" | "add" | "edit";
 type Modal =
   | { kind: "export"; via: "file" | "qr"; path: Field; error?: string }
   | {
-    kind: "import";
-    via: "file" | "link";
-    path: Field;
-    link: Field;
-    error?: string;
-  }
+      kind: "import";
+      via: "file" | "link";
+      path: Field;
+      link: Field;
+      error?: string;
+    }
   // The share link's QR code, drawn with half blocks
   | { kind: "qr"; matrix: boolean[][] }
   | { kind: "delete" }
@@ -229,11 +229,14 @@ export class App {
   #notify(kind: Toast["kind"], text: string): void {
     this.#cancelToast?.();
     this.#toast = { kind, text };
-    this.#cancelToast = this.#deps.schedule(() => {
-      this.#toast = null;
-      this.#cancelToast = null;
-      this.#deps.changed();
-    }, kind === "error" ? 6000 : 4000);
+    this.#cancelToast = this.#deps.schedule(
+      () => {
+        this.#toast = null;
+        this.#cancelToast = null;
+        this.#deps.changed();
+      },
+      kind === "error" ? 6000 : 4000,
+    );
   }
 
   #animate(): void {
@@ -260,9 +263,10 @@ export class App {
     this.#scroll = 0;
     this.#modal = null;
     if (screen !== "home") {
-      const { item } = screen === "edit"
-        ? this.#components.editForm(index!)
-        : this.#components.addForm();
+      const { item } =
+        screen === "edit"
+          ? this.#components.editForm(index!)
+          : this.#components.addForm();
       this.#form = {
         values: initialValues(item),
         errors: {},
@@ -282,9 +286,10 @@ export class App {
 
   #openModal(modal: Modal): void {
     this.#modal = modal;
-    this.#focus = modal.kind === "export" || modal.kind === "import"
-      ? "modal.path"
-      : "modal.cancel";
+    this.#focus =
+      modal.kind === "export" || modal.kind === "import"
+        ? "modal.path"
+        : "modal.cancel";
   }
 
   #openExport(): void {
@@ -309,15 +314,18 @@ export class App {
     const kind = modal?.kind;
     this.#modal = null;
     // Back on the button that opened it
-    this.#focus = modal?.kind === "deleteItem"
-      ? modal.from
-      : kind === "export" || kind === "qr"
-      ? "backup.export"
-      : kind === "import"
-      ? (this.#store.data.length ? "backup.import" : "empty.import")
-      : kind === "delete"
-      ? "list.delete"
-      : null;
+    this.#focus =
+      modal?.kind === "deleteItem"
+        ? modal.from
+        : kind === "export" || kind === "qr"
+          ? "backup.export"
+          : kind === "import"
+            ? this.#store.data.length
+              ? "backup.import"
+              : "empty.import"
+            : kind === "delete"
+              ? "list.delete"
+              : null;
     this.#reveal = true;
   }
 
@@ -373,10 +381,9 @@ export class App {
     const outcome = await this.#components.backup().importData();
     this.#importContent = null;
     if (outcome !== "imported") {
-      modal.error = this.#components.transfer().importError(
-        outcome === "tooMany" ? outcome : "invalid",
-        "file",
-      );
+      modal.error = this.#components
+        .transfer()
+        .importError(outcome === "tooMany" ? outcome : "invalid", "file");
       return this.#deps.changed();
     }
     this.#closeModal();
@@ -439,17 +446,19 @@ export class App {
     if (!form) return;
     form.submitted = true;
     form.errors = validate(form.values);
-    const invalid = (["name", "price", "expiration"] as FieldName[])
-      .find((name) => form.errors[name]);
+    const invalid = (["name", "price", "expiration"] as FieldName[]).find(
+      (name) => form.errors[name],
+    );
     if (invalid) {
       // Like the browser does with a required field
       this.#focus = `add.${invalid}`;
       this.#reveal = true;
       return;
     }
-    const target = form.index === null
-      ? this.#components.addForm()
-      : this.#components.editForm(form.index);
+    const target =
+      form.index === null
+        ? this.#components.addForm()
+        : this.#components.editForm(form.index);
     target.item = toSubscription(form.values, target.item.currency);
     target.submit();
   }
@@ -533,8 +542,8 @@ export class App {
   }
 
   #hitAt(x: number, y: number): PlacedHit[] {
-    const hits = this.#activeHits().filter((hit) =>
-      hit.screen && contains(hit.screen, x, y)
+    const hits = this.#activeHits().filter(
+      (hit) => hit.screen && contains(hit.screen, x, y),
     );
     // Topmost layer first, then in drawing order: small controls are
     // registered before the field they sit on (the sort is stable)
@@ -581,7 +590,7 @@ export class App {
       .sort((a, b) =>
         header(a) && header(b)
           ? a.unclipped.column - b.unclipped.column
-          : Number(header(b)) - Number(header(a))
+          : Number(header(b)) - Number(header(a)),
       );
   }
 
@@ -589,9 +598,12 @@ export class App {
     const focusables = this.#focusables();
     if (!focusables.length) return;
     const index = focusables.findIndex((hit) => hit.id === this.#focus);
-    const next = index < 0
-      ? (direction === 1 ? 0 : focusables.length - 1)
-      : (index + direction + focusables.length) % focusables.length;
+    const next =
+      index < 0
+        ? direction === 1
+          ? 0
+          : focusables.length - 1
+        : (index + direction + focusables.length) % focusables.length;
     this.#focus = focusables[next].id;
     this.#reveal = true;
   }
@@ -602,8 +614,8 @@ export class App {
     const current = focusables.find((hit) => hit.id === this.#focus);
     if (!current) {
       // Start from the page, not the header
-      const first = focusables.find((hit) => hit.layer !== "header") ??
-        focusables[0];
+      const first =
+        focusables.find((hit) => hit.layer !== "header") ?? focusables[0];
       this.#focus = first?.id ?? null;
       this.#reveal = true;
       return;
@@ -617,8 +629,8 @@ export class App {
     // between cards, Tab and the mouse reach the ✕, and moving from it
     // starts from its card
     const containerOf = (hit: PlacedHit) =>
-      focusables.find((other) =>
-        other !== hit && encloses(other.unclipped, hit.unclipped)
+      focusables.find(
+        (other) => other !== hit && encloses(other.unclipped, hit.unclipped),
       );
     const from = (containerOf(current) ?? current).unclipped;
     const origin = middle(from);
@@ -632,13 +644,14 @@ export class App {
       const dx = target.x - origin.x;
       const dy = target.y - origin.y;
       // Entirely on that side, not just a bit shifted
-      const ahead = direction === "up"
-        ? rect.row + rect.height <= from.row
-        : direction === "down"
-        ? rect.row >= from.row + from.height
-        : direction === "left"
-        ? rect.column + rect.width <= from.column
-        : rect.column >= from.column + from.width;
+      const ahead =
+        direction === "up"
+          ? rect.row + rect.height <= from.row
+          : direction === "down"
+            ? rect.row >= from.row + from.height
+            : direction === "left"
+              ? rect.column + rect.width <= from.column
+              : rect.column >= from.column + from.width;
       if (!ahead) continue;
 
       const vertical = direction === "up" || direction === "down";
@@ -687,11 +700,12 @@ export class App {
       }
       const { step } = options;
       if (step) {
-        const direction = key.key === "up" || key.key === "pageup"
-          ? 1
-          : key.key === "down" || key.key === "pagedown"
-          ? -1
-          : 0;
+        const direction =
+          key.key === "up" || key.key === "pageup"
+            ? 1
+            : key.key === "down" || key.key === "pagedown"
+              ? -1
+              : 0;
         if (direction) {
           const big = key.key === "pageup" || key.key === "pagedown";
           return edit((f) => field(step(f.value, direction, big)));
@@ -699,9 +713,7 @@ export class App {
       }
       if (key.typed && !key.ctrl && !key.meta) {
         const text = options.filter
-          ? [...key.typed].filter((char) => options.filter!.test(char)).join(
-            "",
-          )
+          ? [...key.typed].filter((char) => options.filter!.test(char)).join("")
           : key.typed;
         if (text) edit((f) => insert(f, text));
         return true;
@@ -724,16 +736,16 @@ export class App {
     }
     // Elements move under a still pointer when the page changes
     if (this.#pointer) {
-      this.#hover = this.#hitAt(this.#pointer.x, this.#pointer.y)[0]?.id ??
-        null;
+      this.#hover =
+        this.#hitAt(this.#pointer.x, this.#pointer.y)[0]?.id ?? null;
     }
     return output;
   }
 
   // Scrolls the page so the focused element is visible
   #revealFocus(): boolean {
-    const hit = this.#hits.find((h) =>
-      h.id === this.#focus && h.layer === "page"
+    const hit = this.#hits.find(
+      (h) => h.id === this.#focus && h.layer === "page",
     );
     if (!hit) return false;
     const top = 1;
@@ -767,7 +779,7 @@ export class App {
           Math.floor(rows / 2) + index,
           center(line, columns),
           { fg: p.muted, bg: p.bg },
-        )
+        ),
       );
       return { nodes: root.nodes, hits: root.hits };
     }
@@ -788,11 +800,12 @@ export class App {
       clip: viewport,
       dy: top - this.#scroll,
     });
-    this.#pageHeight = this.#screen !== "home"
-      ? this.#drawAdd(page)
-      : this.#store.data.length
-      ? this.#drawDashboard(page)
-      : this.#drawEmpty(page);
+    this.#pageHeight =
+      this.#screen !== "home"
+        ? this.#drawAdd(page)
+        : this.#store.data.length
+          ? this.#drawDashboard(page)
+          : this.#drawEmpty(page);
     // The page may have got shorter (e.g. after deleting everything)
     const max = Math.max(0, this.#pageHeight - viewport.height);
     if (this.#scroll > max) {
@@ -803,9 +816,13 @@ export class App {
     this.#drawScrollbar(root, viewport);
     if (header) {
       const painter = root.sub({ layer: "header", z: Z.chrome, clip: screen });
-      painter.box("bar", { column: 0, row: 0, width: columns, height: 1 }, {
-        bg: p.surface,
-      });
+      painter.box(
+        "bar",
+        { column: 0, row: 0, width: columns, height: 1 },
+        {
+          bg: p.surface,
+        },
+      );
       this.#drawHeader(painter, { ...this.#container(), row: 0 });
     }
     this.#drawStatus(root.sub({ layer: "status", z: Z.chrome, clip: screen }));
@@ -905,33 +922,43 @@ export class App {
     const h = this.#t.tui.hints;
     const { columns, rows } = this.#size;
     const row = rows - 1;
-    painter.box("bar", { column: 0, row, width: columns, height: 1 }, {
-      bg: p.surface2,
-    });
+    painter.box(
+      "bar",
+      { column: 0, row, width: columns, height: 1 },
+      {
+        bg: p.surface2,
+      },
+    );
 
     // The page is drawn already: its hits are in this frame's output
     const focused = painter.hits.find((hit) => hit.id === this.#focus);
-    const stepper = this.#focus === "add.price" ||
-      this.#focus === "add.expiration";
+    const stepper =
+      this.#focus === "add.price" || this.#focus === "add.expiration";
     const hints: [string, string][] = this.#modal
-      ? [["Tab", h.move], ["Enter", h.select], ["Esc", h.back]]
+      ? [
+          ["Tab", h.move],
+          ["Enter", h.select],
+          ["Esc", h.back],
+        ]
       : [
-        ["Tab", h.move],
-        ...(stepper ? [["↑↓", h.adjust] as [string, string]] : []),
-        ["Enter", h.select],
-        ...(/^card\.\d+$/.test(this.#focus ?? "")
-          ? [["Del", h.delete] as [string, string]]
-          : []),
-        ...(this.#screen !== "home"
-          ? [["Esc", h.back] as [string, string]]
-          : [["a", h.add] as [string, string]]),
-        ...(focused?.input ? [] : [
-          ["t", h.theme] as [string, string],
-          ["l", h.language] as [string, string],
-        ]),
-        [focused?.input ? "Ctrl+C" : "q", h.quit],
-        ["PgUp/PgDn", h.scroll],
-      ];
+          ["Tab", h.move],
+          ...(stepper ? [["↑↓", h.adjust] as [string, string]] : []),
+          ["Enter", h.select],
+          ...(/^card\.\d+$/.test(this.#focus ?? "")
+            ? [["Del", h.delete] as [string, string]]
+            : []),
+          ...(this.#screen !== "home"
+            ? [["Esc", h.back] as [string, string]]
+            : [["a", h.add] as [string, string]]),
+          ...(focused?.input
+            ? []
+            : [
+                ["t", h.theme] as [string, string],
+                ["l", h.language] as [string, string],
+              ]),
+          [focused?.input ? "Ctrl+C" : "q", h.quit],
+          ["PgUp/PgDn", h.scroll],
+        ];
 
     let x = 1;
     hints.forEach(([key, label], index) => {
@@ -959,23 +986,33 @@ export class App {
       clip: viewport,
     });
     const column = viewport.column + viewport.width - 1;
-    const size = Math.max(1, Math.round(visible * visible / total));
+    const size = Math.max(1, Math.round((visible * visible) / total));
     const max = total - visible;
-    const top = viewport.row +
-      Math.round((visible - size) * (this.#scroll / max));
-    bar.box("track", { ...viewport, column, width: 1 }, {
-      fg: p.border,
-      bg: p.bg,
-    }, { filler: "│" });
-    bar.box("thumb", { column, row: top, width: 1, height: size }, {
-      fg: this.#hover === "scrollbar" ? p.accentStrong : p.fieldBorder,
-      bg: p.bg,
-    }, { z: 1, filler: "┃" });
+    const top =
+      viewport.row + Math.round((visible - size) * (this.#scroll / max));
+    bar.box(
+      "track",
+      { ...viewport, column, width: 1 },
+      {
+        fg: p.border,
+        bg: p.bg,
+      },
+      { filler: "│" },
+    );
+    bar.box(
+      "thumb",
+      { column, row: top, width: 1, height: size },
+      {
+        fg: this.#hover === "scrollbar" ? p.accentStrong : p.fieldBorder,
+        bg: p.bg,
+      },
+      { z: 1, filler: "┃" },
+    );
     bar.hit({
       id: "scrollbar",
       rect: { ...viewport, column, width: 1 },
       onClick: (_x, y) => {
-        this.#scroll = Math.round(max * y / Math.max(1, visible - 1));
+        this.#scroll = Math.round((max * y) / Math.max(1, visible - 1));
       },
     });
   }
@@ -991,11 +1028,16 @@ export class App {
     const row = rows - 4;
     const fg = success ? p.success : p.danger;
     const bg = success ? p.successSoft : p.dangerSoft;
-    frame(painter, "frame", { column, row, width, height: 3 }, {
-      border: fg,
-      fill: bg,
-      outside: p.bg,
-    });
+    frame(
+      painter,
+      "frame",
+      { column, row, width, height: 3 },
+      {
+        border: fg,
+        fill: bg,
+        outside: p.bg,
+      },
+    );
     painter.line("text", column + 2, row + 1, [
       { text: `${icon} `, style: { fg, bg, bold: true } },
       { text: truncate(toast.text, width - 6), style: { fg: p.text, bg } },
@@ -1044,8 +1086,12 @@ export class App {
     const inner = panelWidth - 6;
     const cta = `${t.empty.cta}`;
     const example = t.empty.default;
-    const inline = buttonWidth(cta, "+") + buttonWidth(example, "✦") +
-        textWidth(t.empty.or) + 4 <= inner;
+    const inline =
+      buttonWidth(cta, "+") +
+        buttonWidth(example, "✦") +
+        textWidth(t.empty.or) +
+        4 <=
+      inner;
     const message = wrap(t.empty.message, inner);
     const row = 1;
 
@@ -1120,8 +1166,11 @@ export class App {
       });
 
     if (inline) {
-      const total = buttonWidth(cta, "+") + buttonWidth(example, "✦") +
-        textWidth(t.empty.or) + 4;
+      const total =
+        buttonWidth(cta, "+") +
+        buttonWidth(example, "✦") +
+        textWidth(t.empty.or) +
+        4;
       let x = column + Math.floor((panelWidth - total) / 2);
       x += addButton(x, y) + 2;
       x +=
@@ -1157,8 +1206,8 @@ export class App {
     const importLabel = t.backup.import;
     button(painter, ctx, {
       id: "empty.import",
-      column: column +
-        Math.floor((panelWidth - buttonWidth(importLabel, "↑")) / 2),
+      column:
+        column + Math.floor((panelWidth - buttonWidth(importLabel, "↑")) / 2),
       row: y,
       label: importLabel,
       icon: "↑",
@@ -1168,12 +1217,17 @@ export class App {
     y += 2;
 
     const height = y - row + 1;
-    frame(painter, "panel", { column, row, width: panelWidth, height }, {
-      border: this.#panelBorder(),
-      fill: p.surface,
-      outside: p.bg,
-      z: -2,
-    });
+    frame(
+      painter,
+      "panel",
+      { column, row, width: panelWidth, height },
+      {
+        border: this.#panelBorder(),
+        fill: p.surface,
+        outside: p.bg,
+        z: -2,
+      },
+    );
 
     return this.#drawFooter(painter, row + height + 1);
   }
@@ -1199,32 +1253,63 @@ export class App {
       tint: string,
       z: number,
     ) => {
-      frame(painter, key, { column: x, row: y, width: 18, height: 5 }, {
-        border: illo.stroke,
-        fill: illo.card,
-        outside: illo.blob,
-        z,
-      });
-      painter.box(`${key}.avatar`, {
-        column: x + 2,
-        row: y + 1,
-        width: 4,
-        height: 2,
-      }, {
-        bg: tint,
-      }, { z: z + 2 });
-      painter.text(`${key}.line1`, x + 7, y + 1, "▆▆▆▆▆▆▆", {
-        fg: illo.line,
-        bg: illo.card,
-      }, z + 2);
-      painter.text(`${key}.line2`, x + 7, y + 2, "▆▆▆▆", {
-        fg: illo.line,
-        bg: illo.card,
-      }, z + 2);
-      painter.text(`${key}.price`, x + 2, y + 3, "▆▆▆▆▆▆▆▆▆▆▆", {
-        fg: illo.lav,
-        bg: illo.card,
-      }, z + 2);
+      frame(
+        painter,
+        key,
+        { column: x, row: y, width: 18, height: 5 },
+        {
+          border: illo.stroke,
+          fill: illo.card,
+          outside: illo.blob,
+          z,
+        },
+      );
+      painter.box(
+        `${key}.avatar`,
+        {
+          column: x + 2,
+          row: y + 1,
+          width: 4,
+          height: 2,
+        },
+        {
+          bg: tint,
+        },
+        { z: z + 2 },
+      );
+      painter.text(
+        `${key}.line1`,
+        x + 7,
+        y + 1,
+        "▆▆▆▆▆▆▆",
+        {
+          fg: illo.line,
+          bg: illo.card,
+        },
+        z + 2,
+      );
+      painter.text(
+        `${key}.line2`,
+        x + 7,
+        y + 2,
+        "▆▆▆▆",
+        {
+          fg: illo.line,
+          bg: illo.card,
+        },
+        z + 2,
+      );
+      painter.text(
+        `${key}.price`,
+        x + 2,
+        y + 3,
+        "▆▆▆▆▆▆▆▆▆▆▆",
+        {
+          fg: illo.lav,
+          bg: illo.card,
+        },
+        z + 2,
+      );
     };
     card("illo.back", column + 5, row + 1, illo.mint, 3);
     card("illo.front", column + 11, row + 4, illo.peach, 6);
@@ -1236,18 +1321,31 @@ export class App {
       symbol: string,
       bg: string,
     ) => {
-      painter.line(key, x, y, [
-        { text: "▐", style: { fg: bg, bg: illo.blob } },
-        { text: symbol, style: { fg: illo.stroke, bg, bold: true } },
-        { text: "▌", style: { fg: bg, bg: illo.blob } },
-      ], 10);
+      painter.line(
+        key,
+        x,
+        y,
+        [
+          { text: "▐", style: { fg: bg, bg: illo.blob } },
+          { text: symbol, style: { fg: illo.stroke, bg, bold: true } },
+          { text: "▌", style: { fg: bg, bg: illo.blob } },
+        ],
+        10,
+      );
     };
     coin("illo.euro", column + 27, row + 1 + bounce, "€", illo.butter);
     coin("illo.dollar", column + 5, row + 7 - bounce, "$", illo.pink);
-    painter.text("illo.spark", column + 25, row + 6, "✦", {
-      fg: illo.lav,
-      bg: illo.blob,
-    }, 10);
+    painter.text(
+      "illo.spark",
+      column + 25,
+      row + 6,
+      "✦",
+      {
+        fg: illo.lav,
+        bg: illo.blob,
+      },
+      10,
+    );
   }
 
   // Dashboard and list ----------------------------------------------------
@@ -1359,35 +1457,52 @@ export class App {
       const active = item.isActive;
       const due = list.expiresThisMonth(item);
       const fill = active ? p.surface : p.surface2;
-      frame(painter, id, { column, row, width: cardWidth, height: 7 }, {
-        border: focused
-          ? p.accentStrong
-          : hover
-          ? p.fieldBorder
-          : due
-          ? p.accent
-          : this.#panelBorder(),
-        fill,
-        outside: p.bg,
-        dashed: !active,
-        bold: focused,
-      });
+      frame(
+        painter,
+        id,
+        { column, row, width: cardWidth, height: 7 },
+        {
+          border: focused
+            ? p.accentStrong
+            : hover
+              ? p.fieldBorder
+              : due
+                ? p.accent
+                : this.#panelBorder(),
+          fill,
+          outside: p.bg,
+          dashed: !active,
+          bold: focused,
+        },
+      );
 
       const tint = active ? p.tints[index % p.tints.length] : p.border;
       const letter = item.name.trim().charAt(0).toUpperCase() || "?";
-      painter.box(`${id}.avatar`, {
-        column: column + 2,
-        row: row + 1,
-        width: 5,
-        height: 2,
-      }, {
-        bg: tint,
-      }, { z: 2 });
-      painter.text(`${id}.letter`, column + 4, row + 1, letter, {
-        fg: active ? p.text : p.muted,
-        bg: tint,
-        bold: true,
-      }, 3);
+      painter.box(
+        `${id}.avatar`,
+        {
+          column: column + 2,
+          row: row + 1,
+          width: 5,
+          height: 2,
+        },
+        {
+          bg: tint,
+        },
+        { z: 2 },
+      );
+      painter.text(
+        `${id}.letter`,
+        column + 4,
+        row + 1,
+        letter,
+        {
+          fg: active ? p.text : p.muted,
+          bg: tint,
+          bold: true,
+        },
+        3,
+      );
       const textColumn = column + 9;
       // Room for the ✕ in the top right corner
       const textWidthLeft = cardWidth - 14;
@@ -1408,27 +1523,39 @@ export class App {
       const pill = active
         ? { fg: p.success, bg: p.successSoft }
         : { fg: p.muted, bg: p.surface };
-      painter.line(`${id}.status`, textColumn - 1, row + 2, [
-        { text: "▐", style: { fg: pill.bg, bg: fill } },
-        {
-          text: `${active ? "●" : "○"} ${status}`,
-          style: { ...pill, bold: true, underline: hover || focused },
-        },
-        { text: "▌", style: { fg: pill.bg, bg: fill } },
-      ], 2);
+      painter.line(
+        `${id}.status`,
+        textColumn - 1,
+        row + 2,
+        [
+          { text: "▐", style: { fg: pill.bg, bg: fill } },
+          {
+            text: `${active ? "●" : "○"} ${status}`,
+            style: { ...pill, bold: true, underline: hover || focused },
+          },
+          { text: "▌", style: { fg: pill.bg, bg: fill } },
+        ],
+        2,
+      );
 
       const price = formatPrice(item.price, item.currency);
-      painter.line(`${id}.price`, column + 2, row + 4, [
-        { text: price, style: { fg: p.text, bg: fill, bold: true } },
-        { text: " ", style: { bg: fill } },
-        {
-          text: truncate(
-            list.recurrence(item),
-            cardWidth - 5 - textWidth(price),
-          ),
-          style: { fg: p.muted, bg: fill },
-        },
-      ], 2);
+      painter.line(
+        `${id}.price`,
+        column + 2,
+        row + 4,
+        [
+          { text: price, style: { fg: p.text, bg: fill, bold: true } },
+          { text: " ", style: { bg: fill } },
+          {
+            text: truncate(
+              list.recurrence(item),
+              cardWidth - 5 - textWidth(price),
+            ),
+            style: { fg: p.muted, bg: fill },
+          },
+        ],
+        2,
+      );
       painter.text(
         `${id}.expires`,
         column + 2,
@@ -1464,8 +1591,8 @@ export class App {
         ctx.focus === deleteId
           ? { fg: p.bg, bg: p.accentStrong, bold: true }
           : ctx.hover === deleteId
-          ? { fg: p.danger, bg: p.dangerSoft, bold: true }
-          : { fg: p.muted, bg: fill },
+            ? { fg: p.danger, bg: p.dangerSoft, bold: true }
+            : { fg: p.muted, bg: fill },
         2,
       );
       painter.hit({
@@ -1495,8 +1622,8 @@ export class App {
         ctx.focus === editId
           ? { fg: p.bg, bg: p.accentStrong, bold: true }
           : ctx.hover === editId
-          ? { fg: p.accentStrong, bg: p.accentSoft, bold: true }
-          : { fg: p.muted, bg: fill },
+            ? { fg: p.accentStrong, bg: p.accentSoft, bold: true }
+            : { fg: p.muted, bg: fill },
         2,
       );
       painter.hit({
@@ -1540,20 +1667,21 @@ export class App {
     const exportLabel = t.backup.export;
     const importLabel = t.backup.import;
     const deleteLabel = t.main.delete;
-    const backupWidth = buttonWidth(exportLabel, "↓") + 1 +
-      buttonWidth(importLabel, "↑");
+    const backupWidth =
+      buttonWidth(exportLabel, "↓") + 1 + buttonWidth(importLabel, "↑");
     const deleteWidth = buttonWidth(deleteLabel, "✕");
     const oneRow = backupWidth + deleteWidth + 2 <= width;
     let x = left;
-    x += button(painter, ctx, {
-      id: "backup.export",
-      column: x,
-      row: y,
-      label: exportLabel,
-      icon: "↓",
-      bg: p.bg,
-      onPress: () => this.#openExport(),
-    }) + 1;
+    x +=
+      button(painter, ctx, {
+        id: "backup.export",
+        column: x,
+        row: y,
+        label: exportLabel,
+        icon: "↓",
+        bg: p.bg,
+        onPress: () => this.#openExport(),
+      }) + 1;
     button(painter, ctx, {
       id: "backup.import",
       column: x,
@@ -1617,12 +1745,8 @@ export class App {
     if (big && textWidth(big[0]) > inner) {
       const tight = [...tile.value].map((char) => bigText(char)!);
       big = [0, 1, 2].map((line) =>
-        tight.map((glyph) => glyph[line]).join("")
-      ) as [
-        string,
-        string,
-        string,
-      ];
+        tight.map((glyph) => glyph[line]).join(""),
+      ) as [string, string, string];
     }
     if (big && textWidth(big[0]) <= inner) {
       big.forEach((line, index) =>
@@ -1636,7 +1760,7 @@ export class App {
             bold: true,
           },
           2,
-        )
+        ),
       );
     } else {
       painter.text(
@@ -1666,7 +1790,7 @@ export class App {
     });
   }
 
-  // Footer, like partials/footer.vto. Returns the page height.
+  // Footer, like components/SiteFooter.vue. Returns the page height.
   #drawFooter(painter: Painter, row: number): number {
     const p = this.#p;
     const t = this.#t;
@@ -1715,19 +1839,26 @@ export class App {
     const x0 = column + 3;
     const bg = p.surface;
     const message = (name: FieldName) =>
-      errors[name] ? t.tui[errors[name]!] as string : undefined;
+      errors[name] ? (t.tui[errors[name]!] as string) : undefined;
 
     // The panel is drawn last, around what the fields needed
     let y = 2;
 
     const back = `← ${t.add.back}`;
     const backActive = ctx.focus === "add.back" || ctx.hover === "add.back";
-    painter.text("back", x0, y, truncate(back, inner), {
-      fg: p.accentStrong,
-      bg,
-      bold: true,
-      underline: backActive,
-    }, 2);
+    painter.text(
+      "back",
+      x0,
+      y,
+      truncate(back, inner),
+      {
+        fg: p.accentStrong,
+        bg,
+        bold: true,
+        underline: backActive,
+      },
+      2,
+    );
     painter.hit({
       id: "add.back",
       rect: {
@@ -1784,9 +1915,9 @@ export class App {
     const place = (index: number) =>
       twoColumns
         ? {
-          column: index ? second : x0,
-          width: index ? inner - half - 3 : half,
-        }
+            column: index ? second : x0,
+            width: index ? inner - half - 3 : half,
+          }
         : { column: x0, width: inner };
 
     const nameHeight = input(painter, ctx, {
@@ -1851,9 +1982,10 @@ export class App {
     const parsed = /^\d{4}-\d{2}-\d{2}$/.test(date)
       ? new Date(`${date}T00:00:00`)
       : null;
-    const readable = parsed && !isNaN(parsed.getTime())
-      ? parsed.toLocaleDateString(this.#store.locale, { dateStyle: "medium" })
-      : undefined;
+    const readable =
+      parsed && !isNaN(parsed.getTime())
+        ? parsed.toLocaleDateString(this.#store.locale, { dateStyle: "medium" })
+        : undefined;
     const expirationField = () =>
       input(painter, ctx, {
         id: "add.expiration",
@@ -1937,12 +2069,17 @@ export class App {
     y += cancelFits ? 2 : 4;
 
     // Under the fields: they're drawn first, so they'd lose a tie
-    frame(painter, "panel", { column, row: 1, width: panelWidth, height: y }, {
-      border: this.#panelBorder(),
-      fill: bg,
-      outside: p.bg,
-      z: -2,
-    });
+    frame(
+      painter,
+      "panel",
+      { column, row: 1, width: panelWidth, height: y },
+      {
+        border: this.#panelBorder(),
+        fill: bg,
+        outside: p.bg,
+        z: -2,
+      },
+    );
 
     return this.#drawFooter(painter, y + 2);
   }
@@ -1954,7 +2091,8 @@ export class App {
         name === "price"
           ? stepPrice(f.value, direction)
           : stepDate(f.value, direction),
-      ));
+      ),
+    );
   }
 
   // Puts the cursor where the field was clicked
@@ -1984,48 +2122,69 @@ export class App {
     const bg = p.surface;
 
     const isDelete = modal.kind === "delete" || modal.kind === "deleteItem";
-    const name = modal.kind === "deleteItem"
-      ? this.#store.data[modal.index]?.name ?? ""
-      : "";
-    const title = modal.kind === "export"
-      ? t.backup.export
-      : modal.kind === "import"
-      ? t.backup.import
-      : modal.kind === "deleteItem"
-      ? getTranslation(t.main.deleteItem, name)
-      : t.main.delete;
+    const name =
+      modal.kind === "deleteItem"
+        ? (this.#store.data[modal.index]?.name ?? "")
+        : "";
+    const title =
+      modal.kind === "export"
+        ? t.backup.export
+        : modal.kind === "import"
+          ? t.backup.import
+          : modal.kind === "deleteItem"
+            ? getTranslation(t.main.deleteItem, name)
+            : t.main.delete;
     const message = wrap(
       modal.kind === "export"
-        ? modal.via === "file" ? t.tui.exportMessage : t.transfer.qrExport
+        ? modal.via === "file"
+          ? t.tui.exportMessage
+          : t.transfer.qrExport
         : modal.kind === "import"
-        ? modal.via === "file" ? t.tui.importMessage : t.tui.linkMessage
-        : modal.kind === "deleteItem"
-        ? getTranslation(t.main.confirmDeleteItem, name)
-        : t.main.confirmDelete,
+          ? modal.via === "file"
+            ? t.tui.importMessage
+            : t.tui.linkMessage
+          : modal.kind === "deleteItem"
+            ? getTranslation(t.main.confirmDeleteItem, name)
+            : t.main.confirmDelete,
       inner,
     );
-    const transfer = modal.kind === "export" || modal.kind === "import"
-      ? modal
-      : null;
+    const transfer =
+      modal.kind === "export" || modal.kind === "import" ? modal : null;
     const error = transfer?.error;
     // The QR code needs no field; its errors get their own lines
     const field = transfer && transfer.via !== "qr";
     const errorLines = error && !field ? wrap(error, inner) : [];
-    const height = 2 + 2 + (transfer ? 5 : 0) + message.length + 1 +
+    const height =
+      2 +
+      2 +
+      (transfer ? 5 : 0) +
+      message.length +
+      1 +
       (field ? (error ? 5 : 4) + 1 : 0) +
-      (errorLines.length ? errorLines.length + 1 : 0) + 1 + 1;
+      (errorLines.length ? errorLines.length + 1 : 0) +
+      1 +
+      1;
     const row = Math.max(1, Math.floor((rows - height) / 2));
 
     // Shadow
-    painter.box("shadow", { column: column + 1, row: row + 1, width, height }, {
-      bg: p.border,
-    });
-    frame(painter, "frame", { column, row, width, height }, {
-      border: isDelete ? p.danger : p.fieldBorder,
-      fill: bg,
-      outside: p.bg,
-      z: 1,
-    });
+    painter.box(
+      "shadow",
+      { column: column + 1, row: row + 1, width, height },
+      {
+        bg: p.border,
+      },
+    );
+    frame(
+      painter,
+      "frame",
+      { column, row, width, height },
+      {
+        border: isDelete ? p.danger : p.fieldBorder,
+        fill: bg,
+        outside: p.bg,
+        z: 1,
+      },
+    );
     // Clicks inside do nothing, outside close it (like <dialog> with a
     // backdrop): the body is registered first so it wins
     painter.hit({ id: "modal.body", rect: { column, row, width, height } });
@@ -2037,11 +2196,18 @@ export class App {
 
     const x = column + 3;
     let y = row + 2;
-    painter.text("title", x, y, truncate(title, inner), {
-      fg: isDelete ? p.danger : p.text,
-      bg,
-      bold: true,
-    }, 3);
+    painter.text(
+      "title",
+      x,
+      y,
+      truncate(title, inner),
+      {
+        fg: isDelete ? p.danger : p.text,
+        bg,
+        bold: true,
+      },
+      3,
+    );
     y += 2;
     const controls = painter.sub({
       layer: "modal",
@@ -2056,24 +2222,26 @@ export class App {
         else transfer.via = via as "file" | "link";
         transfer.error = undefined;
       };
-      y += segmented(controls, ctx, {
-        id: "modal.via",
-        column: x,
-        row: y,
-        width: inner,
-        label: transfer.kind === "export"
-          ? t.transfer.exportIntro
-          : t.transfer.importIntro,
-        value: transfer.via as "file" | "qr" | "link",
-        choices: [
-          { value: "file", label: t.transfer.file },
-          transfer.kind === "export"
-            ? { value: "qr", label: t.transfer.qr }
-            : { value: "link", label: t.tui.linkTitle },
-        ],
-        bg,
-        onChange: choose,
-      }) + 1;
+      y +=
+        segmented(controls, ctx, {
+          id: "modal.via",
+          column: x,
+          row: y,
+          width: inner,
+          label:
+            transfer.kind === "export"
+              ? t.transfer.exportIntro
+              : t.transfer.importIntro,
+          value: transfer.via as "file" | "qr" | "link",
+          choices: [
+            { value: "file", label: t.transfer.file },
+            transfer.kind === "export"
+              ? { value: "qr", label: t.transfer.qr }
+              : { value: "link", label: t.tui.linkTitle },
+          ],
+          bg,
+          onChange: choose,
+        }) + 1;
     }
 
     message.forEach((line, index) => {
@@ -2089,70 +2257,80 @@ export class App {
     y += message.length + 1;
 
     if (transfer && field) {
-      const key = transfer.kind === "import" && transfer.via === "link"
-        ? "link"
-        : "path";
+      const key =
+        transfer.kind === "import" && transfer.via === "link" ? "link" : "path";
       const current = () =>
         key === "link" && transfer.kind === "import"
           ? transfer.link
           : transfer.path;
-      y += input(controls, ctx, {
-        id: "modal.path",
-        column: x,
-        row: y,
-        width: inner,
-        label: key === "link" ? t.tui.linkTitle : t.tui.fileTitle,
-        field: current(),
-        placeholder: key === "link" ? "https://…#d=…" : undefined,
-        error,
-        bg,
-        onKey: (pressed) => {
-          const set = (update: (f: Field) => Field) => {
-            const next = update(current());
-            if (key === "link" && transfer.kind === "import") {
-              transfer.link = next;
-            } else transfer.path = next;
-            transfer.error = undefined;
-            return true;
-          };
-          switch (pressed.key) {
-            case "backspace":
-              return set(backspace);
-            case "delete":
-              return set(deleteForward);
-            case "left":
-            case "right":
-            case "home":
-            case "end":
-              return set((f) => moveCursor(f, pressed.key as "left"));
-            case "return":
-              this.#confirmModal();
+      y +=
+        input(controls, ctx, {
+          id: "modal.path",
+          column: x,
+          row: y,
+          width: inner,
+          label: key === "link" ? t.tui.linkTitle : t.tui.fileTitle,
+          field: current(),
+          placeholder: key === "link" ? "https://…#d=…" : undefined,
+          error,
+          bg,
+          onKey: (pressed) => {
+            const set = (update: (f: Field) => Field) => {
+              const next = update(current());
+              if (key === "link" && transfer.kind === "import") {
+                transfer.link = next;
+              } else transfer.path = next;
+              transfer.error = undefined;
               return true;
-          }
-          if (pressed.typed && !pressed.ctrl && !pressed.meta) {
-            return set((f) => insert(f, pressed.typed));
-          }
-          return false;
-        },
-      }) + 1;
+            };
+            switch (pressed.key) {
+              case "backspace":
+                return set(backspace);
+              case "delete":
+                return set(deleteForward);
+              case "left":
+              case "right":
+              case "home":
+              case "end":
+                return set((f) => moveCursor(f, pressed.key as "left"));
+              case "return":
+                this.#confirmModal();
+                return true;
+            }
+            if (pressed.typed && !pressed.ctrl && !pressed.meta) {
+              return set((f) => insert(f, pressed.typed));
+            }
+            return false;
+          },
+        }) + 1;
     }
     errorLines.forEach((line, index) => {
-      painter.text(`error.${index}`, x, y + index, line, {
-        fg: p.danger,
-        bg,
-        bold: true,
-      }, 3);
+      painter.text(
+        `error.${index}`,
+        x,
+        y + index,
+        line,
+        {
+          fg: p.danger,
+          bg,
+          bold: true,
+        },
+        3,
+      );
     });
     if (errorLines.length) y += errorLines.length + 1;
 
     // Buttons at the bottom right: cancel, then the action
-    const confirmLabel = modal.kind === "export"
-      ? modal.via === "qr" ? t.tui.show : t.tui.save
-      : modal.kind === "import"
-      ? t.tui.open
-      : modal.kind === "deleteItem"
-      ? t.tui.delete
-      : t.main.delete;
+    const confirmLabel =
+      modal.kind === "export"
+        ? modal.via === "qr"
+          ? t.tui.show
+          : t.tui.save
+        : modal.kind === "import"
+          ? t.tui.open
+          : modal.kind === "deleteItem"
+            ? t.tui.delete
+            : t.main.delete;
     const confirmWidth = buttonWidth(confirmLabel, isDelete ? "✕" : undefined);
     const cancelWidth = buttonWidth(t.add.cancel);
     const confirmColumn = x + inner - confirmWidth;
@@ -2231,7 +2409,7 @@ export class App {
             bg: p.bg,
           },
           1,
-        )
+        ),
       );
       close(top + lines.length + 1);
       return;
@@ -2244,8 +2422,8 @@ export class App {
     const block = full
       ? qrRows + 2 + 1 + hint.length + 2
       : titled
-      ? qrRows + 3
-      : qrRows;
+        ? qrRows + 3
+        : qrRows;
     let y = Math.floor((rows - block) / 2);
     if (titled) {
       painter.text(
@@ -2290,10 +2468,17 @@ export class App {
     if (full) {
       y += 1;
       hint.forEach((line, index) =>
-        painter.text(`qr.hint.${index}`, 0, y + index, center(line, columns), {
-          fg: p.muted,
-          bg: p.bg,
-        }, 1)
+        painter.text(
+          `qr.hint.${index}`,
+          0,
+          y + index,
+          center(line, columns),
+          {
+            fg: p.muted,
+            bg: p.bg,
+          },
+          1,
+        ),
       );
       y += hint.length;
       close(y);

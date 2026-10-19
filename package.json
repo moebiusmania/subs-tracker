@@ -1,0 +1,32 @@
+{
+  "name": "subs-tracker",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.4.3",
+  "scripts": {
+    "dev": "vite",
+    "dev:host": "vite --host 0.0.0.0",
+    "build": "vite build && vite build --ssr src/entry-server.ts --outDir _ssr && bun scripts/prerender.ts",
+    "build:gh": "SITE_URL=https://moebiusmania.github.io/subs-tracker/ bun run build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "check": "prettier --check . && vue-tsc --build",
+    "format": "prettier --write .",
+    "tui": "bun tui/main.ts",
+    "tui:build": "bun build --compile tui/main.ts --outfile dist/subs-tracker"
+  },
+  "dependencies": {
+    "uqr": "^0.1.3",
+    "vue": "^3.5.44"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.3",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "happy-dom": "^21.0.3",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5",
+    "vue-tsc": "^3.3.13"
+  }
+}

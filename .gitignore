@@ -1,6 +1,9 @@
-# Lume build output and cache
+# Dependencies
+node_modules
+
+# Vite build output (the server build is removed after the prerender)
 _site
-_cache
+_ssr
 
 # Misc
 .DS_Store
@@ -12,5 +15,5 @@ _cache
 .env.*
 !.env.example
 
-# Compiled TUI (deno task tui:build)
+# Compiled TUI (bun run tui:build)
 dist

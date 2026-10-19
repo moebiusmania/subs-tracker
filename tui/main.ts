@@ -1,13 +1,12 @@
-// Terminal version of Subscriptions tracker: `deno task tui`, or compiled to a
-// single binary with `deno task tui:build`. Same features and data format as
+// Terminal version of Subscriptions tracker: `bun run tui`, or compiled to a
+// single binary with `bun run tui:build`. Same features and data format as
 // the web app, saved to a JSON file instead of localStorage.
-import { emitInputEvents, Tui } from "deno_tui/mod.ts";
-import type {
-  MousePressEvent,
-  MouseScrollEvent,
-} from "deno_tui/src/input_reader/types.ts";
-import { createStore } from "../src/js/lib/store.ts";
+import { readFile } from "node:fs/promises";
+import { writeFileSync } from "node:fs";
+
+import { createStore } from "../src/lib/store.ts";
 import { App } from "./app.ts";
+import { decodeBuffer, type MouseEvent } from "./input.ts";
 import { toKeys } from "./keys.ts";
 import { Scene } from "./scene.ts";
 import { createStyler, supportsTrueColor } from "./palette.ts";
@@ -20,28 +19,29 @@ import {
   systemLocale,
 } from "./system.ts";
 
-const env = (name: string): string | undefined => Deno.env.get(name);
+const env = (name: string): string | undefined => process.env[name];
 
-if (!Deno.stdin.isTerminal() || !Deno.stdout.isTerminal()) {
+const { stdin, stdout } = process;
+
+if (!stdin.isTTY || !stdout.isTTY) {
   console.error("Subscriptions tracker needs an interactive terminal.");
-  Deno.exit(1);
+  process.exit(1);
 }
 
-const file = dataPath(env, Deno.build.os);
+const file = dataPath(env, process.platform);
 const store = createStore();
 store.setSystemLocale(systemLocale(env));
 const saved = loadState(file);
 if (saved) store.setState(saved);
 
-const encoder = new TextEncoder();
-const write = (text: string) => Deno.stdout.writeSync(encoder.encode(text));
+const write = (text: string) => stdout.write(text);
 
-// Any-motion mouse tracking (1003) for hover, reported as SGR (1006)
-const MOUSE_ON = "\x1b[?1000h\x1b[?1003h\x1b[?1006h";
-const MOUSE_OFF = "\x1b[?1006l\x1b[?1003l\x1b[?1000l";
+// The alternate screen, without a cursor, keeps the shell's scrollback as
+// it was. Any-motion mouse tracking (1003) for hover, reported as SGR (1006)
+const SETUP = "\x1b[?1049h\x1b[?25l\x1b[?1000h\x1b[?1003h\x1b[?1006h";
+const RESTORE = "\x1b[?1006l\x1b[?1003l\x1b[?1000l\x1b[0m\x1b[?25h\x1b[?1049l";
 
-const tui = new Tui({ refreshRate: 1000 / 60 });
-const scene = new Scene(tui.canvas, createStyler(supportsTrueColor(env)));
+const scene = new Scene(write, createStyler(supportsTrueColor(env)));
 
 let queued = false;
 const draw = () => {
@@ -54,13 +54,21 @@ const draw = () => {
   });
 };
 
-const quit = () => tui.emit("destroy");
+let running = true;
+// Restores the terminal and exits on quit, Ctrl+C and SIGTERM
+const quit = () => {
+  if (!running) return;
+  running = false;
+  write(RESTORE);
+  stdin.setRawMode(false);
+  process.exit(0);
+};
 
 const app = new App({
   store,
   persist: () => saveState(file, store.getState),
-  readFile: (path) => Deno.readTextFile(path),
-  writeFile: (path, content) => Deno.writeTextFileSync(path, content),
+  readFile: (path) => readFile(path, "utf8"),
+  writeFile: (path, content) => writeFileSync(path, content),
   resolvePath: (path) => resolvePath(path, env),
   displayPath: (path) => displayPath(path, env),
   dataFile: displayPath(file, env),
@@ -73,43 +81,50 @@ const app = new App({
   animate: true,
 });
 
-tui.on("destroy", () => {
-  write(MOUSE_OFF);
+process.on("SIGTERM", quit);
+process.on("SIGINT", quit);
+// Leave the terminal usable even if something throws
+process.on("exit", () => {
+  if (running) write(RESTORE);
 });
-// Restores the terminal and exits on quit, Ctrl+C and SIGTERM
-tui.dispatch();
 
-const size = tui.canvas.size;
-app.resize(size.peek().columns, size.peek().rows);
-size.subscribe(({ columns, rows }) => {
+const resize = () => {
+  const { columns, rows } = stdout;
   app.resize(columns, rows);
+  scene.resize(columns, rows);
+};
+resize();
+stdout.on("resize", () => {
+  resize();
   draw();
 });
 
-tui.on("keyPress", (event) => {
-  for (const key of toKeys(event)) app.key(key);
-  draw();
-});
-
-tui.on("mouseEvent", (event) => {
+// Returns true when the screen needs a redraw: moving the pointer only
+// does when the hover changes
+const mouse = (event: MouseEvent): boolean => {
   if ("scroll" in event) {
-    const { x, y, scroll } = event as MouseScrollEvent;
-    if (scroll) {
-      app.wheel(x, y, scroll);
-      draw();
-    }
-    return;
+    app.wheel(event.x, event.y, event.scroll);
+    return true;
   }
-  const { x, y, button, release, drag } = event as MousePressEvent;
+  const { x, y, button, release, drag } = event;
   if (button === 0 && !release && !drag) {
     app.click(x, y);
-    draw();
-  } else if (app.move(x, y)) {
+    return true;
+  }
+  return app.move(x, y);
+};
+
+stdin.setRawMode(true);
+stdin.on("data", (buffer: Buffer) => {
+  for (const event of decodeBuffer(new Uint8Array(buffer))) {
+    if (event.key === "mouse") {
+      if (mouse(event as MouseEvent)) draw();
+      continue;
+    }
+    for (const key of toKeys(event)) app.key(key);
     draw();
   }
 });
 
-tui.run();
-write(MOUSE_ON);
+write(SETUP);
 scene.render(app.render().nodes);
-emitInputEvents(tui.stdin, tui, 1000 / 120);

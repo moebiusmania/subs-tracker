@@ -55,13 +55,13 @@ The web app needs a browser, and a browser isn't always there or isn't always ha
 - **Over SSH**: you can check and update your subscriptions on a remote machine from any terminal, without port forwarding or exposing a web server.
 - **Terminal-first workflows**: if you live in the terminal (tmux, tiling window managers, keyboard-driven setups), it's quicker to run a command than to open a browser tab.
 - **Your data as a plain file**: the data is a JSON file you can back up, sync with your own tools (git, rsync, Syncthing…) or move between machines, instead of being tied to one browser's storage.
-- **A single binary**: `deno task tui:build` produces a standalone executable with no runtime to install, easy to copy onto another machine.
+- **A single binary**: `bun run tui:build` produces a standalone executable with no runtime to install, easy to copy onto another machine.
 
 It's not a separate app: it reuses the same logic as the web version, so the numbers always match, and the export/import files work in both. You can move your data from one to the other at any time.
 
 ```bash
-$ deno task tui          # run it
-$ deno task tui:build    # compile a standalone binary to dist/subs-tracker
+$ bun run tui          # run it
+$ bun run tui:build    # compile a standalone binary to dist/subs-tracker
 ```
 
 | Key                         | What it does                                                   |
@@ -100,65 +100,68 @@ Feel free to [open an issue on this repo](https://github.com/moebiusmania/subs-t
 
 ### How to develop
 
-You only need [Deno](https://deno.com/) 2.x installed: there is no Node.js, no `package.json` and no install step, dependencies are fetched and cached by Deno on first run.
+You need [Bun](https://bun.sh/) 1.x installed (and Node.js, which Vite, Vitest and vue-tsc run on; any recent version will do).
 
-Clone the repo
+Clone the repo and install the dependencies
 
 ```bash
 $ git clone https://github.com/moebiusmania/subs-tracker
 $ cd subs-tracker
+$ bun install
 ```
 
 start the development server
 
 ```bash
-$ deno task serve
+$ bun run dev
 ```
 
 open a browser at `http://localhost:3000` and you will see the application.
 
-All the available tasks:
+All the available scripts:
 
-| Task                  | What it does                                                             |
-| --------------------- | ------------------------------------------------------------------------ |
-| `deno task serve`     | dev server with live reload on `http://localhost:3000`                   |
-| `deno task dev:host`  | same, but reachable from other devices on your network (phones, tablets) |
-| `deno task build`     | builds the static site into `_site/`                                     |
-| `deno task build:gh`  | builds for GitHub Pages, under the `/subs-tracker/` path                 |
-| `deno task test`      | runs the unit tests                                                      |
-| `deno task check`     | formatting check, lint and type-check                                    |
-| `deno task tui`       | runs the terminal version                                                |
-| `deno task tui:build` | compiles the terminal version to a standalone binary in `dist/`          |
+| Script              | What it does                                                             |
+| ------------------- | ------------------------------------------------------------------------ |
+| `bun run dev`       | dev server with hot reload on `http://localhost:3000`                    |
+| `bun run dev:host`  | same, but reachable from other devices on your network (phones, tablets) |
+| `bun run build`     | builds the static site into `_site/`                                     |
+| `bun run build:gh`  | builds for GitHub Pages, under the `/subs-tracker/` path                 |
+| `bun run preview`   | serves the built site from `_site/`                                      |
+| `bun run test`      | runs the unit tests                                                      |
+| `bun run check`     | formatting check and type-check                                          |
+| `bun run format`    | formats every file                                                       |
+| `bun run tui`       | runs the terminal version                                                |
+| `bun run tui:build` | compiles the terminal version to a standalone binary in `dist/`          |
 
 ### How it's built
 
-The app is a static website: every page is plain HTML generated at build time, with a small script adding the interactivity in the browser.
+The app is a static website: the page is rendered to plain HTML at build time, then a script takes over in the browser.
 
-- **Pages** are [Vento](https://vento.js.org/) templates in `src/` (`index.vto` for the home, `add.vto` for the form), shared markup lives in `src/_includes/`.
-- **Interactivity** is handled by [Alpine.js](https://alpinejs.dev/): `src/js/main.ts` is the only script, bundled by Lume with esbuild.
-- **Business logic** (costs math, the store, local storage and the UI components logic) lives in `src/js/lib/` as plain TypeScript with no framework, so it's fully unit tested.
-- **Offline & install**: `src/sw.js` is the service worker. It loads everything from the network first and falls back to the cached copy when offline. At build time `_config.ts` fills in the list of files to precache and a version hashed from the whole site, so every deploy installs a fresh worker. `src/manifest.webmanifest` and the icons in `src/icons/` make the app installable.
-- **Terminal version** lives in `tui/` and uses [deno_tui](https://github.com/Im-Beast/deno_tui) to draw and read the keyboard and mouse. A small declarative layer on top of it (`tui/scene.ts`) redraws only what changed, and the screens reuse the web app's store and component logic from `src/js/lib/`, so both versions behave the same.
-- **Styles** are a single hand-written stylesheet, `src/styles.css`, using modern CSS (cascade layers, `@scope`, nesting, `light-dark()`, `@starting-style`, view transitions) with no framework or preprocessor. Light and dark themes both meet the WCAG 2.1 AA contrast requirements, and animations are disabled when the system asks for reduced motion.
+- **Pages**: [Vue](https://vuejs.org/) single-file components in `src/components/`, bundled by [Vite](https://vite.dev/) from `index.html` and `src/main.ts`. The build also renders the app on the server once (`src/entry-server.ts`, `scripts/prerender.ts`), so the page arrives as plain HTML (`/`, `/add/` and `/edit/`), and the browser app replaces it as soon as it starts.
+- **Business logic** (costs math, the store, local storage and the UI components logic) lives in `src/lib/` as plain TypeScript with no framework, so it's fully unit tested. The Vue components only wire it to the page.
+- **Offline & install**: `public/sw.js` is the service worker. It loads everything from the network first and falls back to the cached copy when offline. After the build, `scripts/prerender.ts` fills in the list of files to precache and a version hashed from the whole site, so every deploy installs a fresh worker. `public/manifest.webmanifest` and the icons in `public/icons/` make the app installable.
+- **Terminal version** lives in `tui/` and runs on Bun. It decodes the keyboard and mouse itself (`tui/input.ts`) and draws with a small renderer (`tui/scene.ts`) that writes only the cells that changed. The screens reuse the web app's store and component logic from `src/lib/`, so both versions behave the same.
+- **Styles** are a single hand-written stylesheet, `public/styles.css`, using modern CSS (cascade layers, `@scope`, nesting, `light-dark()`, `@starting-style`, view transitions) with no framework or preprocessor. Light and dark themes both meet the WCAG 2.1 AA contrast requirements, and animations are disabled when the system asks for reduced motion.
 
 ### Tests & deploy
 
-Unit tests use the built-in [Deno test runner](https://docs.deno.com/runtime/fundamentals/testing/) and live next to the code they test (`*_test.ts` in `src/js/lib/` and `tui/`).
+Unit tests use [Vitest](https://vitest.dev/) and live next to the code they test (`*.test.ts` in `src/`, `src/lib/` and `tui/`).
 
-Every push and pull request runs the format, lint, type-check and test steps on GitHub Actions and builds the site. Pushes to `main` that pass them are then deployed to GitHub Pages.
+Every push and pull request runs the format, type-check and test steps on GitHub Actions and builds the site. Pushes to `main` that pass them are then deployed to GitHub Pages.
 
 ### What has been used
 
-- [Deno](https://deno.com/) - runtime and toolchain (tasks, tests, lint, format, type-check)
-- [Lume](https://lume.land/) - static site generator, builds the pages as plain HTML
-- [Vento](https://vento.js.org/) - templating language used by Lume
-- [Alpine.js](https://alpinejs.dev/) - client side interactivity and state
-- [deno_tui](https://github.com/Im-Beast/deno_tui) - terminal rendering and keyboard/mouse input for the terminal version
+- [Bun](https://bun.sh/) - package manager, script runner and the terminal version's runtime
+- [Vite](https://vite.dev/) - dev server and bundler
+- [Vue](https://vuejs.org/) - client side interactivity and state, and the prerendered HTML
+- [Vitest](https://vitest.dev/) - unit tests
+- [Prettier](https://prettier.io/) and [vue-tsc](https://github.com/vuejs/language-tools) - formatting and type-check
 - [Inter](https://fonts.bunny.net/family/inter) - font, served by the privacy friendly [Bunny Fonts](https://fonts.bunny.net/)
 - [Fraunces](https://fonts.bunny.net/family/fraunces) - serif for headings and figures, also from Bunny Fonts
 - [Lucide](https://lucide.dev/) - icons
 - [uqr](https://github.com/unjs/uqr) - QR code encoder for the share links
 - [Canvas UI Peel](https://canvasui.dev/docs/components/peel) by David Haz - WebGL peel effect behind the add/edit dialog animation (MIT + Commons Clause)
+- [deno_tui](https://github.com/Im-Beast/deno_tui) - the terminal version's input decoder and text width are ported from it (MIT)
 - [GitHub Actions](https://github.com/features/actions) & [GitHub Pages](https://pages.github.com/) - CI and hosting
 
 ### Support

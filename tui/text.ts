@@ -1,8 +1,63 @@
 // Plain-text helpers. Every string drawn on screen is measured in terminal
 // cells, so wide characters (CJK, most emoji) count as two.
-import { textWidth } from "deno_tui/src/utils/strings.ts";
 
-export { textWidth };
+// Cells a character takes, from deno_tui 2.1.11 (src/utils/strings.ts),
+// Copyright 2023 Im-Beast, MIT license, which took it from sindresorhus'
+// is-fullwidth-code-point. It looks at UTF-16 code units: a character
+// outside the BMP (most emoji) counts its two halves, so two cells
+const characterWidth = (character: string): number => {
+  const codePoint = character.charCodeAt(0);
+
+  if (codePoint === 0xd83e || codePoint === 0x200b) return 0;
+
+  if (
+    codePoint >= 0x1100 &&
+    (codePoint <= 0x115f ||
+      codePoint === 0x2329 ||
+      codePoint === 0x232a ||
+      (0x2e80 <= codePoint && codePoint <= 0x3247 && codePoint !== 0x303f) ||
+      (0x3250 <= codePoint && codePoint <= 0x4dbf) ||
+      (0x4e00 <= codePoint && codePoint <= 0xa4c6) ||
+      (0xa960 <= codePoint && codePoint <= 0xa97c) ||
+      (0xac00 <= codePoint && codePoint <= 0xd7a3) ||
+      (0xf900 <= codePoint && codePoint <= 0xfaff) ||
+      (0xfe10 <= codePoint && codePoint <= 0xfe19) ||
+      (0xfe30 <= codePoint && codePoint <= 0xfe6b) ||
+      (0xff01 <= codePoint && codePoint <= 0xff60) ||
+      (0xffe0 <= codePoint && codePoint <= 0xffe6))
+  ) {
+    return 2;
+  }
+
+  return 1;
+};
+
+// The last byte of an escape sequence ("m" in "\x1b[1m")
+const isFinalAnsiByte = (character: string): boolean => {
+  const codePoint = character.charCodeAt(0);
+  return codePoint >= 0x40 && codePoint < 0x70;
+};
+
+// Width in terminal cells, up to the first newline and without escape
+// sequences
+export const textWidth = (text: string): number => {
+  let width = 0;
+  let ansi = false;
+  for (let i = 0; i < text.length; ++i) {
+    const char = text[i]!;
+    if (char === "\x1b") {
+      ansi = true;
+      i += 2;
+    } else if (char === "\n") {
+      break;
+    } else if (!ansi) {
+      width += characterWidth(char);
+    } else if (isFinalAnsiByte(char)) {
+      ansi = false;
+    }
+  }
+  return width;
+};
 
 const segmenter = new Intl.Segmenter();
 
@@ -103,5 +158,5 @@ export const wrapSpans = (spans: Span[], width: number): Span[][] => {
 
 export const wrap = (text: string, width: number): string[] =>
   wrapSpans([{ text }], width).map((line) =>
-    line.map((span) => span.text).join("")
+    line.map((span) => span.text).join(""),
   );

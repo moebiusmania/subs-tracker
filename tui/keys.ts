@@ -1,12 +1,12 @@
-// Turns what deno_tui reads from stdin into the app's keys. One read can hold
-// several keys (fast typing, a paste with a newline, "⌫⌫" held down), which
-// deno_tui reports as a single unknown key.
-import type { KeyPressEvent } from "deno_tui/src/input_reader/types.ts";
+// Turns the key presses decoded from stdin (input.ts) into the app's keys.
+// One read can hold several keys (fast typing, a paste with a newline, "⌫⌫"
+// held down), which the decoder reports as a single unknown key.
+import type { KeyPressEvent } from "./input.ts";
 import type { Key } from "./painter.ts";
 
 type Named = Pick<Key, "key"> & Partial<Pick<Key, "shift" | "ctrl">>;
 
-// Sequences deno_tui's decoder doesn't name (xterm and tmux variants)
+// Sequences the decoder doesn't name (xterm and tmux variants)
 const SEQUENCES: Record<string, Named> = {
   "\x1b[Z": { key: "tab", shift: true },
   "\x1bOA": { key: "up" },
@@ -31,18 +31,15 @@ const CONTROLS: Record<string, Named> = {
 
 const decoder = new TextDecoder();
 
-const make = (
-  event: KeyPressEvent,
-  named: Partial<Key>,
-  typed = "",
-): Key => ({
-  ...event,
-  meta: false,
-  ctrl: false,
-  shift: false,
-  ...named,
-  typed,
-} as Key);
+const make = (event: KeyPressEvent, named: Partial<Key>, typed = ""): Key =>
+  ({
+    ...event,
+    meta: false,
+    ctrl: false,
+    shift: false,
+    ...named,
+    typed,
+  }) as Key;
 
 // deno-lint-ignore no-control-regex
 const CONTROL = /[\x00-\x1f\x7f]/;
@@ -53,8 +50,8 @@ export const toKeys = (event: KeyPressEvent): Key[] => {
   const sequence = SEQUENCES[raw];
   if (sequence) return [make(event, sequence)];
 
-  // Escape sequences, and single keys deno_tui already understood
-  if (raw.startsWith("\x1b") || raw.length <= 1 && CONTROL.test(raw)) {
+  // Escape sequences, and single keys the decoder already understood
+  if (raw.startsWith("\x1b") || (raw.length <= 1 && CONTROL.test(raw))) {
     return [{ ...event, typed: "" }];
   }
   if (!CONTROL.test(raw)) {

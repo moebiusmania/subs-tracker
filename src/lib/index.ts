@@ -1,0 +1,87 @@
+import type { Subscription } from "./types.ts";
+
+const pad = (value: number): string => value.toString().padStart(2, "0");
+
+const formatDate = (value: Date): string =>
+  `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
+
+// Accepts a comma as decimal separator too, as typed with an Italian keyboard.
+// Cents at most
+const parsePrice = (value: string): number | null => {
+  const clean = value.trim().replace(",", ".");
+  if (!/^\d+(\.\d{1,2})?$|^\.\d{1,2}$/.test(clean)) return null;
+  return parseFloat(clean);
+};
+
+// Prices are shown with a decimal comma, whatever the language
+const formatPrice = (value: number, currency = ""): string =>
+  `${value.toString().replace(".", ",")}${currency}`;
+
+const getInactives = (data: Subscription[]): Subscription[] =>
+  data.filter((item: Subscription): boolean => !item.isActive);
+
+const getMonthlyCost = (data: Subscription[]): number => {
+  const value: string = data
+    .filter(
+      (item: Subscription): boolean =>
+        item.isActive && item.recurrence === "monthly",
+    )
+    .map((item: Subscription): number => item.price)
+    .reduce((a: number, b: number): number => a + b, 0)
+    .toFixed(2);
+  return parseFloat(value);
+};
+
+const getYearlyCost = (data: Subscription[]): number => {
+  const value: string = data
+    .filter((item: Subscription): boolean => item.isActive)
+    .map((item: Subscription): number =>
+      item.recurrence === "monthly" ? item.price * 12 : item.price,
+    )
+    .reduce((a: number, b: number): number => a + b, 0)
+    .toFixed(2);
+  return parseFloat(value);
+};
+
+// Expires in the same calendar month as `now` (stored dates are strings)
+const isExpiringThisMonth = (
+  item: Subscription,
+  now: Date = new Date(),
+): boolean => {
+  const date = new Date(item.expiration);
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth()
+  );
+};
+
+// The same day `months` later, on the last day of shorter months
+// (Jan 31 + 1 month = Feb 28)
+const addMonths = (value: Date, months: number): Date => {
+  const date = new Date(value);
+  const day = date.getDate();
+  date.setDate(1);
+  date.setMonth(date.getMonth() + months);
+  const lastDay = new Date(
+    date.getFullYear(),
+    date.getMonth() + 1,
+    0,
+  ).getDate();
+  date.setDate(Math.min(day, lastDay));
+  return date;
+};
+
+const getTranslation = (key: string, value: unknown): string =>
+  key.replace("{{value}}", String(value));
+
+export {
+  addMonths,
+  formatDate,
+  formatPrice,
+  getInactives,
+  getMonthlyCost,
+  getTranslation,
+  getYearlyCost,
+  isExpiringThisMonth,
+  parsePrice,
+};

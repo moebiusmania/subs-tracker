@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "lib": ["ESNext"],
+    "types": ["bun"]
+  },
+  // The TUI shares src/lib with the web app
+  "include": [
+    "vite.config.ts",
+    "scripts/*.ts",
+    "tui/*.ts",
+    "src/lib/**/*.ts",
+    "src/i18n/*.json"
+  ]
+}

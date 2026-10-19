@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   check:
-    name: Lint, type-check, test & build
+    name: Format, type-check, test & build
     runs-on: ubuntu-26.04
 
     steps:
@@ -18,20 +18,22 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: 🦕 Setup Deno
-        uses: denoland/setup-deno@v2
+      - name: 🥟 Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          deno-version: v2.x
-          cache: true
+          bun-version-file: package.json
 
-      - name: 🧹 Format, lint & type-check
-        run: deno task check
+      - name: 📦 Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: 🧹 Format & type-check
+        run: bun run check
 
       - name: 🧪 Run unit tests
-        run: deno task test
+        run: bun run test
 
       - name: 🏗️ Build static website
-        run: deno task build:gh
+        run: bun run build:gh
 
       # The site is built once here and handed to the deploy job as an artifact
       - name: 🚀 Upload Pages artifact

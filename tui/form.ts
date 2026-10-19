@@ -1,12 +1,12 @@
 // Text editing and the add form's rules, kept free of any terminal code so
 // they can be unit tested.
-import type { I18n, Subscription } from "../src/js/lib/types.ts";
+import type { I18n, Subscription } from "../src/lib/types.ts";
 import {
   addMonths,
   formatDate,
   formatPrice,
   parsePrice,
-} from "../src/js/lib/index.ts";
+} from "../src/lib/index.ts";
 
 export { parsePrice };
 
@@ -37,7 +37,8 @@ export const insert = (f: Field, text: string): Field => {
 };
 
 export const backspace = (f: Field): Field => {
-  const previous = boundaries(f.value).filter((index) => index < f.cursor)
+  const previous = boundaries(f.value)
+    .filter((index) => index < f.cursor)
     .pop();
   if (previous === undefined) return f;
   return {
@@ -105,8 +106,9 @@ export const parseDate = (value: string): Date | null => {
   if (!match) return null;
   const [year, month, day] = match.slice(1).map(Number);
   const date = new Date(year, month - 1, day);
-  return date.getFullYear() === year && date.getMonth() === month - 1 &&
-      date.getDate() === day
+  return date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
     ? date
     : null;
 };

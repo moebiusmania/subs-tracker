@@ -1,21 +1,22 @@
 // Where the terminal version keeps its data and which language it starts in.
 // The web app uses localStorage; here the same AppState JSON lives in a file.
-import { dirname, join, resolve } from "@std/path";
-import type { AppState, Locale } from "../src/js/lib/types.ts";
-import { detectLocale } from "../src/js/lib/i18n.ts";
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import type { AppState, Locale } from "../src/lib/types.ts";
+import { detectLocale } from "../src/lib/i18n.ts";
 
 type Env = (name: string) => string | undefined;
 
 // SUBS_TRACKER_DATA overrides the default location:
 // %APPDATA%\subs-tracker\data.json on Windows,
 // $XDG_CONFIG_HOME/subs-tracker/data.json (or ~/.config/…) elsewhere
-export const dataPath = (env: Env, os: typeof Deno.build.os): string => {
+export const dataPath = (env: Env, os: NodeJS.Platform): string => {
   const custom = env("SUBS_TRACKER_DATA");
   if (custom) return resolve(custom);
 
-  if (os === "windows") {
-    const appData = env("APPDATA") ??
-      join(env("USERPROFILE") ?? ".", "AppData", "Roaming");
+  if (os === "win32") {
+    const appData =
+      env("APPDATA") ?? join(env("USERPROFILE") ?? ".", "AppData", "Roaming");
     return join(appData, "subs-tracker", "data.json");
   }
 
@@ -47,9 +48,9 @@ export const resolvePath = (path: string, env: Env): string => {
 export const loadState = (path: string): AppState | null => {
   let text: string;
   try {
-    text = Deno.readTextFileSync(path);
+    text = readFileSync(path, "utf8");
   } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return null;
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
     throw error;
   }
 
@@ -61,16 +62,16 @@ export const loadState = (path: string): AppState | null => {
   } catch {
     // Handled below
   }
-  Deno.renameSync(path, `${path}.bak`);
+  renameSync(path, `${path}.bak`);
   return null;
 };
 
 // Written to a temporary file first, so a crash never leaves half a file
 export const saveState = (path: string, state: AppState): void => {
-  Deno.mkdirSync(dirname(path), { recursive: true });
+  mkdirSync(dirname(path), { recursive: true });
   const temporary = `${path}.tmp`;
-  Deno.writeTextFileSync(temporary, JSON.stringify(state));
-  Deno.renameSync(temporary, path);
+  writeFileSync(temporary, JSON.stringify(state));
+  renameSync(temporary, path);
 };
 
 // POSIX locales ("it_IT.UTF-8", "en_GB:it") as browser-style tags ("it-IT"),
