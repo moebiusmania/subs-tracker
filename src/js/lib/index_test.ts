@@ -6,11 +6,13 @@ const subs = mockSubs();
 import {
   addMonths,
   formatDate,
+  formatPrice,
   getInactives,
   getMonthlyCost,
   getTranslation,
   getYearlyCost,
   isExpiringThisMonth,
+  parsePrice,
 } from "./index.ts";
 
 Deno.test("formatDate", () => {
@@ -83,4 +85,19 @@ Deno.test("addMonths - same day, last day of shorter months", () => {
   assertEquals(formatDate(addMonths(new Date(2026, 0, 31), 1)), "2026-02-28");
   assertEquals(formatDate(addMonths(new Date(2026, 11, 15), 1)), "2027-01-15");
   assertEquals(formatDate(addMonths(new Date(2026, 2, 31), -1)), "2026-02-28");
+});
+
+Deno.test("parsePrice - accepts a decimal comma", () => {
+  assertEquals(parsePrice("12.5"), 12.5);
+  assertEquals(parsePrice("12,5"), 12.5);
+  assertEquals(parsePrice(".5"), 0.5);
+  assertEquals(parsePrice("12a"), null);
+  assertEquals(parsePrice("-3"), null);
+  assertEquals(parsePrice("1.234"), null);
+});
+
+Deno.test("formatPrice - shows a decimal comma", () => {
+  assertEquals(formatPrice(9.99, "€"), "9,99€");
+  assertEquals(formatPrice(5, "€"), "5€");
+  assertEquals(formatPrice(0.5), "0,5");
 });

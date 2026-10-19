@@ -9,7 +9,6 @@ import {
   insert,
   moveCursor,
   parseDate,
-  parsePrice,
   stepDate,
   stepPrice,
   toSubscription,
@@ -60,14 +59,6 @@ Deno.test("parseDate - only real calendar dates", () => {
   assertEquals(parseDate(""), null);
 });
 
-Deno.test("parsePrice - accepts a decimal comma", () => {
-  assertEquals(parsePrice("12.5"), 12.5);
-  assertEquals(parsePrice("12,5"), 12.5);
-  assertEquals(parsePrice(".5"), 0.5);
-  assertEquals(parsePrice("12a"), null);
-  assertEquals(parsePrice("-3"), null);
-});
-
 const values = (overrides: Partial<Record<string, string>> = {}) => ({
   name: field(overrides.name ?? "Netflix"),
   price: field(overrides.price ?? "12.5"),
@@ -112,17 +103,18 @@ Deno.test("toSubscription - builds the item the store saves", () => {
 Deno.test("initialValues - starts from the web form defaults", () => {
   const form = initialValues(subs[1]);
   assertEquals(form.name.value, "Music streaming");
-  assertEquals(form.price.value, "49.99");
+  assertEquals(form.price.value, "49,99");
   assertEquals(form.recurrence, "yearly");
   assertEquals(form.expiration.value.length, 10);
 });
 
 Deno.test("stepPrice - steps by 0.1, never under the minimum", () => {
-  assertEquals(stepPrice("9.99", 1), "10.09");
-  assertEquals(stepPrice("1", -1), "0.9");
+  assertEquals(stepPrice("9.99", 1), "10,09");
+  assertEquals(stepPrice("9,99", -1), "9,89");
+  assertEquals(stepPrice("1", -1), "0,9");
   assertEquals(stepPrice("0.1", -1), "0");
   assertEquals(stepPrice("0.05", -1), "0");
-  assertEquals(stepPrice("", 1), "0.1");
+  assertEquals(stepPrice("", 1), "0,1");
 });
 
 Deno.test("stepDate - days, months and month ends", () => {

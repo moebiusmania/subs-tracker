@@ -530,7 +530,7 @@ export const createTour = (
   label(form, 20, 36, t.add.title, { class: "serif", "font-size": 19 });
   const fields = [
     { name: t.add.name, value: t.tour.video },
-    { name: t.add.price, value: "13.99€" },
+    { name: t.add.price, value: "13,99€" },
     { name: t.add.recurrence, value: t.recurrence.monthly },
   ].map(({ name, value }, index) => {
     const y = 64 + index * 58;
@@ -631,19 +631,19 @@ export const createTour = (
   const cards = [
     {
       name: t.tour.music,
-      price: "10.99€",
+      price: "10,99€",
       recurrence: t.recurrence.monthly,
       tint: "var(--tint-lav)",
     },
     {
       name: t.tour.video,
-      price: "13.99€",
+      price: "13,99€",
       recurrence: t.recurrence.monthly,
       tint: "var(--tint-peach)",
     },
     {
       name: t.tour.cloud,
-      price: "99.99€",
+      price: "99,99€",
       recurrence: t.recurrence.yearly,
       tint: "var(--tint-sky)",
     },
@@ -687,10 +687,10 @@ export const createTour = (
 
   show(stats, 15.1, 0.45, 0.9);
   const monthly = [
-    number(60, "0.00€"),
-    number(60, "10.99€"),
-    number(60, "24.98€"),
-    number(60, "13.99€"),
+    number(60, "0,00€"),
+    number(60, "10,99€"),
+    number(60, "24,98€"),
+    number(60, "13,99€"),
   ];
   swap(monthly[0], 15.3, 15.7);
   swap(monthly[1], 15.75, 16.15);
@@ -730,16 +730,16 @@ export const createTour = (
   );
   pop(stats, 17.3, 1.02);
   const yearly = [
-    number(340, "299.76€"),
-    number(340, "399.75€"),
-    number(340, "267.87€"),
+    number(340, "299,76€"),
+    number(340, "399,75€"),
+    number(340, "267,87€"),
   ];
   swap(yearly[0], 17.6, 18.5);
   swap(yearly[1], 18.55, 29.6);
   swap(yearly[2], 29.65);
   const plus = place(stats, 470, 62);
   hidden(plus);
-  label(plus, 0, 0, "+99.99€", {
+  label(plus, 0, 0, "+99,99€", {
     class: "ember",
     "font-size": 12,
     "font-weight": 600,

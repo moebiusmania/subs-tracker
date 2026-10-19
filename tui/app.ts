@@ -6,7 +6,7 @@
 import type { Store } from "../src/js/lib/store.ts";
 import type { I18n, Locale } from "../src/js/lib/types.ts";
 import { createComponents, type Deps } from "../src/js/lib/components.ts";
-import { getTranslation } from "../src/js/lib/index.ts";
+import { formatPrice, getTranslation } from "../src/js/lib/index.ts";
 import { translations } from "../src/js/lib/i18n.ts";
 import { encodeShare, shareLink, SITE_URL } from "../src/js/lib/transfer.ts";
 import { qrMatrix } from "../src/js/lib/qr.ts";
@@ -1417,7 +1417,7 @@ export class App {
         { text: "▌", style: { fg: pill.bg, bg: fill } },
       ], 2);
 
-      const price = `${item.price}${item.currency}`;
+      const price = formatPrice(item.price, item.currency);
       painter.line(`${id}.price`, column + 2, row + 4, [
         { text: price, style: { fg: p.text, bg: fill, bold: true } },
         { text: " ", style: { bg: fill } },
@@ -1811,7 +1811,7 @@ export class App {
         row: y,
         label: t.add.price,
         field: values.price,
-        placeholder: "10.00",
+        placeholder: "10,00",
         error: message("price"),
         bg,
         controls: [

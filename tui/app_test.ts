@@ -116,7 +116,7 @@ Deno.test("app - the empty state carries the header's controls", () => {
 
 Deno.test("app - dashboard shows the web app's numbers", () => {
   const { texts } = setup({ mock: true });
-  // 229.87€ in big digits
+  // 229,87€ in big digits
   assertStringIncludes(texts(), "┏━┓ ┏━┓ ┏━┓   ┏━┓ ╺━┓ ┏━╸");
   // The description wraps in the tile
   assertStringIncludes(texts(), "with 1 inactive\nsubscriptions");
@@ -184,10 +184,10 @@ Deno.test("app - price and date step with the arrows and buttons", () => {
   press("a");
   press("tab");
   press("up");
-  assertEquals(app.form?.values.price.value, "1.1");
+  assertEquals(app.form?.values.price.value, "1,1");
   click("add.price.control0");
   click("add.price.control0");
-  assertEquals(app.form?.values.price.value, "0.9");
+  assertEquals(app.form?.values.price.value, "0,9");
 
   const today = app.form!.values.expiration.value;
   press("tab");

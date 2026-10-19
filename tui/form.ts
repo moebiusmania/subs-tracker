@@ -1,7 +1,14 @@
 // Text editing and the add form's rules, kept free of any terminal code so
 // they can be unit tested.
 import type { I18n, Subscription } from "../src/js/lib/types.ts";
-import { addMonths, formatDate } from "../src/js/lib/index.ts";
+import {
+  addMonths,
+  formatDate,
+  formatPrice,
+  parsePrice,
+} from "../src/js/lib/index.ts";
+
+export { parsePrice };
 
 // A one-line text input: its value and the cursor position (in UTF-16 units,
 // always on a grapheme boundary)
@@ -85,7 +92,7 @@ export type Errors = Partial<Record<FieldName, keyof I18n["tui"]>>;
 // Same defaults as the web form (components.addForm)
 export const initialValues = (item: Subscription): FormValues => ({
   name: field(item.name),
-  price: field(item.price.toString()),
+  price: field(formatPrice(item.price)),
   expiration: field(formatDate(new Date(item.expiration))),
   recurrence: item.recurrence,
   isActive: item.isActive,
@@ -104,15 +111,7 @@ export const parseDate = (value: string): Date | null => {
     : null;
 };
 
-// Accepts a comma as decimal separator too, as typed with an Italian keyboard.
-// Cents at most, like the web input's step="0.01"
-export const parsePrice = (value: string): number | null => {
-  const clean = value.trim().replace(",", ".");
-  if (!/^\d+(\.\d{1,2})?$|^\.\d{1,2}$/.test(clean)) return null;
-  return parseFloat(clean);
-};
-
-// The web form's price input has min="0": free subscriptions are allowed
+// Free subscriptions are allowed
 export const MIN_PRICE = 0;
 
 export const validate = (values: FormValues): Errors => {
@@ -142,12 +141,11 @@ export const toSubscription = (
   recurrence: values.recurrence,
 });
 
-// Up/down on the price by 0.1 (the web input steps by its step="0.01",
-// too slow from the keyboard)
+// Up/down on the price by 0.1
 export const stepPrice = (value: string, direction: 1 | -1): string => {
   const price = parsePrice(value) ?? 0;
   const next = Math.max(MIN_PRICE, price + direction * 0.1);
-  return parseFloat(next.toFixed(2)).toString();
+  return formatPrice(parseFloat(next.toFixed(2)));
 };
 
 // Up/down on the date, by one day (by a month with PageUp/PageDown).

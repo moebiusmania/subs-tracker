@@ -3,11 +3,13 @@ import { MAX_SUBSCRIPTIONS, type Store } from "./store.ts";
 import {
   addMonths,
   formatDate,
+  formatPrice,
   getInactives,
   getMonthlyCost,
   getTranslation,
   getYearlyCost,
   isExpiringThisMonth,
+  parsePrice,
 } from "./index.ts";
 import {
   decodeShare,
@@ -147,10 +149,10 @@ export const createComponents = (deps: Deps) => {
         );
       },
       get monthly(): string {
-        return `${getMonthlyCost(app().data)}€`;
+        return formatPrice(getMonthlyCost(app().data), "€");
       },
       get yearly(): string {
-        return `${getYearlyCost(app().data)}€`;
+        return formatPrice(getYearlyCost(app().data), "€");
       },
     }),
 
@@ -168,6 +170,9 @@ export const createComponents = (deps: Deps) => {
         statusLabel(item: Subscription): string {
           const toggle = getTranslation(app().i18n.main.toggle, item.name);
           return `${this.status(item)}, ${toggle}`;
+        },
+        price(item: Subscription): string {
+          return formatPrice(item.price, item.currency);
         },
         recurrence(item: Subscription): string {
           return app().i18n.recurrence[item.recurrence];
@@ -395,6 +400,8 @@ export const createComponents = (deps: Deps) => {
     addForm: () => ({
       item: newItem(),
       formatDate,
+      formatPrice,
+      parsePrice,
       init(): void {
         if (!app().canAdd) deps.closeForm();
       },
@@ -417,6 +424,8 @@ export const createComponents = (deps: Deps) => {
           ? { ...saved, expiration: new Date(saved.expiration) }
           : newItem(),
         formatDate,
+        formatPrice,
+        parsePrice,
         init(): void {
           if (!this.found) deps.closeForm();
         },

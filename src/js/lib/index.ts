@@ -5,6 +5,18 @@ const pad = (value: number): string => value.toString().padStart(2, "0");
 const formatDate = (value: Date): string =>
   `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
 
+// Accepts a comma as decimal separator too, as typed with an Italian keyboard.
+// Cents at most
+const parsePrice = (value: string): number | null => {
+  const clean = value.trim().replace(",", ".");
+  if (!/^\d+(\.\d{1,2})?$|^\.\d{1,2}$/.test(clean)) return null;
+  return parseFloat(clean);
+};
+
+// Prices are shown with a decimal comma, whatever the language
+const formatPrice = (value: number, currency = ""): string =>
+  `${value.toString().replace(".", ",")}${currency}`;
+
 const getInactives = (data: Subscription[]): Subscription[] =>
   data.filter((item: Subscription): boolean => !item.isActive);
 
@@ -61,9 +73,11 @@ const getTranslation = (key: string, value: any): string =>
 export {
   addMonths,
   formatDate,
+  formatPrice,
   getInactives,
   getMonthlyCost,
   getTranslation,
   getYearlyCost,
   isExpiringThisMonth,
+  parsePrice,
 };

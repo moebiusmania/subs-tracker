@@ -111,7 +111,7 @@
                   </button>
                 </div>
               </div>
-              <p class="sub-card__price" x-text="item.price + item.currency"></p>
+              <p class="sub-card__price" x-text="price(item)"></p>
               <div class="sub-card__bottom">
                 <p class="sub-card__expires">
                   {{ include "partials/icon.vto" { name: "calendar" } }}

@@ -181,8 +181,8 @@ Deno.test("dashboard - computes totals from the store", () => {
 
   assertEquals(dashboard.total, 4);
   assertEquals(dashboard.inactives, "with 1 inactive subscriptions");
-  assertEquals(dashboard.monthly, "14.99€");
-  assertEquals(dashboard.yearly, "229.87€");
+  assertEquals(dashboard.monthly, "14,99€");
+  assertEquals(dashboard.yearly, "229,87€");
 });
 
 Deno.test("dashboard - reacts to store changes", () => {
